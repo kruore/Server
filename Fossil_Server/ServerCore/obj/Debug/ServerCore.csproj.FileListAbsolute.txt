@@ -1,0 +1,7 @@
+C:\Users\epsel\source\repos\Fossil_Server\ServerCore\bin\Debug\ServerCore.exe.config
+C:\Users\epsel\source\repos\Fossil_Server\ServerCore\bin\Debug\ServerCore.exe
+C:\Users\epsel\source\repos\Fossil_Server\ServerCore\bin\Debug\ServerCore.pdb
+C:\Users\epsel\source\repos\Fossil_Server\ServerCore\obj\Debug\ServerCore.csprojAssemblyReference.cache
+C:\Users\epsel\source\repos\Fossil_Server\ServerCore\obj\Debug\ServerCore.csproj.CoreCompileInputs.cache
+C:\Users\epsel\source\repos\Fossil_Server\ServerCore\obj\Debug\ServerCore.exe
+C:\Users\epsel\source\repos\Fossil_Server\ServerCore\obj\Debug\ServerCore.pdb

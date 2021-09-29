@@ -1,0 +1,7 @@
+C:\Users\epsel\source\repos\Fossil_Server\DummyClient\bin\Debug\DummyClient.exe.config
+C:\Users\epsel\source\repos\Fossil_Server\DummyClient\bin\Debug\DummyClient.exe
+C:\Users\epsel\source\repos\Fossil_Server\DummyClient\bin\Debug\DummyClient.pdb
+C:\Users\epsel\source\repos\Fossil_Server\DummyClient\obj\Debug\DummyClient.csprojAssemblyReference.cache
+C:\Users\epsel\source\repos\Fossil_Server\DummyClient\obj\Debug\DummyClient.csproj.CoreCompileInputs.cache
+C:\Users\epsel\source\repos\Fossil_Server\DummyClient\obj\Debug\DummyClient.exe
+C:\Users\epsel\source\repos\Fossil_Server\DummyClient\obj\Debug\DummyClient.pdb
