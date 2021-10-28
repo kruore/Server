@@ -12,7 +12,6 @@ namespace DummyClient
     {
         static void Main(string[] args)
         {
-
             string host = Dns.GetHostName();
             IPHostEntry iphost = Dns.GetHostEntry(host);
             //트래픽이 큰 경우 해당 사이트에 많은 주소값이 들어갈 수 도 있다.
@@ -23,7 +22,7 @@ namespace DummyClient
             // ID를 찾아내면 해당 주소로 이름을 찾아내게 한다.-> 관리가 쉽다. 융통성있게...
 
             //휴대폰 설정
-            Socket socket = new Socket(endPoint.AddressFamily,SocketType.Stream,ProtocolType.Tcp);
+            Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
 
             try
@@ -32,9 +31,13 @@ namespace DummyClient
                 Console.WriteLine($"Connected to {socket.RemoteEndPoint.ToString()}");
 
 
-                //보낸다.
-                byte[] sendBuff = Encoding.UTF8.GetBytes("Hello World");
-                int sendBytes = socket.Send(sendBuff);
+
+                for(int i=0;i<10000; i++)
+                {
+                    byte[] sendBuff = Encoding.UTF8.GetBytes("Hello World");
+                    int sendBytes = socket.Send(sendBuff);
+                }
+             
 
                 //받는다.
                 byte[] recvBuff = new byte[1024];
@@ -50,7 +53,8 @@ namespace DummyClient
             {
                 Console.WriteLine(e);
             }
-         
+
         }
+
     }
 }

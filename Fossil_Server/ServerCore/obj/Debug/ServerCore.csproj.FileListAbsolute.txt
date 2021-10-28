@@ -5,3 +5,10 @@ C:\Users\epsel\source\repos\Fossil_Server\ServerCore\obj\Debug\ServerCore.csproj
 C:\Users\epsel\source\repos\Fossil_Server\ServerCore\obj\Debug\ServerCore.csproj.CoreCompileInputs.cache
 C:\Users\epsel\source\repos\Fossil_Server\ServerCore\obj\Debug\ServerCore.exe
 C:\Users\epsel\source\repos\Fossil_Server\ServerCore\obj\Debug\ServerCore.pdb
+E:\GITHUB\Server\Fossil_Server\ServerCore\bin\Debug\ServerCore.exe.config
+E:\GITHUB\Server\Fossil_Server\ServerCore\bin\Debug\ServerCore.exe
+E:\GITHUB\Server\Fossil_Server\ServerCore\bin\Debug\ServerCore.pdb
+E:\GITHUB\Server\Fossil_Server\ServerCore\obj\Debug\ServerCore.csprojAssemblyReference.cache
+E:\GITHUB\Server\Fossil_Server\ServerCore\obj\Debug\ServerCore.csproj.CoreCompileInputs.cache
+E:\GITHUB\Server\Fossil_Server\ServerCore\obj\Debug\ServerCore.exe
+E:\GITHUB\Server\Fossil_Server\ServerCore\obj\Debug\ServerCore.pdb
