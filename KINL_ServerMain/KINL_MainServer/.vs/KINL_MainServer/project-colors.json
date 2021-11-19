@@ -1,0 +1,26 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "fce3a621-0aa1-4786-8878-bd42ab696138": {
+      "ProjectGuid": "fce3a621-0aa1-4786-8878-bd42ab696138",
+      "DisplayName": "KINL_MainServer",
+      "ColorIndex": 0
+    },
+    "c82dc857-969f-4792-8a78-fb0c93b376a4": {
+      "ProjectGuid": "c82dc857-969f-4792-8a78-fb0c93b376a4",
+      "DisplayName": "KINL_ServerCore",
+      "ColorIndex": 1
+    },
+    "db2b52dd-4c4c-4ee2-93d2-4c097cf8380b": {
+      "ProjectGuid": "db2b52dd-4c4c-4ee2-93d2-4c097cf8380b",
+      "DisplayName": "KINL_DummyClient",
+      "ColorIndex": 2
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "기타 파일",
+      "ColorIndex": -1
+    }
+  },
+  "NextColorIndex": 3
+}

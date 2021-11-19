@@ -1,0 +1,15 @@
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\bin\Debug\net6.0\KINL_MainServer.exe
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\bin\Debug\net6.0\KINL_MainServer.deps.json
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\bin\Debug\net6.0\KINL_MainServer.runtimeconfig.json
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\bin\Debug\net6.0\KINL_MainServer.dll
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\bin\Debug\net6.0\ref\KINL_MainServer.dll
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\bin\Debug\net6.0\KINL_MainServer.pdb
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\obj\Debug\net6.0\KINL_MainServer.csproj.AssemblyReference.cache
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\obj\Debug\net6.0\KINL_MainServer.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\obj\Debug\net6.0\KINL_MainServer.AssemblyInfoInputs.cache
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\obj\Debug\net6.0\KINL_MainServer.AssemblyInfo.cs
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\obj\Debug\net6.0\KINL_MainServer.csproj.CoreCompileInputs.cache
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\obj\Debug\net6.0\KINL_MainServer.dll
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\obj\Debug\net6.0\ref\KINL_MainServer.dll
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\obj\Debug\net6.0\KINL_MainServer.pdb
+C:\Users\epsel\source\repos\KINL_MainServer\KINL_MainServer\obj\Debug\net6.0\KINL_MainServer.genruntimeconfig.cache

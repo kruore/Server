@@ -28,7 +28,6 @@ namespace ServerCore
             //손님 입장
             Socket clientSocket = _socket.Accept();
 
-
             try
             {
                 while (true)
