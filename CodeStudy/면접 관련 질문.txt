@@ -1,0 +1,77 @@
+C++ 
+
+
+부모 클래스 소멸자를 virtual 로 만들지 않으면?
+전방 선언이 필요한 이유
+new/ delete 짝이 안 맞으면?
+함수 호출 Stack Frame 관련
+버퍼 오버플로우?
+스마트 포인터? = 중요
+
+스마트 포인터 사이클 해결 방법
+
+
+뻔한 C++...?
+
+
+
+자료구조 / 알고리즘
+
+Vector / List의 차이
+Vector Reserve 하는 이유
+Map HashMpaa 차이
+레드 블랙 트리
+우선순위 큐
+이진 탐색 시간 복잡도 이유
+병합 정렬
+
+
+운영 체제
+가상 메모리 
+Page Fault?
+페이징
+컨텍스트 스위칭
+
+멀티스레드
+
+스레드와 프로세스 차이
+스레드를 너무 많이 만들면 안될까?
+스핀락 데드락
+데드락 해결방법
+Lock Free Queue AbA?
+Atyomic 메모리 모델
+
+
+데이터 베이스
+
+Union vs Union All
+Clustered vs Non-Clustered Index
+Join
+NoSQL(Redis?)
+
+
+네트워크 / 보안
+
+TCP vs UDP
+IOCP 관련
+동기 vs 비동기 함수
+대칭키 vs 비대칭 키
+
+보안 관련으로도 질문을 하는 경우가 있다.
+
+
+그래픽스
+
+렌더링 파이프
+DirectX ? OpenGL?
+그림자 어떻게 했냐
+Diffuse vs Ambient vs Specular
+Tanget Space
+Double Buffering
+
+수학/ 퀴즈
+
+내적/ 외적 계산 관련
+삼각함수 계산 관련
+동력학 계산 관련
+1~6 나오는 주사위를 굴려서 1~18 주사위를 만드려면?
