@@ -9,6 +9,13 @@ public enum DataType
 {
     Text, Image, Video
 }
+public class Knight
+{
+    public int Hp =10;
+    public int Hp2 = 100;
+    public string name = "Hello World";
+}
+
 
 namespace _KINLAB
 {
@@ -17,9 +24,11 @@ namespace _KINLAB
         public override void OnConnected(EndPoint _endPoint)
         {
             Console.WriteLine($"OnConnected : {_endPoint}");
-            byte[] sendBuff = Encoding.UTF8.GetBytes("Welcome to Server");
-            Send(sendBuff);
+            Knight a = new Knight() { Hp= 10, Hp2 = 100, name = "Hello World"};
+            ArraySegment<byte> openSegment=SendBufferHelper.Open(4096);
+            byte[] sendBuff = BitConverter.GetBytes(a.Hp2);
 
+            Send(sendBuff);
             Thread.Sleep(1000);
             Disconnect();
         }
@@ -28,10 +37,11 @@ namespace _KINLAB
             Console.WriteLine($"OnDisconnected : {endPoint}");
         }
 
-        public override void OnRecv(ArraySegment<byte> buffer)
+        public override int OnRecv(ArraySegment<byte> _buffer)
         {
-            string recvData = Encoding.UTF8.GetString(buffer.Array, buffer.Offset, buffer.Count);
+            string recvData = Encoding.UTF8.GetString(_buffer.Array, _buffer.Offset, _buffer.Count);
             Console.WriteLine($"From Client : { recvData }");
+            return recvData.Length;
         }
 
         public override void OnSend(int numOfBytes)

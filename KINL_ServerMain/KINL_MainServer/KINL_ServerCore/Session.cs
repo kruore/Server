@@ -16,8 +16,7 @@ namespace KINL_ServerCore
         
         RecvBuffer _recvBuffer = new RecvBuffer(1024);
 
-
-        Queue<byte[]> _sendQueue = new Queue<byte[]>();
+        Queue<ArraySegment<byte>> _sendQueue = new Queue<ArraySegment<byte>>();
         Queue<byte[]> _recvQueue = new Queue<byte[]>();
 
         object _lock = new object();
@@ -28,7 +27,7 @@ namespace KINL_ServerCore
         SocketAsyncEventArgs _recvArgs = new SocketAsyncEventArgs();
 
         public abstract void OnConnected(EndPoint _endPoint);
-        public abstract void OnRecv(ArraySegment<byte> buffer);
+        public abstract int OnRecv(ArraySegment<byte> buffer);
         public abstract void OnSend(int numOfBytes);
         public abstract void OnDisconnected(EndPoint endPoint);
 
@@ -41,7 +40,7 @@ namespace KINL_ServerCore
             _recvArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnRecvCompleted);
 
             //recvArgs.UserToken = _socket.RemoteEndPoint;
-            _recvArgs.SetBuffer(new byte[1024], 0, 1024);
+            //_recvArgs.SetBuffer(new byte[1024], 0, 1024);
 
             //콜백 
             _sendArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnSendCompleted);
@@ -73,8 +72,8 @@ namespace KINL_ServerCore
 
             while (_sendQueue.Count > 0)
             {
-                byte[] buff = _sendQueue.Dequeue();
-                _pendingList.Add(new ArraySegment<byte>(buff, 0, buff.Length));
+                ArraySegment<byte> buff = _sendQueue.Dequeue();
+                _pendingList.Add(buff);
             }
 
             _sendArgs.BufferList = _pendingList;
@@ -120,7 +119,6 @@ namespace KINL_ServerCore
                 return;
             }
             OnDisconnected(_socket.RemoteEndPoint);
-
             _socket.Shutdown(SocketShutdown.Both);
             _socket.Close();
         }
@@ -128,6 +126,9 @@ namespace KINL_ServerCore
         void RegisterRecv(SocketAsyncEventArgs args)
         {
             args.AcceptSocket = null;
+            _recvBuffer.Clean();
+            ArraySegment<byte> segment = _recvBuffer.WriteSegment;
+            _recvArgs.SetBuffer(segment.Array, segment.Offset, segment.Count);
 
             bool pending = _socket.ReceiveAsync(args);
             if (pending == false)
@@ -142,7 +143,26 @@ namespace KINL_ServerCore
             {
                 try
                 {
-                    OnRecv(new ArraySegment<byte>(args.Buffer, args.Offset, args.BytesTransferred));
+                    //Write 커서 이동
+                    if(_recvBuffer.OnWrite(args.BytesTransferred)==false)
+                    {
+                        Disconnect();
+                        return;
+                    }
+                    // Data Send
+                    
+                    int processLen =  OnRecv(_recvBuffer.ReadSegment);
+                    if (processLen < 0 || _recvBuffer.DataSize < processLen)
+                    {
+                        Disconnect();
+                        return; 
+                    }
+
+                    if (_recvBuffer.OnRead(processLen) == false)
+                    {
+                        Disconnect();
+                        return;
+                    }
                     //string recvData = Encoding.UTF8.GetString(args.Buffer, args.Offset, args.BytesTransferred);
                     //Console.WriteLine($"From Client : { recvData }");
                     //// TODO
