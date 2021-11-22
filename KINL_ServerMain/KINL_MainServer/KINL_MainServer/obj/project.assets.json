@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\epsel\\source\\repos\\KINL_MainServer\\KINL_MainServer\\KINL_MainServer.csproj",
+      "projectUniqueName": "D:\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_MainServer\\KINL_MainServer.csproj",
       "projectName": "KINL_MainServer",
-      "projectPath": "C:\\Users\\epsel\\source\\repos\\KINL_MainServer\\KINL_MainServer\\KINL_MainServer.csproj",
+      "projectPath": "D:\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_MainServer\\KINL_MainServer.csproj",
       "packagesPath": "C:\\Users\\epsel\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\epsel\\source\\repos\\KINL_MainServer\\KINL_MainServer\\obj\\",
+      "outputPath": "D:\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_MainServer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

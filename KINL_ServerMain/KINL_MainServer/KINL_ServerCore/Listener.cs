@@ -11,12 +11,14 @@ namespace KINL_ServerCore
     class Listener
     {
         Socket _listenSocket;
-        Action<Socket> _onAcceptHandler;
+        //해당 작업 변경
+        //Action<Socket> _onAcceptHandler;
+        Func<Session> _sessionFactory;
 
-        public void InitListener(IPEndPoint ipEndPoint,Action<Socket> onAcceptHandler)
+        public void InitListener(IPEndPoint ipEndPoint, Func<Session> sessionFactory)
         {
             _listenSocket = new Socket(ipEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            _onAcceptHandler += onAcceptHandler;
+            _sessionFactory += sessionFactory;
 
             _listenSocket.Bind(ipEndPoint);
 
@@ -56,7 +58,10 @@ namespace KINL_ServerCore
             {
                 // TODO
                 // 콜백으로 던져준다.
-                _onAcceptHandler.Invoke(args.AcceptSocket);
+                Session session = _sessionFactory.Invoke();
+                session.Start_Session(args.AcceptSocket);
+                session.OnConnected(args.AcceptSocket.RemoteEndPoint);
+                //_onAcceptHandler.Invoke(args.AcceptSocket);
             }
             else
             {

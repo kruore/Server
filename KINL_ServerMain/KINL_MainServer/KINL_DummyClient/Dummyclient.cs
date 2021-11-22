@@ -27,7 +27,7 @@ namespace _KINL_DummyClient
                     socket.Connect(ipEndPoint);
                     Console.WriteLine($"Connect To {socket.RemoteEndPoint.ToString()}");
 
-                    for(int i = 0; i< 10; i++)
+                    for(int i = 0; i< 1000; i++)
                     {
                         byte[] sendBuff = Encoding.UTF8.GetBytes($"Hello? : {i}");
                         int sendByte = socket.Send(sendBuff);
