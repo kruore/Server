@@ -13,9 +13,7 @@ C:\Users\epsel\source\repos\KINL_MainServer\KINL_ServerCore\obj\Debug\net6.0\KIN
 C:\Users\epsel\source\repos\KINL_MainServer\KINL_ServerCore\obj\Debug\net6.0\ref\KINL_ServerCore.dll
 C:\Users\epsel\source\repos\KINL_MainServer\KINL_ServerCore\obj\Debug\net6.0\KINL_ServerCore.pdb
 C:\Users\epsel\source\repos\KINL_MainServer\KINL_ServerCore\obj\Debug\net6.0\KINL_ServerCore.genruntimeconfig.cache
-D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_ServerCore\bin\Debug\net6.0\KINL_ServerCore.exe
 D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_ServerCore\bin\Debug\net6.0\KINL_ServerCore.deps.json
-D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_ServerCore\bin\Debug\net6.0\KINL_ServerCore.runtimeconfig.json
 D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_ServerCore\bin\Debug\net6.0\KINL_ServerCore.dll
 D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_ServerCore\bin\Debug\net6.0\ref\KINL_ServerCore.dll
 D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_ServerCore\bin\Debug\net6.0\KINL_ServerCore.pdb
@@ -27,4 +25,3 @@ D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_ServerCore\obj\Debug\net6.
 D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_ServerCore\obj\Debug\net6.0\KINL_ServerCore.dll
 D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_ServerCore\obj\Debug\net6.0\ref\KINL_ServerCore.dll
 D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_ServerCore\obj\Debug\net6.0\KINL_ServerCore.pdb
-D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_ServerCore\obj\Debug\net6.0\KINL_ServerCore.genruntimeconfig.cache

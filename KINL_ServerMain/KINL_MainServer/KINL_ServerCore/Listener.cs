@@ -8,7 +8,7 @@ using System.Net;
 
 namespace KINL_ServerCore
 {
-    class Listener
+    public class Listener
     {
         Socket _listenSocket;
         //해당 작업 변경

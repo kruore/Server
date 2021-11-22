@@ -7,14 +7,27 @@
   "targets": {
     ".NETCoreApp,Version=v6.0": {
       "KINL_DummyClient/1.0.0": {
+        "dependencies": {
+          "KINL_ServerCore": "1.0.0"
+        },
         "runtime": {
           "KINL_DummyClient.dll": {}
+        }
+      },
+      "KINL_ServerCore/1.0.0": {
+        "runtime": {
+          "KINL_ServerCore.dll": {}
         }
       }
     }
   },
   "libraries": {
     "KINL_DummyClient/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "KINL_ServerCore/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

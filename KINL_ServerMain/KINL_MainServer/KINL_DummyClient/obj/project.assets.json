@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net6.0": {}
+    "net6.0": {
+      "KINL_ServerCore/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/KINL_ServerCore.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/KINL_ServerCore.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "KINL_ServerCore/1.0.0": {
+      "type": "project",
+      "path": "../KINL_ServerCore/KINL_ServerCore.csproj",
+      "msbuildProject": "../KINL_ServerCore/KINL_ServerCore.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net6.0": []
+    "net6.0": [
+      "KINL_ServerCore >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\epsel\\.nuget\\packages\\": {},
@@ -38,7 +57,11 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_ServerCore\\KINL_ServerCore.csproj": {
+              "projectPath": "D:\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_ServerCore\\KINL_ServerCore.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

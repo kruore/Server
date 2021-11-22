@@ -28,3 +28,6 @@ D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_DummyClient\obj\Debug\net6
 D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_DummyClient\obj\Debug\net6.0\ref\KINL_DummyClient.dll
 D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_DummyClient\obj\Debug\net6.0\KINL_DummyClient.pdb
 D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_DummyClient\obj\Debug\net6.0\KINL_DummyClient.genruntimeconfig.cache
+D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_DummyClient\bin\Debug\net6.0\KINL_ServerCore.dll
+D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_DummyClient\bin\Debug\net6.0\KINL_ServerCore.pdb
+D:\GitHub\Server\KINL_ServerMain\KINL_MainServer\KINL_DummyClient\obj\Debug\net6.0\KINL_DummyClient.csproj.CopyComplete

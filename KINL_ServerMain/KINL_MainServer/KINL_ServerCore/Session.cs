@@ -9,10 +9,13 @@ using System.Net.Sockets;
 namespace KINL_ServerCore
 {
 
-    abstract class Session
+    public abstract class Session
     {
         Socket _socket;
         int _disconnected = 0;
+        
+        RecvBuffer _recvBuffer = new RecvBuffer(1024);
+
 
         Queue<byte[]> _sendQueue = new Queue<byte[]>();
         Queue<byte[]> _recvQueue = new Queue<byte[]>();
