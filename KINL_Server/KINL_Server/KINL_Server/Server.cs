@@ -6,54 +6,72 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 
-public enum DataType
+namespace KINL_Server
 {
-    Text = 0, File = 1, Image = 2, Video = 3
-}
 
-class Server
-{
-    public Server()
+    public enum DataType
     {
-        AsyncServerStart();
+        Text = 0, File = 1, Image = 2, Video = 3
     }
-    
-    private void AsyncServerStart()
+    class Server
     {
-        int port = 4545;
-        TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
-        listener.Start(); 
-        Console.WriteLine("서버를 시작합니다. 접속 대기중");
-
-        TcpClient acceptClient = listener.AcceptTcpClient();
-        Console.WriteLine("클라이언트 접속성공.");
-
-        ClientData clientData = new ClientData(acceptClient);
-
-
-        while (true)
+        public Server()
         {
+            AsyncServerStart();
+        }
+
+        private void AsyncServerStart()
+        {
+            int port = 4545;
+            TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
+            
+            listener.Start();
+            Console.WriteLine("서버를 시작합니다. 접속 대기중");
+
             TcpClient acceptClient = listener.AcceptTcpClient();
-            ClientData 
+            Console.WriteLine("클라이언트 접속성공.");
+
+            ClientData clientData = new ClientData(acceptClient);
+
+            clientData.client.GetStream().BeginRead(clientData.readByteData, 0, clientData.readByteData.Length, new AsyncCallback(DataReceived), clientData);
+
+            while (true)
+            {
+                TcpClient acceptClient = listener.AcceptTcpClient();
+                ClientData clientData = new ClientData(acceptClient);
+                
+                clientData.client.GetStream().BeginRead(clientData.readByteData, 0, clientData.readByteData.Length, new AsyncCallback(DataReceived), clientData);
+            }
         }
-    }
 
-    static void Main(string[] args)
-    {
-
-        string host = Dns.GetHostName();
-
-        // Port Define 4545
-        int portNum = 4545;
-
-
-        IPEndPoint iPEndPoint = new IPEndPoint(iPAddress, portNum);
-        Console.WriteLine($" Server Open : Host IP = {iPAddress} ");
-
-        while (true)
+        public void DataReceived(IAsyncResult ar)
         {
-            ;
-        }
-    }
+            ClientData callbackClient = ar.AsyncState as ClientData;
+            int bytesRead = callbackClient.client.GetStream().EndRead(ar);
 
+            string readString = Encoding.Default.GetString(callbackClient.readByteData, 0, bytesRead);
+
+            callbackClient.client.GetStream().BeginRead(callbackClient.readByteData, 0, callbackClient.readByteData.Length, new AsyncCallback(DataReceived), callbackClient);
+
+        }
+
+        static void Main(string[] args)
+        {
+            Server server = new Server();
+            string host = Dns.GetHostName();
+            Console.WriteLine($"Host : {host}");
+
+            // Port Define 4545
+            int portNum = 4545;
+            IPAddress iPAddress = IPAddress.Parse("210.94.216.195");
+            IPEndPoint iPEndPoint = new IPEndPoint(iPAddress, portNum);
+            Console.WriteLine($" Server Open : Host IP = {iPAddress},{portNum} ");
+
+            while (true)
+            {
+                ;
+            }
+        }
+
+    }
 }
