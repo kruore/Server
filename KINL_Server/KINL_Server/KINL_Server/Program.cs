@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Sockets;
 
 namespace KINL_Server
 {
@@ -10,7 +12,8 @@ namespace KINL_Server
     {
         static void Main(string[] args)
         {
-            Server server = new Server();  
+            MainServer a =new MainServer();
+            a.ConsoleView();
         }
     }
 }
