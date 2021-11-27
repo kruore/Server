@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "thyO27wvN9CJOqS4zswMag7htfB5S4PJYLjFqBonajLu9etK6ZE3TJ4APREKuxgxGx/k4YbtOua8Qe3mCxaHHg==",
+  "dgSpecHash": "3UpvpP1vZcWy3RGgRfPav4Z9G+V8OFYIVbs6kWynh0OP75CpS8wmreaj5eYeyuIGlHNNLHHgfOZZnBf9mqYxtA==",
   "success": true,
-  "projectFilePath": "D:\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_DummyClient\\KINL_DummyClient.csproj",
+  "projectFilePath": "C:\\Users\\kruore\\Documents\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_DummyClient\\KINL_DummyClient.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
