@@ -32,6 +32,7 @@ namespace KINL_ServerCore
             //    args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted);
             //    RegisterAccept(args);
             //}
+
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
             args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted);
             RegisterAccept(args);

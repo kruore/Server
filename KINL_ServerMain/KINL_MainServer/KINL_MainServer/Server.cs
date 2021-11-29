@@ -53,20 +53,7 @@ namespace _KINLAB
     {
         static Listener _listener = new Listener();
 
-        //static void OnAcceptHandler(Socket clientSocket)
-        //{
-        //    try
-        //    {
-        //        //   Session session = new Session();
-        //        var session = new ServerSession();
-        //        session.Start_Session(clientSocket);
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex.ToString());
-        //    }
-        //}
         static void Main(string[] args)
         {
             string host = Dns.GetHostName();

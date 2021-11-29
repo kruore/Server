@@ -1,13 +1,13 @@
 {
   "Version": 1,
   "ProjectMap": {
-    "525fcc1e-7ece-4671-8993-306c5807ca9c": {
-      "ProjectGuid": "525fcc1e-7ece-4671-8993-306c5807ca9c",
+    "bea2aa83-91f3-4cd2-84d0-99674d2a7e05": {
+      "ProjectGuid": "bea2aa83-91f3-4cd2-84d0-99674d2a7e05",
       "DisplayName": "KINL_Server",
       "ColorIndex": 0
     },
-    "21687fb8-fb66-4041-9022-88ed4b187a47": {
-      "ProjectGuid": "21687fb8-fb66-4041-9022-88ed4b187a47",
+    "a8c4f136-b886-408c-bdf0-add91a6ad8bb": {
+      "ProjectGuid": "a8c4f136-b886-408c-bdf0-add91a6ad8bb",
       "DisplayName": "DummyClient",
       "ColorIndex": 1
     },
