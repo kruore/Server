@@ -10,15 +10,13 @@ namespace KINL_Server
 {
     class Session
     {
-
         Socket _socket;
         int _disconnect = 0;
 
         object _lock = new object();
-        bool _pending = false;
 
         Queue<byte[]> _sendQueue = new Queue<byte[]>();
-
+        List<ArraySegment<byte>> _pendingLists = new List<ArraySegment<byte>>();
         SocketAsyncEventArgs _sendArgs = new SocketAsyncEventArgs();
         SocketAsyncEventArgs _recvArgs = new SocketAsyncEventArgs();
         public void Start(Socket socket)
@@ -37,7 +35,7 @@ namespace KINL_Server
             lock (_lock)
             {
                 _sendQueue.Enqueue(sendBuff);
-                if (_pending == false)
+                if (_pendingLists.Count == 0)
                 {
                     RegisterSend();
                 }
@@ -46,17 +44,17 @@ namespace KINL_Server
 
         void RegisterSend()
         {
-            _pending = true;
+            _pendingLists.Clear();
 
-            while(_sendQueue.Count>0)
+            while (_sendQueue.Count>0)
             {
                 byte[] buff = _sendQueue.Dequeue();
-                _sendArgs.BufferList.Add(new ArraySegment<byte>(buff, 0, buff.Length));
+                //_sendArgs.SetBuffer(buff, 0,buff.Length);
+                _pendingLists.Add(new ArraySegment<byte>(buff, 0, buff.Length));
             }
-
-
+            _sendArgs.BufferList = _pendingLists;
             bool pending = _socket.SendAsync(_sendArgs);
-            if (pending)
+            if (pending == false)
                 OnSendCompleted(null, _sendArgs);
         }
         void OnSendCompleted(object sender, SocketAsyncEventArgs args)
@@ -67,15 +65,14 @@ namespace KINL_Server
                 {
                     try
                     {
+                        _sendArgs.BufferList = null;
+                        _pendingLists.Clear();
+                        Console.WriteLine($"Byte Transfered{_sendArgs.BytesTransferred}");
+
                         if (_sendQueue.Count > 0)
                         {
                             RegisterSend();
                         }
-                        else
-                        {
-                            _pending = false;
-                        }
-
                     }
                     catch (Exception ex)
                     {
@@ -96,9 +93,9 @@ namespace KINL_Server
             {
                 return;
             }
-
             _socket.Shutdown(SocketShutdown.Both);
             _socket.Close();
+          //  Console.WriteLine("ServerDisconnect");
         }
 
         void RegisterRecv()

@@ -22,13 +22,13 @@ namespace DummyClient
 
             while(true)
             {
-                Socket socket = new Socket(iPEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 try
                 {
                     socket.Connect(iPEndPoint);
                     Console.WriteLine($"Connected to {socket.RemoteEndPoint.ToString()}");
 
-                    byte[] buffer = Encoding.UTF8.GetBytes("Hello World");
+                    byte[] buffer = Encoding.UTF8.GetBytes("LSJ,1,1,1,1,1,1");
                     int sendBytes = socket.Send(buffer);
                     byte[] recvBuffer = new byte[1024];
                     int recvBytes = socket.Receive(recvBuffer);
@@ -37,7 +37,6 @@ namespace DummyClient
 
                     socket.Shutdown(SocketShutdown.Both);
                     socket.Close();
-
                 }
                 catch (Exception ex)
                 {

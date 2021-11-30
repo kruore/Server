@@ -21,7 +21,8 @@ namespace KINL_Server
             _onAcceptHandler += onAcceptHandler;
             _listenSocket.Bind(endPoint);
 
-            _listenSocket.Listen(10);
+            _listenSocket.Listen(5);
+            SocketAsyncEventArgs socketAsyncEventArgs = new SocketAsyncEventArgs();
 
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
             args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted);
@@ -32,7 +33,7 @@ namespace KINL_Server
             args.AcceptSocket = null;
 
             bool pending = _listenSocket.AcceptAsync(args);
-            if(pending ==false)
+            if(pending == false)
             {
                 OnAcceptCompleted(null, args);
             }
@@ -46,7 +47,7 @@ namespace KINL_Server
             }
             else
             {
-                Console.WriteLine("dusck");
+                Console.WriteLine("에러");
             }
             RegisterAccept(args);
         }
