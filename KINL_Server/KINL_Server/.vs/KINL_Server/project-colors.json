@@ -15,7 +15,12 @@
       "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
       "DisplayName": "기타 파일",
       "ColorIndex": -1
+    },
+    "a154f4ac-3aed-4917-a78d-dc078ac834e1": {
+      "ProjectGuid": "a154f4ac-3aed-4917-a78d-dc078ac834e1",
+      "DisplayName": "Server",
+      "ColorIndex": 2
     }
   },
-  "NextColorIndex": 2
+  "NextColorIndex": 3
 }

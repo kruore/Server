@@ -13,3 +13,6 @@ C:\Users\user\Documents\GitHub\Server\KINL_Server\KINL_Server\DummyClient\obj\De
 C:\Users\user\Documents\GitHub\Server\KINL_Server\KINL_Server\DummyClient\obj\Debug\net6.0\ref\DummyClient.dll
 C:\Users\user\Documents\GitHub\Server\KINL_Server\KINL_Server\DummyClient\obj\Debug\net6.0\DummyClient.pdb
 C:\Users\user\Documents\GitHub\Server\KINL_Server\KINL_Server\DummyClient\obj\Debug\net6.0\DummyClient.genruntimeconfig.cache
+C:\Users\user\Documents\GitHub\Server\KINL_Server\KINL_Server\DummyClient\bin\Debug\net6.0\KINL_Server.dll
+C:\Users\user\Documents\GitHub\Server\KINL_Server\KINL_Server\DummyClient\bin\Debug\net6.0\KINL_Server.pdb
+C:\Users\user\Documents\GitHub\Server\KINL_Server\KINL_Server\DummyClient\obj\Debug\net6.0\DummyClient.csproj.CopyComplete

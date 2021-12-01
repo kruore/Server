@@ -5,33 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using KINL_Server;
 
-
-namespace KINL_Server
+namespace Server
 {
-    public class Server
+    class Server
     {
         static Listener _listener = new Listener();
 
-        static void OnAcceptHandler(Socket clientSocket)
-        {
-            try
-            {
-                Session session = new Session();
-                session.Start(clientSocket);
-                byte[] sendBuffer = Encoding.UTF8.GetBytes("Server Connected");
-                session.Send(sendBuffer);
-
-                Thread.Sleep(1000);
-
-                session.Disconnect();
-            }
-
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-        }
         public static void Main(string[] args)
         {
             string host = Dns.GetHostName();
@@ -40,7 +21,7 @@ namespace KINL_Server
             IPAddress ipAddress = IPAddress.Any;
             IPEndPoint ipEndPoint = new IPEndPoint(ipAddress, port);
 
-            _listener.init(ipEndPoint, OnAcceptHandler);
+            _listener.init(ipEndPoint, () => { return new ServerSession(); });
             Console.WriteLine("Server Started");
             while (true)
             {
@@ -49,5 +30,4 @@ namespace KINL_Server
         }
 
     }
-
 }

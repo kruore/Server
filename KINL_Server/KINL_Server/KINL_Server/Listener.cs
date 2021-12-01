@@ -10,15 +10,15 @@ using System.Net.Sockets;
 
 namespace KINL_Server
 {
-    class Listener
+    public class Listener
     {
         Socket _listenSocket;
-        Action<Socket> _onAcceptHandler;
+        Func<Session> _sessionFactory;
 
-        public void init(IPEndPoint endPoint, Action<Socket> onAcceptHandler)
+        public void init(IPEndPoint endPoint, Func<Session> sessionFactory)
         {
             _listenSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            _onAcceptHandler += onAcceptHandler;
+            _sessionFactory += sessionFactory;
             _listenSocket.Bind(endPoint);
 
             _listenSocket.Listen(5);
@@ -43,7 +43,11 @@ namespace KINL_Server
         {
             if(args.SocketError==SocketError.Success)
             {
-                _onAcceptHandler.Invoke(args.AcceptSocket);
+                Session session = _sessionFactory.Invoke();
+                session.Start(args.AcceptSocket);
+                session.OnConnected(args.AcceptSocket.RemoteEndPoint);
+
+                //_onAcceptHandler.Invoke(args.AcceptSocket);
             }
             else
             {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
-
+using KINL_Server;
 
 namespace DummyClient
 {
@@ -20,23 +20,16 @@ namespace DummyClient
             int port = 4545;
             IPEndPoint iPEndPoint = new IPEndPoint(ipAddr, port);
 
-            while(true)
+            Connector connector = new Connector();
+
+            connector.Connect(iPEndPoint, () => { return new ServerSession(); });
+
+            while (true)
             {
                 Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 try
                 {
-                    socket.Connect(iPEndPoint);
-                    Console.WriteLine($"Connected to {socket.RemoteEndPoint.ToString()}");
 
-                    byte[] buffer = Encoding.UTF8.GetBytes("LSJ,1,1,1,1,1,1");
-                    int sendBytes = socket.Send(buffer);
-                    byte[] recvBuffer = new byte[1024];
-                    int recvBytes = socket.Receive(recvBuffer);
-                    string recvData = Encoding.UTF8.GetString(recvBuffer);
-                    Console.WriteLine($"Form Server { recvData }");
-
-                    socket.Shutdown(SocketShutdown.Both);
-                    socket.Close();
                 }
                 catch (Exception ex)
                 {

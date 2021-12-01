@@ -8,29 +8,39 @@ using System.Net.Sockets;
 
 namespace KINL_Server
 {
-    class Session
+ 
+    public abstract class Session
     {
         Socket _socket;
         int _disconnect = 0;
 
         object _lock = new object();
+        RecvBuffer _recvBuffer = new RecvBuffer(1024);
 
-        Queue<byte[]> _sendQueue = new Queue<byte[]>();
+        Queue<ArraySegment<byte>> _sendQueue = new Queue<ArraySegment<byte>>();
         List<ArraySegment<byte>> _pendingLists = new List<ArraySegment<byte>>();
         SocketAsyncEventArgs _sendArgs = new SocketAsyncEventArgs();
         SocketAsyncEventArgs _recvArgs = new SocketAsyncEventArgs();
+
+        public abstract void OnConnected(EndPoint endPoint);
+        public abstract void OnDisConnected(EndPoint endPoint);
+        public abstract void OnSend(int numOfBytes);
+        public abstract int OnRecv(ArraySegment<byte> buffer);
+
+
         public void Start(Socket socket)
         {
             _socket = socket;
             _recvArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnRecvCompleted);
-            _recvArgs.SetBuffer(new byte[1024], 0, 1024);
+            // RecvBuffer _recvBuffer = new RecvBuffer(1024);로 대체
+            //_recvArgs.SetBuffer(new byte[1024], 0, 1024);
 
             _sendArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnSendCompleted);
 
             RegisterRecv();
         }
 
-        public void Send(byte[] sendBuff)
+        public void Send(ArraySegment<byte> sendBuff)
         {
             lock (_lock)
             {
@@ -46,11 +56,11 @@ namespace KINL_Server
         {
             _pendingLists.Clear();
 
-            while (_sendQueue.Count>0)
+            while (_sendQueue.Count > 0)
             {
-                byte[] buff = _sendQueue.Dequeue();
+                ArraySegment<byte> buff = _sendQueue.Dequeue();
                 //_sendArgs.SetBuffer(buff, 0,buff.Length);
-                _pendingLists.Add(new ArraySegment<byte>(buff, 0, buff.Length));
+                _pendingLists.Add(buff);
             }
             _sendArgs.BufferList = _pendingLists;
             bool pending = _socket.SendAsync(_sendArgs);
@@ -67,7 +77,8 @@ namespace KINL_Server
                     {
                         _sendArgs.BufferList = null;
                         _pendingLists.Clear();
-                        Console.WriteLine($"Byte Transfered{_sendArgs.BytesTransferred}");
+
+                        OnSend(_sendArgs.BytesTransferred);
 
                         if (_sendQueue.Count > 0)
                         {
@@ -93,13 +104,19 @@ namespace KINL_Server
             {
                 return;
             }
+            OnDisConnected(_socket.RemoteEndPoint);
             _socket.Shutdown(SocketShutdown.Both);
             _socket.Close();
-          //  Console.WriteLine("ServerDisconnect");
+            //  Console.WriteLine("ServerDisconnect");
         }
 
         void RegisterRecv()
         {
+            //커서 날아가는거 방지
+            _recvBuffer.Clean();
+
+            ArraySegment<byte> segment = _recvBuffer.WriteSegment;
+            _recvArgs.SetBuffer(segment.Array, segment.Offset, segment.Count);
             bool pending = _socket.ReceiveAsync(_recvArgs);
             if (pending == false)
             {
@@ -112,8 +129,29 @@ namespace KINL_Server
             {
                 try
                 {
-                    string recvData = Encoding.UTF8.GetString(args.Buffer, args.Offset, args.BytesTransferred);
-                    Console.WriteLine($"[From Client] : {recvData}");
+
+                    //Write 커서 이동
+                    if (_recvBuffer.OnWrite(args.BytesTransferred) == false)
+                    {
+                        Disconnect();
+                        return;
+                    }
+
+                    //컨텐츠 쪽으로 데이터를 넘겨준다.
+                    int processLen = OnRecv(_recvBuffer.ReadSegment);
+                    if (processLen < 0 || _recvBuffer.DataSize < processLen)
+                    {
+                        Disconnect();
+                        return;
+                    }
+
+                    //Read Buffer Move
+                    if (_recvBuffer.OnRead(processLen) == false)
+                    {
+                        Disconnect();
+                        return;
+                    }
+
                     RegisterRecv();
                 }
                 catch (Exception ex)
