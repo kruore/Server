@@ -1,8 +1,12 @@
 {
   "version": 2,
+<<<<<<< Updated upstream
   "dgSpecHash": "kBC4hz15fPF7mbusZU8QvvsdIDmgEnefeKLIAa9sOoNXhz9ZeLkyZFExjmPDA216sGgxZg3HhfIo2u2EWBpMzA==",
+=======
+  "dgSpecHash": "lqgA+u38rVzusmzJz4cXwt8usxXWml4BB6N1pYmHWxb59cggMSf+2gkfp5K03Za5Ia3NckgwvhYcalaCTotc/w==",
+>>>>>>> Stashed changes
   "success": true,
-  "projectFilePath": "C:\\Users\\user\\Documents\\GitHub\\Server\\KINL_Server\\KINL_Server\\DummyClient\\DummyClient.csproj",
+  "projectFilePath": "C:\\Users\\kruore\\Documents\\GitHub\\Server\\KINL_Server\\KINL_Server\\DummyClient\\DummyClient.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
