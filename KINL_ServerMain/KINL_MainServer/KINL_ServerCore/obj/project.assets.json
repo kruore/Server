@@ -8,23 +8,23 @@
     "net6.0": []
   },
   "packageFolders": {
-    "C:\\Users\\user\\.nuget\\packages\\": {},
+    "C:\\Users\\epsel\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\user\\Documents\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_ServerCore\\KINL_ServerCore.csproj",
+      "projectUniqueName": "D:\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_ServerCore\\KINL_ServerCore.csproj",
       "projectName": "KINL_ServerCore",
-      "projectPath": "C:\\Users\\user\\Documents\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_ServerCore\\KINL_ServerCore.csproj",
-      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\user\\Documents\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_ServerCore\\obj\\",
+      "projectPath": "D:\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_ServerCore\\KINL_ServerCore.csproj",
+      "packagesPath": "C:\\Users\\epsel\\.nuget\\packages\\",
+      "outputPath": "D:\\GitHub\\Server\\KINL_ServerMain\\KINL_MainServer\\KINL_ServerCore\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\epsel\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

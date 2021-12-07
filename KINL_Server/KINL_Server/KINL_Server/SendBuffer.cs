@@ -32,7 +32,6 @@ namespace KINL_Server
         }
     }
 
-
     public class SendBuffer
     {
         //recvBuffer는 세션마다였지만.

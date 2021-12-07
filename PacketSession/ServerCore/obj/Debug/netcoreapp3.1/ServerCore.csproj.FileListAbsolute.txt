@@ -1,0 +1,20 @@
+C:\Users\epsel\Downloads\PacketSession (1)\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.deps.json
+C:\Users\epsel\Downloads\PacketSession (1)\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.dll
+C:\Users\epsel\Downloads\PacketSession (1)\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.pdb
+C:\Users\epsel\Downloads\PacketSession (1)\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.csproj.AssemblyReference.cache
+C:\Users\epsel\Downloads\PacketSession (1)\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\epsel\Downloads\PacketSession (1)\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.AssemblyInfoInputs.cache
+C:\Users\epsel\Downloads\PacketSession (1)\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.AssemblyInfo.cs
+C:\Users\epsel\Downloads\PacketSession (1)\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.csproj.CoreCompileInputs.cache
+C:\Users\epsel\Downloads\PacketSession (1)\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.dll
+C:\Users\epsel\Downloads\PacketSession (1)\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.pdb
+D:\GitHub\Server\PacketSession\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.deps.json
+D:\GitHub\Server\PacketSession\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.dll
+D:\GitHub\Server\PacketSession\ServerCore\bin\Debug\netcoreapp3.1\ServerCore.pdb
+D:\GitHub\Server\PacketSession\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.csproj.AssemblyReference.cache
+D:\GitHub\Server\PacketSession\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.GeneratedMSBuildEditorConfig.editorconfig
+D:\GitHub\Server\PacketSession\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.AssemblyInfoInputs.cache
+D:\GitHub\Server\PacketSession\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.AssemblyInfo.cs
+D:\GitHub\Server\PacketSession\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.csproj.CoreCompileInputs.cache
+D:\GitHub\Server\PacketSession\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.dll
+D:\GitHub\Server\PacketSession\ServerCore\obj\Debug\netcoreapp3.1\ServerCore.pdb

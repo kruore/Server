@@ -1,12 +1,15 @@
 {
   "version": 2,
-<<<<<<< Updated upstream
-  "dgSpecHash": "kBC4hz15fPF7mbusZU8QvvsdIDmgEnefeKLIAa9sOoNXhz9ZeLkyZFExjmPDA216sGgxZg3HhfIo2u2EWBpMzA==",
-=======
-  "dgSpecHash": "lqgA+u38rVzusmzJz4cXwt8usxXWml4BB6N1pYmHWxb59cggMSf+2gkfp5K03Za5Ia3NckgwvhYcalaCTotc/w==",
->>>>>>> Stashed changes
+  "dgSpecHash": "E0tecrKXR2IDI8viyjWGgwlFJUFrJT3KTN/Z3F2WEesMSZ0HYHPlpbNWVPq+B4PSf+t02wguAWNb8LXNHCYtlg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\kruore\\Documents\\GitHub\\Server\\KINL_Server\\KINL_Server\\DummyClient\\DummyClient.csproj",
+  "projectFilePath": "D:\\GitHub\\Server\\KINL_Server\\KINL_Server\\DummyClient\\DummyClient.csproj",
   "expectedPackageFiles": [],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "캐시 파일 D:\\GitHub\\Server\\KINL_Server\\KINL_Server\\DummyClient\\obj\\project.nuget.cache을(를) 읽는 동안 문제가 발생했습니다. Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

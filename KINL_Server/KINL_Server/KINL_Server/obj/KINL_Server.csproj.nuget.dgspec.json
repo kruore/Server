@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\kruore\\Documents\\GitHub\\Server\\KINL_Server\\KINL_Server\\KINL_Server\\KINL_Server.csproj": {}
+    "D:\\GitHub\\Server\\KINL_Server\\KINL_Server\\KINL_Server\\KINL_Server.csproj": {}
   },
   "projects": {
-    "C:\\Users\\kruore\\Documents\\GitHub\\Server\\KINL_Server\\KINL_Server\\KINL_Server\\KINL_Server.csproj": {
+    "D:\\GitHub\\Server\\KINL_Server\\KINL_Server\\KINL_Server\\KINL_Server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kruore\\Documents\\GitHub\\Server\\KINL_Server\\KINL_Server\\KINL_Server\\KINL_Server.csproj",
+        "projectUniqueName": "D:\\GitHub\\Server\\KINL_Server\\KINL_Server\\KINL_Server\\KINL_Server.csproj",
         "projectName": "KINL_Server",
-        "projectPath": "C:\\Users\\kruore\\Documents\\GitHub\\Server\\KINL_Server\\KINL_Server\\KINL_Server\\KINL_Server.csproj",
-        "packagesPath": "C:\\Users\\kruore\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\kruore\\Documents\\GitHub\\Server\\KINL_Server\\KINL_Server\\KINL_Server\\obj\\",
+        "projectPath": "D:\\GitHub\\Server\\KINL_Server\\KINL_Server\\KINL_Server\\KINL_Server.csproj",
+        "packagesPath": "C:\\Users\\epsel\\.nuget\\packages\\",
+        "outputPath": "D:\\GitHub\\Server\\KINL_Server\\KINL_Server\\KINL_Server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\kruore\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\epsel\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

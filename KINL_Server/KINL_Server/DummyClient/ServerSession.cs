@@ -30,7 +30,7 @@ namespace DummyClient
 
         }
 
-        public override void Read(ArraySegment<byte> openSegment)
+        public override void Read(ArraySegment<byte> s)
         {
             ushort count = 0;
 
@@ -38,7 +38,7 @@ namespace DummyClient
             count += 2;
             //ushort id = BitConverter.ToUInt16(openSegment.Array, openSegment.Offset + count);
             count += 2;
-            this.playerId = BitConverter.ToUInt16(openSegment.Array, openSegment.Offset + count);
+            this.playerId = BitConverter.ToUInt16(s.Array, s.Offset + count);
             count += 8;
             Console.WriteLine($" DATA RECV : {playerId}");
 
@@ -52,13 +52,16 @@ namespace DummyClient
             ushort count = 0;
             bool success = true;
 
-            count += 2;
-            success &= BitConverter.TryWriteBytes(new Span<byte>(openSegment.Array, openSegment.Offset + count, openSegment.Count - count), this.packetid);
-            count += 2;
-            success &= BitConverter.TryWriteBytes(new Span<byte>(openSegment.Array, openSegment.Offset + count, openSegment.Count - count), this.playerId);
-            count += 8;
-            success &= BitConverter.TryWriteBytes(new Span<byte>(openSegment.Array, openSegment.Offset , openSegment.Count), count);
+            //count += 2;
+            //success &= BitConverter.TryWriteBytes(new Span<byte>(openSegment.Array, openSegment.Offset + count, openSegment.Count - count), this.packetid);
+            //count += 2;
+            //success &= BitConverter.TryWriteBytes(new Span<byte>(openSegment.Array, openSegment.Offset + count, openSegment.Count - count), this.playerId);
+            //count += 8;
+            //success &= BitConverter.TryWriteBytes(new Span<byte>(openSegment.Array, openSegment.Offset , openSegment.Count), count);
 
+
+            count += sizeof(ushort);
+            success &= BitConverter.TryWriteBytes(openSegment.Slice(count,openSegment.))
             if (success==false)
             {
                 return null;

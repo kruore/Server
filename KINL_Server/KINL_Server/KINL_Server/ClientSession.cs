@@ -21,27 +21,38 @@ namespace KINL_Server
     class PlayerInfoReq : Packet
     {
         public long playerId;
+        public string name;
 
         public PlayerInfoReq()
         {
-            this.playerId = (ushort)PacketID.PlayerInfoReq;
+            //this.playerId = (ushort)packetid.playerInfoReq;
 
         }
 
-        public override void Read(ArraySegment<byte> openSegment)
+        public override void Read(ArraySegment<byte> s)
         {
             ushort count = 0;
 
-            //ushort size = BitConverter.ToUInt16(openSegment.Array, openSegment.Offset);
             count += 2;
-            //ushort id = BitConverter.ToUInt16(openSegment.Array, openSegment.Offset + count);
             count += 2;
-            this.playerId = BitConverter.ToUInt16(openSegment.Array, openSegment.Offset + count);
+            this.playerId = BitConverter.ToUInt16(s.Array, s.Offset+count);
+            BitConverter.ToUInt16(new ReadOnlySpan<byte>(s.Array, s.Offset + count, s.Count, s.Count - count));
             count += 8;
-            Console.WriteLine($" DATA RECV : {playerId}");
+            //String
+            //int messageSize = Encoding.UTF8.GetBytes(ac).Length;
+            //ushort size = BitConverter.ToUInt16(openSegment, openSegment.Offset+messageSize);
+
+
+            //count += 2;
+            ////ushort size = BitConverter.ToUInt16(openSegment.Array, openSegment.Offset);
+            //count += 2;
+            ////ushort id = BitConverter.ToUInt16(openSegment.Array, openSegment.Offset + count);
+            //count += 2;
+            //this.playerId = BitConverter.ToUInt16(openSegment.Array, openSegment.Offset + count);
+            //count += 8;
+            //Console.WriteLine($" DATA RECV : {playerId}");
 
         }
-
         public override ArraySegment<byte> Write()
         {
 
