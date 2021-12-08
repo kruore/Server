@@ -1,0 +1,17 @@
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\bin\Debug\net6.0-windows\KINL_VoucherServer.exe
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\bin\Debug\net6.0-windows\KINL_VoucherServer.deps.json
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\bin\Debug\net6.0-windows\KINL_VoucherServer.runtimeconfig.json
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\bin\Debug\net6.0-windows\KINL_VoucherServer.dll
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\bin\Debug\net6.0-windows\ref\KINL_VoucherServer.dll
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\bin\Debug\net6.0-windows\KINL_VoucherServer.pdb
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\obj\Debug\net6.0-windows\KINL_VoucherServer.csproj.AssemblyReference.cache
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\obj\Debug\net6.0-windows\KINL_VoucherServer.Form1.resources
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\obj\Debug\net6.0-windows\KINL_VoucherServer.csproj.GenerateResource.cache
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\obj\Debug\net6.0-windows\KINL_VoucherServer.GeneratedMSBuildEditorConfig.editorconfig
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\obj\Debug\net6.0-windows\KINL_VoucherServer.AssemblyInfoInputs.cache
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\obj\Debug\net6.0-windows\KINL_VoucherServer.AssemblyInfo.cs
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\obj\Debug\net6.0-windows\KINL_VoucherServer.csproj.CoreCompileInputs.cache
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\obj\Debug\net6.0-windows\KINL_VoucherServer.dll
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\obj\Debug\net6.0-windows\ref\KINL_VoucherServer.dll
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\obj\Debug\net6.0-windows\KINL_VoucherServer.pdb
+D:\GitHub\Server\1208\KINL_Server\KINL_VoucherServer\KINL_VoucherServer\obj\Debug\net6.0-windows\KINL_VoucherServer.genruntimeconfig.cache
