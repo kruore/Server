@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KINL_Server", "KINL_Server\KINL_Server.csproj", "{E1431C9E-7B47-49BD-92E3-A3002F355AC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KINL_Server", "KINL_Server\KINL_Server.csproj", "{E1431C9E-7B47-49BD-92E3-A3002F355AC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyClient", "DummyClient\DummyClient.csproj", "{E70A041A-0FF8-4B59-880E-F3C2ED5EC33E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{E1431C9E-7B47-49BD-92E3-A3002F355AC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1431C9E-7B47-49BD-92E3-A3002F355AC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1431C9E-7B47-49BD-92E3-A3002F355AC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E70A041A-0FF8-4B59-880E-F3C2ED5EC33E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E70A041A-0FF8-4B59-880E-F3C2ED5EC33E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E70A041A-0FF8-4B59-880E-F3C2ED5EC33E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E70A041A-0FF8-4B59-880E-F3C2ED5EC33E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

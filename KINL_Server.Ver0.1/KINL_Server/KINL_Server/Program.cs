@@ -5,27 +5,56 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using KINL_Server;
 
-class Parogram
+class KINL_ServerCore
 {
+    public KINL_ServerCore()
+    {
+        AsyncServerStarted();
+    }
+
+    public void AsyncServerStarted()
+    {
+        int port = 4545;
+        IPAddress address = IPAddress.Any;
+        IPEndPoint iPEndPoint = new IPEndPoint(address, port);
+
+        TcpListener listener = new TcpListener(iPEndPoint);
+        listener.Start();
+
+
+        Console.WriteLine("Server Started");
+
+        while (true)
+        {
+            Console.WriteLine("Waiting");
+            TcpClient acceptClient = listener.AcceptTcpClient();
+            ClientData clientData = new ClientData(acceptClient);
+            clientData._client.GetStream().BeginRead(clientData._recvData, 0, clientData._recvData.Length, new AsyncCallback(DataRecived), clientData);
+            Console.WriteLine("Accept");
+        }
+    }
+
+    private void DataRecived(IAsyncResult ar)
+    {
+        try
+        {
+            ClientData callbackClient = ar.AsyncState as ClientData;
+            int byteRead = callbackClient._client.GetStream().EndRead(ar);
+            string readString = Encoding.Default.GetString(callbackClient._recvData, 0, byteRead);
+
+            Console.WriteLine($"{callbackClient._clientNumber}의 사용자 : {readString}");
+            callbackClient._client.GetStream().BeginRead(callbackClient._recvData, 0, callbackClient._recvData.Length, new AsyncCallback(DataRecived), callbackClient);
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
     static void Main(string[] args)
     {
-        string host= Dns.GetHostName();
-        int port = 4545;
-        IPAddress iPAddress = IPAddress.Any;
-        IPEndPoint iPEndPoint = new IPEndPoint(IPAddress.Any, port);
-
-        Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-        socket.Connect(iPEndPoint);
-        Console.WriteLine($"Connect Server");
-
-        byte[] buffer = new byte[1024];
-        int sendBytes = socket.Send(buffer);
-
-        byte[] recvBuff = new byte[1024];
-        int recvBytes = socket.Receive(recvBuff);
-        string recvData = Encoding.UTF8.GetString()
-
+        KINL_ServerCore a = new KINL_ServerCore();
     }
 }
