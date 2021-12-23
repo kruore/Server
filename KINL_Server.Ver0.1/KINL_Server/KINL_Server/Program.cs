@@ -5,15 +5,49 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Collections.Concurrent;
 using KINL_Server;
 
-class KINL_ServerCore
+
+
+class StaticDefine
 {
+    public const int SHOW_CURRENT_CLIENT = 1;
+    public const int SHOW_ACCESS_LOG = 2;
+    public const int SHOW_DATA_LOG = 3;
+    public const int ADD_ACCESS_LOG = 5;
+    public const int ADD_CHATTING_LOG = 6;
+    public const int EXIT = 0;
+}
+
+public class KINL_ServerCore
+{
+    //ClientManager clientManager = null;
+    ConcurrentBag<string> AccessLog = null;
+    ConcurrentBag<string> DataLog = null;
+    Thread connectCheckThread = null;
+    
     public KINL_ServerCore()
     {
-        AsyncServerStarted();
+        Task serverStart = Task.Run(() =>
+        {
+            AsyncServerStarted();
+        });
+        connectCheckThread = new Thread(connectCheck);
+        connectCheckThread.Start();
+        DataLog = new ConcurrentBag<string>();
+        AccessLog = new ConcurrentBag<string>();
     }
+    public void connectCheck()
+    {
+        while(true)
+        {
+            foreach(var item in ClientManager.clientDic)
+            {
 
+            }
+        }
+    }
     public void AsyncServerStarted()
     {
         int port = 4545;
@@ -22,7 +56,6 @@ class KINL_ServerCore
 
         TcpListener listener = new TcpListener(iPEndPoint);
         listener.Start();
-
 
         Console.WriteLine("Server Started");
 
@@ -35,7 +68,6 @@ class KINL_ServerCore
             Console.WriteLine("Accept");
         }
     }
-
     private void DataRecived(IAsyncResult ar)
     {
         try
@@ -49,10 +81,8 @@ class KINL_ServerCore
         }
         catch (Exception ex)
         {
-
         }
     }
-
     static void Main(string[] args)
     {
         KINL_ServerCore a = new KINL_ServerCore();
