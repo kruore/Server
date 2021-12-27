@@ -9,7 +9,7 @@ using System.Collections.Concurrent;
 
 namespace KINL_Server
 {
-    
+
     public class KINL_ServerCore
     {
         ClientManager clientManager = null;
@@ -48,7 +48,6 @@ namespace KINL_Server
                     catch (Exception ex)
                     {
                         RemoveClient(item.Value);
-                        
                     }
                 }
                 Thread.Sleep(1000);
@@ -57,20 +56,25 @@ namespace KINL_Server
 
         private void RemoveClient(ClientData targetClient)
         {
+
             ClientData result = null;
+            if (result != null)
+            {
+                return;
+            }
             ClientManager.clientDic.TryRemove(targetClient._clientNumber, out result);
             Console.WriteLine("Removed");
-            string leaveMsg = string.Format("[{0}]{1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result._clientUserName);
-            AccessLog.Add(leaveMsg);
-        } 
+            //string leaveMsg = string.Format("[{0}]{1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result._clientUserName);
+            // AccessLog.Add(leaveMsg);
+        }
         private void MessageParsing(string sender, string message)
         {
             List<string> msgList = new List<string>();
 
             string[] msgArray = message.Split('>');
-            foreach(var item in msgArray)
+            foreach (var item in msgArray)
             {
-                if(string.IsNullOrEmpty(item))
+                if (string.IsNullOrEmpty(item))
                 {
                     continue;
                 }
@@ -167,6 +171,7 @@ namespace KINL_Server
             TcpListener listener = new TcpListener(iPEndPoint);
             listener.Start();
 
+
             Console.WriteLine("Server Started");
 
             while (true)
@@ -191,6 +196,8 @@ namespace KINL_Server
             }
             catch (Exception ex)
             {
+                RemoveClient(ar.AsyncState as ClientData);
+
             }
         }
     }

@@ -21,9 +21,9 @@ namespace KINL_Server
 
         public enum Client_Type
         {
-            Tablet,User,CameraData,NULL
+            Tablet1,Tablet2,User,CameraData,NULL
         }
-
+        
         public ClientData(TcpClient client)
         {
             this._client = client;
