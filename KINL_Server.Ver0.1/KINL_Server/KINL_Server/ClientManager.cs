@@ -61,8 +61,6 @@ namespace KINL_Server
                 {
                     messageParsingAction.BeginInvoke(client._clientUserName, strData, null, null);
                 }
-
-
             }
             catch (Exception ex)
             {
