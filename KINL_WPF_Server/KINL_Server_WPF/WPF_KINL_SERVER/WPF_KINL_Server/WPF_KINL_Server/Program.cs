@@ -6,6 +6,14 @@ using System.Windows.Forms;
 
 namespace WPF_KINL_Server
 {
+    class StaticDefine
+    {
+        public const int ADD_CHATTING_LIST = 0;
+        public const int ADD_ACCESS_LIST = 1;
+        public const int ADD_USER_LIST = 2;
+        public const int REMOVE_USER_LIST = 3;
+    }
+
     internal static class Program
     {
         /// <summary>

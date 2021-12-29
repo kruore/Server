@@ -29,21 +29,25 @@
         private void InitializeComponent()
         {
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.StateLabel = new System.Windows.Forms.Label();
-            this.serverStateLabel = new System.Windows.Forms.Label();
-            this.serverResetButton = new System.Windows.Forms.Button();
-            this.RefreshButton = new System.Windows.Forms.Button();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.UserName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ConnectDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Data = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ControllDevice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DeviceData = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.StateLabel = new System.Windows.Forms.Label();
+            this.serverStateLabel = new System.Windows.Forms.Label();
+            this.serverResetButton = new System.Windows.Forms.Button();
+            this.RefreshButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGridView1
             // 
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.AllowUserToResizeColumns = false;
+            this.dataGridView1.AllowUserToResizeRows = false;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ID,
@@ -52,12 +56,50 @@
             this.Data,
             this.ControllDevice,
             this.DeviceData});
+            this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnF2;
+            this.dataGridView1.Enabled = false;
             this.dataGridView1.Location = new System.Drawing.Point(0, 40);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 23;
             this.dataGridView1.Size = new System.Drawing.Size(995, 599);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick_1);
+            // 
+            // ID
+            // 
+            this.ID.FillWeight = 50F;
+            this.ID.HeaderText = "ID";
+            this.ID.Name = "ID";
+            this.ID.Width = 50;
+            // 
+            // UserName
+            // 
+            this.UserName.HeaderText = "UserName";
+            this.UserName.Name = "UserName";
+            // 
+            // ConnectDate
+            // 
+            this.ConnectDate.HeaderText = "ConnectDate";
+            this.ConnectDate.Name = "ConnectDate";
+            // 
+            // Data
+            // 
+            this.Data.FillWeight = 300F;
+            this.Data.HeaderText = "Data";
+            this.Data.Name = "Data";
+            this.Data.Width = 300;
+            // 
+            // ControllDevice
+            // 
+            this.ControllDevice.HeaderText = "ControllDevice";
+            this.ControllDevice.Name = "ControllDevice";
+            // 
+            // DeviceData
+            // 
+            this.DeviceData.FillWeight = 300F;
+            this.DeviceData.HeaderText = "DeviceData";
+            this.DeviceData.Name = "DeviceData";
+            this.DeviceData.Width = 300;
             // 
             // StateLabel
             // 
@@ -98,42 +140,6 @@
             this.RefreshButton.Text = "Refresh";
             this.RefreshButton.UseVisualStyleBackColor = true;
             this.RefreshButton.Click += new System.EventHandler(this.RefreshButton_Click);
-            // 
-            // ID
-            // 
-            this.ID.FillWeight = 50F;
-            this.ID.HeaderText = "ID";
-            this.ID.Name = "ID";
-            this.ID.Width = 50;
-            // 
-            // UserName
-            // 
-            this.UserName.HeaderText = "UserName";
-            this.UserName.Name = "UserName";
-            // 
-            // ConnectDate
-            // 
-            this.ConnectDate.HeaderText = "ConnectDate";
-            this.ConnectDate.Name = "ConnectDate";
-            // 
-            // Data
-            // 
-            this.Data.FillWeight = 300F;
-            this.Data.HeaderText = "Data";
-            this.Data.Name = "Data";
-            this.Data.Width = 300;
-            // 
-            // ControllDevice
-            // 
-            this.ControllDevice.HeaderText = "ControllDevice";
-            this.ControllDevice.Name = "ControllDevice";
-            // 
-            // DeviceData
-            // 
-            this.DeviceData.FillWeight = 300F;
-            this.DeviceData.HeaderText = "DeviceData";
-            this.DeviceData.Name = "DeviceData";
-            this.DeviceData.Width = 300;
             // 
             // Server
             // 
