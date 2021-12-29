@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Threading;
 
 namespace KINL_Server_WPF
@@ -13,8 +14,10 @@ namespace KINL_Server_WPF
     public class KINL_Server
     {
         ClientManager _clientManager = null;
-        ConcurrentBag<string> chattingLog = null;
-        ConcurrentBag<string> AccessLog = null;
+        private object lockObj = new object();
+        private ObservableCollection<string> chattingLogList = new ObservableCollection<string>();
+        private ObservableCollection<string> userList = new ObservableCollection<string>();
+        private ObservableCollection<string> AccessLogList = new ObservableCollection<string>();
         Thread conntectCheckThread = null;
 
         public bool isOpened = true;
@@ -25,9 +28,7 @@ namespace KINL_Server_WPF
             // 채팅로그와 접근로그를 담을 컬렉션 생성
             // 서버 스레드 및 하트비트 스레드 시작
 
-            _clientManager = new ClientManager();
-            chattingLog = new ConcurrentBag<string>();
-            AccessLog = new ConcurrentBag<string>();
+
             _clientManager.EventHandler += ClientEvent;
             _clientManager.messageParsingAction += MessageParsing;
             Task serverStart = Task.Run(() =>
@@ -72,7 +73,7 @@ namespace KINL_Server_WPF
             ClientData result = null;
             ClientManager.clientDic.TryRemove(targetClient._clientNumber, out result);
             string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result._clientUserName);
-            AccessLog.Add(leaveLog);
+       //     AccessLog.Add(leaveLog);
         }
 
         // 클라이언트에게 메시지를 보내는 첫번째 과정입니다.
@@ -168,11 +169,11 @@ namespace KINL_Server_WPF
                 //        AccessLog.Add(message);
                 //        break;
                 //    }
-                case StaticDefine.ADD_CHATTING_LOG:
-                    {
-                        chattingLog.Add(message);
-                        break;
-                    }
+                //case StaticDefine.ADD_CHATTING_LOG:
+                //    {
+                //        chattingLog.Add(message);
+                //        break;
+                //    }
             }
         }
 
@@ -253,35 +254,35 @@ namespace KINL_Server_WPF
         // 채팅로그확인
         private void ShowCattingLog()
         {
-            if (chattingLog.Count == 0)
-            {
-                Console.WriteLine("채팅기록이 없습니다.");
-                Console.ReadKey();
-                return;
-            }
+            //if (chattingLog.Count == 0)
+            //{
+            //    Console.WriteLine("채팅기록이 없습니다.");
+            //    Console.ReadKey();
+            //    return;
+            //}
 
-            foreach (var item in chattingLog)
-            {
-                Console.WriteLine(item);
-            }
-            Console.ReadKey();
+            //foreach (var item in chattingLog)
+            //{
+            //    Console.WriteLine(item);
+            //}
+            //Console.ReadKey();
         }
 
         // 접근로그확인
         private void ShowAccessLog()
         {
-            if (AccessLog.Count == 0)
-            {
-                Console.WriteLine("접속기록이 없습니다.");
-                Console.ReadKey();
-                return;
-            }
+            //if (AccessLog.Count == 0)
+            //{
+            //    Console.WriteLine("접속기록이 없습니다.");
+            //    Console.ReadKey();
+            //    return;
+            //}
 
-            foreach (var item in AccessLog)
-            {
-                Console.WriteLine(item);
-            }
-            Console.ReadKey();
+            //foreach (var item in AccessLog)
+            //{
+            //    Console.WriteLine(item);
+            //}
+            //Console.ReadKey();
         }
 
         // 현재접속유저확인

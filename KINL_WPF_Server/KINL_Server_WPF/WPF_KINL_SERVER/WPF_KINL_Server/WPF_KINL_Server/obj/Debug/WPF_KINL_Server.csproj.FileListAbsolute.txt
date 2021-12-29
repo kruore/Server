@@ -1,0 +1,11 @@
+C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\WPF_KINL_Server\WPF_KINL_Server\obj\Debug\WPF_KINL_Server.csproj.AssemblyReference.cache
+C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\WPF_KINL_Server\WPF_KINL_Server\obj\Debug\WPF_KINL_Server.csproj.SuggestedBindingRedirects.cache
+C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\WPF_KINL_Server\WPF_KINL_Server\obj\Debug\WPF_KINL_Server.Properties.Resources.resources
+C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\WPF_KINL_Server\WPF_KINL_Server\obj\Debug\WPF_KINL_Server.csproj.GenerateResource.cache
+C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\WPF_KINL_Server\WPF_KINL_Server\obj\Debug\WPF_KINL_Server.csproj.CoreCompileInputs.cache
+C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\WPF_KINL_Server\WPF_KINL_Server\obj\Debug\WPF_KINL_Server.Server.resources
+C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\WPF_KINL_Server\WPF_KINL_Server\bin\Debug\WPF_KINL_Server.exe.config
+C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\WPF_KINL_Server\WPF_KINL_Server\bin\Debug\WPF_KINL_Server.exe
+C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\WPF_KINL_Server\WPF_KINL_Server\bin\Debug\WPF_KINL_Server.pdb
+C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\WPF_KINL_Server\WPF_KINL_Server\obj\Debug\WPF_KINL_Server.exe
+C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\WPF_KINL_Server\WPF_KINL_Server\obj\Debug\WPF_KINL_Server.pdb

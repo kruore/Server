@@ -29,11 +29,6 @@
         private void InitializeComponent()
         {
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.UserID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.UserName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.UserControll = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.UserData = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.UseDevice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.stateLabel = new System.Windows.Forms.Label();
@@ -48,12 +43,6 @@
             this.dataGridView1.AllowUserToResizeRows = false;
             this.dataGridView1.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.UserID,
-            this.UserName,
-            this.UserControll,
-            this.UserData,
-            this.UseDevice});
             this.dataGridView1.Enabled = false;
             this.dataGridView1.Location = new System.Drawing.Point(4, -1);
             this.dataGridView1.Name = "dataGridView1";
@@ -61,31 +50,7 @@
             this.dataGridView1.Size = new System.Drawing.Size(544, 451);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick_1);
-            // 
-            // UserID
-            // 
-            this.UserID.HeaderText = "UserID";
-            this.UserID.Name = "UserID";
-            // 
-            // UserName
-            // 
-            this.UserName.HeaderText = "UserName";
-            this.UserName.Name = "UserName";
-            // 
-            // UserControll
-            // 
-            this.UserControll.HeaderText = "UserControll";
-            this.UserControll.Name = "UserControll";
-            // 
-            // UserData
-            // 
-            this.UserData.HeaderText = "UserData";
-            this.UserData.Name = "UserData";
-            // 
-            // UseDevice
-            // 
-            this.UseDevice.HeaderText = "UseDevice";
-            this.UseDevice.Name = "UseDevice";
+
             // 
             // label1
             // 
@@ -137,11 +102,6 @@
         #endregion
 
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn UserID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn UserName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn UserControll;
-        private System.Windows.Forms.DataGridViewTextBoxColumn UserData;
-        private System.Windows.Forms.DataGridViewTextBoxColumn UseDevice;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Label label1;
