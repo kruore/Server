@@ -94,7 +94,7 @@ namespace KINL_Server
 
             foreach (var item in msgList)
             {
-                string[] splitedMsg = item.Split('<');
+                string[] splitedMsg = item.Split(',');
 
                 receiver = splitedMsg[0];
                 parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);

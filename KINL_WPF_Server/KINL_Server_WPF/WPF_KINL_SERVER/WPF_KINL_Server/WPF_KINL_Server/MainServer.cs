@@ -25,14 +25,14 @@ namespace WPF_KINL_Server
         {
             TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, 4545));
             listener.Start();
-            Console.WriteLine(  "Server Opened" );
+            Console.WriteLine("Server Opened");
 
             while (true)
             {
                 Task<TcpClient> acceptTask = listener.AcceptTcpClientAsync();
                 acceptTask.Wait();
-                Console.WriteLine("SomeClientConnect");
 
+                Console.WriteLine("SomeClientConnect");
                 TcpClient newClient = acceptTask.Result;
 
                 _clientManager.AddClient(newClient);

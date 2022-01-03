@@ -27,23 +27,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\epsel\\.nuget\\packages\\": {},
+    "C:\\Users\\user\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\GitHub\\Server\\PacketSession\\DummyClient\\DummyClient.csproj",
+      "projectUniqueName": "C:\\Users\\user\\Documents\\GitHub\\Server\\PacketSession\\DummyClient\\DummyClient.csproj",
       "projectName": "DummyClient",
-      "projectPath": "D:\\GitHub\\Server\\PacketSession\\DummyClient\\DummyClient.csproj",
-      "packagesPath": "C:\\Users\\epsel\\.nuget\\packages\\",
-      "outputPath": "D:\\GitHub\\Server\\PacketSession\\DummyClient\\obj\\",
+      "projectPath": "C:\\Users\\user\\Documents\\GitHub\\Server\\PacketSession\\DummyClient\\DummyClient.csproj",
+      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\user\\Documents\\GitHub\\Server\\PacketSession\\DummyClient\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\epsel\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -58,8 +58,8 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "D:\\GitHub\\Server\\PacketSession\\ServerCore\\ServerCore.csproj": {
-              "projectPath": "D:\\GitHub\\Server\\PacketSession\\ServerCore\\ServerCore.csproj"
+            "C:\\Users\\user\\Documents\\GitHub\\Server\\PacketSession\\ServerCore\\ServerCore.csproj": {
+              "projectPath": "C:\\Users\\user\\Documents\\GitHub\\Server\\PacketSession\\ServerCore\\ServerCore.csproj"
             }
           }
         }
@@ -83,12 +83,6 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[3.1.21, 3.1.21]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"

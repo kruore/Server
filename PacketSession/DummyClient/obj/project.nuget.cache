@@ -1,10 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "IMYU0aKlNEHLxaTypVsatlKNdZyxwGKpsThZTbZno1uIb6iC62Warhtv89UhzfJpPLsAZf/BwGaiRP+72Pr3eg==",
+  "dgSpecHash": "uHc3QryT5gHPNoTfoJ+xilQr5s9iPJUyCcLG9iSx81JQKKtGhvoW6KnZqvG3WS6iqysALrLnDFd+/3LhjWujyQ==",
   "success": true,
-  "projectFilePath": "D:\\GitHub\\Server\\PacketSession\\DummyClient\\DummyClient.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\epsel\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.21\\microsoft.netcore.app.host.win-x64.3.1.21.nupkg.sha512"
-  ],
+  "projectFilePath": "C:\\Users\\user\\Documents\\GitHub\\Server\\PacketSession\\DummyClient\\DummyClient.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }

@@ -29,12 +29,6 @@
         private void InitializeComponent()
         {
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.UserName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ConnectDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Data = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ControllDevice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DeviceData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.StateLabel = new System.Windows.Forms.Label();
             this.serverStateLabel = new System.Windows.Forms.Label();
             this.serverResetButton = new System.Windows.Forms.Button();
@@ -49,62 +43,20 @@
             this.dataGridView1.AllowUserToResizeColumns = false;
             this.dataGridView1.AllowUserToResizeRows = false;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ID,
-            this.UserName,
-            this.ConnectDate,
-            this.Data,
-            this.ControllDevice,
-            this.DeviceData});
             this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnF2;
             this.dataGridView1.Enabled = false;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 40);
+            this.dataGridView1.Location = new System.Drawing.Point(12, 30);
             this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(995, 599);
+            this.dataGridView1.Size = new System.Drawing.Size(1170, 225);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick_1);
-            // 
-            // ID
-            // 
-            this.ID.FillWeight = 50F;
-            this.ID.HeaderText = "ID";
-            this.ID.Name = "ID";
-            this.ID.Width = 50;
-            // 
-            // UserName
-            // 
-            this.UserName.HeaderText = "UserName";
-            this.UserName.Name = "UserName";
-            // 
-            // ConnectDate
-            // 
-            this.ConnectDate.HeaderText = "ConnectDate";
-            this.ConnectDate.Name = "ConnectDate";
-            // 
-            // Data
-            // 
-            this.Data.FillWeight = 300F;
-            this.Data.HeaderText = "Data";
-            this.Data.Name = "Data";
-            this.Data.Width = 300;
-            // 
-            // ControllDevice
-            // 
-            this.ControllDevice.HeaderText = "ControllDevice";
-            this.ControllDevice.Name = "ControllDevice";
-            // 
-            // DeviceData
-            // 
-            this.DeviceData.FillWeight = 300F;
-            this.DeviceData.HeaderText = "DeviceData";
-            this.DeviceData.Name = "DeviceData";
-            this.DeviceData.Width = 300;
             // 
             // StateLabel
             // 
             this.StateLabel.AutoSize = true;
-            this.StateLabel.Location = new System.Drawing.Point(1012, 67);
+            this.StateLabel.Location = new System.Drawing.Point(1012, 258);
             this.StateLabel.Name = "StateLabel";
             this.StateLabel.Size = new System.Drawing.Size(81, 12);
             this.StateLabel.TabIndex = 1;
@@ -115,7 +67,7 @@
             // 
             this.serverStateLabel.AutoSize = true;
             this.serverStateLabel.ForeColor = System.Drawing.Color.Red;
-            this.serverStateLabel.Location = new System.Drawing.Point(1100, 66);
+            this.serverStateLabel.Location = new System.Drawing.Point(1103, 258);
             this.serverStateLabel.Name = "serverStateLabel";
             this.serverStateLabel.Size = new System.Drawing.Size(49, 12);
             this.serverStateLabel.TabIndex = 2;
@@ -123,7 +75,7 @@
             // 
             // serverResetButton
             // 
-            this.serverResetButton.Location = new System.Drawing.Point(1014, 96);
+            this.serverResetButton.Location = new System.Drawing.Point(1014, 290);
             this.serverResetButton.Name = "serverResetButton";
             this.serverResetButton.Size = new System.Drawing.Size(110, 29);
             this.serverResetButton.TabIndex = 3;
@@ -133,11 +85,13 @@
             // 
             // RefreshButton
             // 
+            this.RefreshButton.AutoSize = true;
             this.RefreshButton.Location = new System.Drawing.Point(1014, 571);
             this.RefreshButton.Name = "RefreshButton";
             this.RefreshButton.Size = new System.Drawing.Size(138, 55);
             this.RefreshButton.TabIndex = 4;
             this.RefreshButton.Text = "Refresh";
+            this.RefreshButton.UseCompatibleTextRendering = true;
             this.RefreshButton.UseVisualStyleBackColor = true;
             this.RefreshButton.Click += new System.EventHandler(this.RefreshButton_Click);
             // 
@@ -145,6 +99,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1180, 638);
             this.Controls.Add(this.RefreshButton);
             this.Controls.Add(this.serverResetButton);
@@ -167,12 +123,6 @@
         private System.Windows.Forms.Label serverStateLabel;
         private System.Windows.Forms.Button serverResetButton;
         private System.Windows.Forms.Button RefreshButton;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn UserName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ConnectDate;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Data;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ControllDevice;
-        private System.Windows.Forms.DataGridViewTextBoxColumn DeviceData;
     }
 }
 

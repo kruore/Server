@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Windows.Forms;
-using System.Net;
-using System.Net.Sockets;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text;
-using System.Collections.ObjectModel;
-using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace WPF_KINL_Server
 {
@@ -18,6 +17,21 @@ namespace WPF_KINL_Server
         private ObservableCollection<string> userList = new ObservableCollection<string>();
         private ObservableCollection<string> AccessLogList = new ObservableCollection<string>();
         Task conntectCheckThread = null;
+        public event System.Windows.Forms.ScrollEventHandler Scroll;
+        private void gridBasic_Scroll(object sender, ScrollEventArgs e)
+        {
+            //수평
+            dataGridView1.HorizontalScrollingOffset = dataGridView1.HorizontalScrollingOffset;
+            //수직
+            dataGridView1.FirstDisplayedScrollingRowIndex = dataGridView1.FirstDisplayedScrollingRowIndex;
+        }
+
+
+        private void gridTarget_Scroll(object sender, ScrollEventArgs e)
+        {
+            dataGridView1.HorizontalScrollingOffset = dataGridView1.HorizontalScrollingOffset;
+            dataGridView1.FirstDisplayedScrollingRowIndex = dataGridView1.FirstDisplayedScrollingRowIndex;
+        }
 
         public Server()
         {
@@ -26,8 +40,43 @@ namespace WPF_KINL_Server
             ClientManager.messageParsingAction += MessageParsing;
             ClientManager.ChangeListViewAction += ChangeListView;
             dataGridView1.DataSource = chattingLogList;
-
+            //ChattingLogListView.ItemActivate = chattingLogList;
+            //UserListView.ItemsSource = userList;
+            //AccessLogListView.ItemsSource = AccessLogList;
+            conntectCheckThread = new Task(ConnectCheckLoop);
+            conntectCheckThread.Start();
+            dataGridView1.Scroll += gridBasic_Scroll;
+            dataGridView1.Scroll += gridTarget_Scroll;
             //dataGridView1.= chattingLogList;
+        }
+        private void ConnectCheckLoop()
+        {
+            while (true)
+            {
+                foreach (var item in ClientManager.clientDic)
+                {
+                    try
+                    {
+                        string sendStringData = "관리자<TEST>";
+                        byte[] sendByteData = new byte[sendStringData.Length];
+                        sendByteData = Encoding.Default.GetBytes(sendStringData);
+                        item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                    }
+                    catch (Exception e)
+                    {
+                        RemoveClient(item.Value);
+                    }
+                }
+                Thread.Sleep(1000);
+            }
+        }
+        private void RemoveClient(ClientData targetClient)
+        {
+            ClientData result = null;
+            ClientManager.clientDic.TryRemove(targetClient.clientNumber, out result);
+            string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
+            ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
+            ChangeListView(result.clientName, StaticDefine.REMOVE_USER_LIST);
         }
         private void ChangeListView(string Message, int key)
         {
@@ -35,49 +84,40 @@ namespace WPF_KINL_Server
             {
                 case StaticDefine.ADD_ACCESS_LIST:
                     {
-                        //Dispatcher.Invoke(DispatcherPriority.Normal, new Action(() =>
-                        //{
-                        //    AccessLogList.Add(Message);
-                        //}));
-
-                        //dataGridView1.BeginInvoke((Action)(() =>
-                        //    dataGridView1.DataSource = dataGridView1.Rows.Add("??", "???", "??????", "제발!", "맞냐", "?")));
-
+                        Console.WriteLine("User ADD");
+                        dataGridView1.BeginInvoke((Action)(() =>
+                        {
+                            dataGridView1.ColumnCount = 3;
+                            dataGridView1.Rows.Add("???", "??", "???");
+                           
+                        }));
                         break;
                     }
                 case StaticDefine.ADD_CHATTING_LIST:
                     {
-                        //dataGridView1.BeginInvoke((Action)(() =>
-                        // dataGridView1.DataSource = dataGridView1.Rows.Add("??", "???", "??????", "제발!", "맞냐", "?")));
-                        ////Dispatcher.Invoke(DispatcherPriority.Normal, new Action(() =>
-                        //{
-                        //    chattingLogList.Add(Message);
-                        //}));
+                        Console.WriteLine("DATACOMMING");
+
                         break;
                     }
                 case StaticDefine.ADD_USER_LIST:
                     {
-                        //dataGridView1.BeginInvoke((Action)(() =>
-                        // dataGridView1.DataSource = dataGridView1.Rows.Add("??", "???", "??????", "제발!", "맞냐", "?")));
-                        //Dispatcher.Invoke(DispatcherPriority.Normal, new Action(() =>
-                        //{
-                        //    userList.Add(Message);
-                        //}));
+                        Console.WriteLine("USER LIST ++");
                         break;
                     }
                 case StaticDefine.REMOVE_USER_LIST:
                     {
-                        //Dispatcher.Invoke(DispatcherPriority.Normal, new Action(() =>
-                        //{
-                        //    userList.Remove(Message);
-                        //}));
+                        Console.WriteLine("REMOVEEEEE");
+                        Console.WriteLine(Message + "DATA");
+                        dataGridView1.BeginInvoke((Action)(() =>
+                        {
+                            dataGridView1.Rows.Remove(dataGridView1.Rows[0]);
+                        }));
                         break;
                     }
                 default:
                     break;
             }
         }
-
         private void MainServerStart()
         {
             MainServer a = new MainServer();
@@ -95,8 +135,12 @@ namespace WPF_KINL_Server
                         Console.WriteLine(item.ToString());
                     }
                 }
+                if (!message.Contains("vp,"))
+                {
+                    Console.WriteLine("ERROR : Doesn't Match Format");
+                    return;
+                }
                 string[] separatingStrings = { "vp," };
-                
                 string[] msgArray = message.Split(separatingStrings, System.StringSplitOptions.RemoveEmptyEntries);
                 foreach (var item in msgArray)
                 {
@@ -123,6 +167,9 @@ namespace WPF_KINL_Server
                     Console.WriteLine("msg: " + msgList[0]);
                     receiver = splitedMsg[1];
                     parsedMessage = String.Format("{0}<{1}>", sender, splitedMsg[1]);
+                    ChangeListView(parsedMessage, StaticDefine.ADD_ACCESS_LIST);
+
+                    dataGridView1.FirstDisplayedScrollingRowIndex = dataGridView1.Rows.Count - 1;
                 }
             }
             catch (Exception ex)
@@ -133,10 +180,14 @@ namespace WPF_KINL_Server
             {
                 string[] splitedMsg = item.Split(',');
                 Console.WriteLine(splitedMsg[1].ToString());
-                receiver = splitedMsg[0];
+
+                if (splitedMsg.Length < 11)
+                {
+                    return;
+                }
+
                 parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
-                Console.WriteLine(parsedMessage.ToString());
-                if (parsedMessage.Contains("ID"))
+                if (parsedMessage.Contains("1"))
                 {
                     string[] groupSplit = receiver.Split(',');
 
@@ -236,14 +287,9 @@ namespace WPF_KINL_Server
             return -1;
         }
 
-
-
-
-
-
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            dataGridView1.DataSource = null;
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -271,7 +317,6 @@ namespace WPF_KINL_Server
         }
         private void dataGridView1_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
         {
-
         }
     }
 }

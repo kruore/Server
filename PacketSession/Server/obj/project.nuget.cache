@@ -1,10 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "M8Hv6jQxLO6T/OygqDRt33GLyq0p1+1g51/Ei4mt0K0VXJ5wbp/1S2jIFjA+5SMYt4kCtTC/8iy7T87woNcxtw==",
+  "dgSpecHash": "WrewJW5XQL7l8UpYw2YTgO8JPBq959paQfZL8G3IBml4n662/J8oWcTnJmNklsxP+NJpNNnOAZUYkraG0U53gQ==",
   "success": true,
-  "projectFilePath": "D:\\GitHub\\Server\\PacketSession\\Server\\Server.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\epsel\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.21\\microsoft.netcore.app.host.win-x64.3.1.21.nupkg.sha512"
-  ],
+  "projectFilePath": "C:\\Users\\user\\Documents\\GitHub\\Server\\PacketSession\\Server\\Server.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }
