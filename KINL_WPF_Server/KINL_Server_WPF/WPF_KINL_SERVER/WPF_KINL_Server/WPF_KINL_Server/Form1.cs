@@ -134,6 +134,11 @@ namespace WPF_KINL_Server
             try
             {
                 Console.WriteLine("msgs: " + msgList[0]);
+               // userList.Add(splitedMsg[2]);
+                this.Invoke((Action)delegate
+                {
+                    PlayerAdd();
+                });
                 foreach (var item in msgList)
                 {
                     string[] splitedMsg = item.Split(',');
@@ -144,7 +149,6 @@ namespace WPF_KINL_Server
                         case "1" :
                             if(userList.Count==0)
                             {
-                                userList.Add(splitedMsg[2]);
                                 Console.WriteLine($"User :{splitedMsg[2].ToString()} Connect ");
                             }
                             // Save User List From Name
@@ -153,6 +157,10 @@ namespace WPF_KINL_Server
                                 if(user != splitedMsg[2])
                                 {
                                     userList.Add(splitedMsg[2]);
+                                    //this.Invoke((Action)delegate
+                                    //{
+                                    //    PlayerAdd();
+                                    //});
                                     Console.WriteLine($"User :{splitedMsg[2].ToString()} Connect ");
                                 }
                                 else
@@ -272,6 +280,13 @@ namespace WPF_KINL_Server
                     ClientManager.clientDic[receiverNumber].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
             }
         }
+
+        private delegate void DataSetting();
+        private void PlayerAdd()
+        {
+            dataGridView1.Rows.Add("???", "???", "????", "?????");
+        }
+
         private int GetClinetNumber(string targetClientName)
         {
             foreach (var item in ClientManager.clientDic)
@@ -283,30 +298,30 @@ namespace WPF_KINL_Server
             }
             return -1;
         }
-
+    
         private void Form1_Load(object sender, EventArgs e)
         {
-           // dataGridView1.DataSource = null;
-           // SetupDataGridView();
+            dataGridView1.DataSource = null;
+            SetupDataGridView();
         }
 
 
         private void SetupDataGridView()
         {
-         
-           // dataGridView1.PerformLayout();
-            //dataGridView1.ColumnCount = 7;
 
-            //chattingLogList.Add("??,???,????");
+            dataGridView1.PerformLayout();
+            dataGridView1.ColumnCount = 7;
+
+            chattingLogList.Add("??,???,????");
 
 
-            //dataGridView1.Columns[0].Name = "ID";
-            //dataGridView1.Columns[1].Name = "Name";
-            //dataGridView1.Columns[2].Name = "Date";
-            //dataGridView1.Columns[3].Name = "Data";
-            //dataGridView1.Columns[4].Name = "Controll";
-            //dataGridView1.Columns[5].Name = "Device";
-            //dataGridView1.Columns[6].Name = "DeviceData";
+            dataGridView1.Columns[0].Name = "ID";
+            dataGridView1.Columns[1].Name = "Name";
+            dataGridView1.Columns[2].Name = "Date";
+            dataGridView1.Columns[3].Name = "Data";
+            dataGridView1.Columns[4].Name = "Controll";
+            dataGridView1.Columns[5].Name = "Device";
+            dataGridView1.Columns[6].Name = "DeviceData";
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)

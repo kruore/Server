@@ -28,36 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.components = new System.ComponentModel.Container();
             this.StateLabel = new System.Windows.Forms.Label();
             this.serverStateLabel = new System.Windows.Forms.Label();
             this.serverResetButton = new System.Windows.Forms.Button();
             this.RefreshButton = new System.Windows.Forms.Button();
+            this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
+            this.printDocument1 = new System.Drawing.Printing.PrintDocument();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.AllowUserToResizeColumns = false;
-            this.dataGridView1.AllowUserToResizeRows = false;
-            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dataGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllHeaders;
-            this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.dataGridView1.Enabled = false;
-            this.dataGridView1.Location = new System.Drawing.Point(12, 30);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(1081, 225);
-            this.dataGridView1.TabIndex = 0;
-            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick_1);
             // 
             // StateLabel
             // 
             this.StateLabel.AutoSize = true;
-            this.StateLabel.Location = new System.Drawing.Point(1012, 258);
+            this.StateLabel.Location = new System.Drawing.Point(1012, 416);
             this.StateLabel.Name = "StateLabel";
             this.StateLabel.Size = new System.Drawing.Size(81, 12);
             this.StateLabel.TabIndex = 1;
@@ -68,7 +54,7 @@
             // 
             this.serverStateLabel.AutoSize = true;
             this.serverStateLabel.ForeColor = System.Drawing.Color.Red;
-            this.serverStateLabel.Location = new System.Drawing.Point(1103, 258);
+            this.serverStateLabel.Location = new System.Drawing.Point(1103, 416);
             this.serverStateLabel.Name = "serverStateLabel";
             this.serverStateLabel.Size = new System.Drawing.Size(49, 12);
             this.serverStateLabel.TabIndex = 2;
@@ -76,7 +62,7 @@
             // 
             // serverResetButton
             // 
-            this.serverResetButton.Location = new System.Drawing.Point(1014, 290);
+            this.serverResetButton.Location = new System.Drawing.Point(1014, 474);
             this.serverResetButton.Name = "serverResetButton";
             this.serverResetButton.Size = new System.Drawing.Size(110, 29);
             this.serverResetButton.TabIndex = 3;
@@ -96,6 +82,22 @@
             this.RefreshButton.UseVisualStyleBackColor = true;
             this.RefreshButton.Click += new System.EventHandler(this.RefreshButton_Click);
             // 
+            // dataGridView1
+            // 
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.AllowUserToResizeColumns = false;
+            this.dataGridView1.AllowUserToResizeRows = false;
+            this.dataGridView1.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this.dataGridView1.Location = new System.Drawing.Point(12, 47);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.RowTemplate.Height = 23;
+            this.dataGridView1.Size = new System.Drawing.Size(516, 193);
+            this.dataGridView1.TabIndex = 5;
+            // 
             // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -103,14 +105,15 @@
             this.AutoScroll = true;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1180, 638);
+            this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.RefreshButton);
             this.Controls.Add(this.serverResetButton);
             this.Controls.Add(this.serverStateLabel);
             this.Controls.Add(this.StateLabel);
-            this.Controls.Add(this.dataGridView1);
             this.Name = "Server";
             this.Text = "Server";
             this.Load += new System.EventHandler(this.Form1_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -118,12 +121,13 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Label StateLabel;
         private System.Windows.Forms.Label serverStateLabel;
         private System.Windows.Forms.Button serverResetButton;
         private System.Windows.Forms.Button RefreshButton;
+        private System.Windows.Forms.BindingSource bindingSource1;
+        private System.Drawing.Printing.PrintDocument printDocument1;
+        private System.Windows.Forms.DataGridView dataGridView1;
     }
 }
 

@@ -197,7 +197,6 @@ namespace KINL_Server
             catch (Exception ex)
             {
                 RemoveClient(ar.AsyncState as ClientData);
-
             }
         }
     }
