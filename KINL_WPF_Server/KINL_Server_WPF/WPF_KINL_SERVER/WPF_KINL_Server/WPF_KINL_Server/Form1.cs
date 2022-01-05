@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Reflection;
 
 namespace WPF_KINL_Server
 {
@@ -17,21 +18,6 @@ namespace WPF_KINL_Server
         private ObservableCollection<string> userList = new ObservableCollection<string>();
         private ObservableCollection<string> AccessLogList = new ObservableCollection<string>();
         Task conntectCheckThread = null;
-        public event System.Windows.Forms.ScrollEventHandler Scroll;
-        private void gridBasic_Scroll(object sender, ScrollEventArgs e)
-        {
-            //수평
-            dataGridView1.HorizontalScrollingOffset = dataGridView1.HorizontalScrollingOffset;
-            //수직
-            dataGridView1.FirstDisplayedScrollingRowIndex = dataGridView1.FirstDisplayedScrollingRowIndex;
-        }
-
-
-        private void gridTarget_Scroll(object sender, ScrollEventArgs e)
-        {
-            dataGridView1.HorizontalScrollingOffset = dataGridView1.HorizontalScrollingOffset;
-            dataGridView1.FirstDisplayedScrollingRowIndex = dataGridView1.FirstDisplayedScrollingRowIndex;
-        }
 
         public Server()
         {
@@ -45,9 +31,6 @@ namespace WPF_KINL_Server
             //AccessLogListView.ItemsSource = AccessLogList;
             conntectCheckThread = new Task(ConnectCheckLoop);
             conntectCheckThread.Start();
-            dataGridView1.Scroll += gridBasic_Scroll;
-            dataGridView1.Scroll += gridTarget_Scroll;
-            //dataGridView1.= chattingLogList;
         }
         private void ConnectCheckLoop()
         {
@@ -75,31 +58,20 @@ namespace WPF_KINL_Server
             ClientData result = null;
             ClientManager.clientDic.TryRemove(targetClient.clientNumber, out result);
             string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
-            ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
+            //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
             ChangeListView(result.clientName, StaticDefine.REMOVE_USER_LIST);
         }
         private void ChangeListView(string Message, int key)
         {
             switch (key)
             {
-                case StaticDefine.ADD_ACCESS_LIST:
-                    {
-                        Console.WriteLine("User ADD");
-                        dataGridView1.BeginInvoke((Action)(() =>
-                        {
-                            dataGridView1.ColumnCount = 3;
-                            dataGridView1.Rows.Add("???", "??", "???");
-                           
-                        }));
-                        break;
-                    }
-                case StaticDefine.ADD_CHATTING_LIST:
+                case StaticDefine.ADD_DATA_LIST:
                     {
                         Console.WriteLine("DATACOMMING");
 
                         break;
                     }
-                case StaticDefine.ADD_USER_LIST:
+                case StaticDefine.ADD_USER:
                     {
                         Console.WriteLine("USER LIST ++");
                         break;
@@ -161,15 +133,40 @@ namespace WPF_KINL_Server
             int receiverNumber = -1;
             try
             {
+                Console.WriteLine("msgs: " + msgList[0]);
                 foreach (var item in msgList)
                 {
                     string[] splitedMsg = item.Split(',');
                     Console.WriteLine("msg: " + msgList[0]);
-                    receiver = splitedMsg[1];
-                    parsedMessage = String.Format("{0}<{1}>", sender, splitedMsg[1]);
-                    ChangeListView(parsedMessage, StaticDefine.ADD_ACCESS_LIST);
-
-                    dataGridView1.FirstDisplayedScrollingRowIndex = dataGridView1.Rows.Count - 1;
+                    switch(splitedMsg[0])
+                    {
+                        // if, Connect
+                        case "1" :
+                            if(userList.Count==0)
+                            {
+                                userList.Add(splitedMsg[2]);
+                                Console.WriteLine($"User :{splitedMsg[2].ToString()} Connect ");
+                            }
+                            // Save User List From Name
+                            foreach(var user in userList)
+                            {
+                                if(user != splitedMsg[2])
+                                {
+                                    userList.Add(splitedMsg[2]);
+                                    Console.WriteLine($"User :{splitedMsg[2].ToString()} Connect ");
+                                }
+                                else
+                                {
+                                    return;
+                                }
+                            }
+                            break;
+                        // if, Disconnect
+                        case "3":
+                            Console.WriteLine($"User :{splitedMsg[2].ToString()} Disconnect ");
+                            userList.Remove(splitedMsg[2]);
+                            break;
+                    }
                 }
             }
             catch (Exception ex)
@@ -196,7 +193,7 @@ namespace WPF_KINL_Server
                         if (string.IsNullOrEmpty(el))
                             continue;
                         string groupLogMessage = string.Format(@"[{0}] [{1}] -> [{2}] , {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), groupSplit[0], el, splitedMsg[1]);
-                        ChangeListView(groupLogMessage, StaticDefine.ADD_CHATTING_LIST);
+                       //ChangeListView(groupLogMessage, StaticDefine.ADD_CHATTING_LIST);
 
                         receiverNumber = GetClinetNumber(el);
 
@@ -217,7 +214,7 @@ namespace WPF_KINL_Server
                         if (el == groupSplit[0])
                             continue;
                         string groupLogMessage = string.Format(@"[{0}] [{1}] -> [{2}] , {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), groupSplit[0], el, splitedMsg[1]);
-                        ChangeListView(groupLogMessage, StaticDefine.ADD_CHATTING_LIST);
+                      //  ChangeListView(groupLogMessage, StaticDefine.ADD_CHATTING_LIST);
 
                         receiverNumber = GetClinetNumber(el);
 
@@ -255,7 +252,7 @@ namespace WPF_KINL_Server
                 }
 
                 string logMessage = string.Format(@"[{0}] [{1}] -> [{2}] , {3}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), sender, receiver, splitedMsg[1]);
-                ChangeListView(logMessage, StaticDefine.ADD_CHATTING_LIST);
+              //  ChangeListView(logMessage, StaticDefine.ADD_CHATTING_LIST);
 
                 if (parsedMessage.Contains("<ChattingStart>"))
                 {
@@ -289,7 +286,27 @@ namespace WPF_KINL_Server
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            dataGridView1.DataSource = null;
+           // dataGridView1.DataSource = null;
+           // SetupDataGridView();
+        }
+
+
+        private void SetupDataGridView()
+        {
+         
+           // dataGridView1.PerformLayout();
+            //dataGridView1.ColumnCount = 7;
+
+            //chattingLogList.Add("??,???,????");
+
+
+            //dataGridView1.Columns[0].Name = "ID";
+            //dataGridView1.Columns[1].Name = "Name";
+            //dataGridView1.Columns[2].Name = "Date";
+            //dataGridView1.Columns[3].Name = "Data";
+            //dataGridView1.Columns[4].Name = "Controll";
+            //dataGridView1.Columns[5].Name = "Device";
+            //dataGridView1.Columns[6].Name = "DeviceData";
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)

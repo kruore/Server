@@ -18,13 +18,21 @@ class Program
         tcpClient = new TcpClient();
 
         tcpClient.Connect("210.94.216.195", 4545);
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 5; i++)
         {
-            byte[] buf = Encoding.Default.GetBytes("vp,ID,Name,Date,Data,Controll,Device,DeviceData");
+            byte[] buf = Encoding.Default.GetBytes($"vp,1,ID,Name+{i},Date,Data,Controll,Device,DeviceData");
             tcpClient.GetStream().Write(buf, 0, buf.Length);
             Thread.Sleep(1000);
         }
+        byte[] bu2f = Encoding.Default.GetBytes("vp,3,ID,Name,Date,Data,Controll,Device,DeviceData");
+        tcpClient.GetStream().Write(bu2f, 0, bu2f.Length);
+
+
+        byte[] recvbuff = new byte[1024];
         
+
+
+
         while (true)
         {
              ;

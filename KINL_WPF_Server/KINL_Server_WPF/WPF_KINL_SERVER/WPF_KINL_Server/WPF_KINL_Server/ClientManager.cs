@@ -51,10 +51,10 @@ namespace WPF_KINL_Server
                         {
                             string userName = strData.Substring(1);
                             client.clientName = userName;
-                            ChangeListViewAction.Invoke(client.clientName, StaticDefine.ADD_USER_LIST);
+                            ChangeListViewAction.Invoke(client.clientName, StaticDefine.ADD_USER);
                             string accessLog = string.Format("[{0}] {1} Access Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), client.clientName);
                             Console.WriteLine(accessLog);
-                            ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_ACCESS_LIST);
+                            //ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_USER);
                             File.AppendAllText("AccessRecored.txt", accessLog + "\n");
                             return;
                         }

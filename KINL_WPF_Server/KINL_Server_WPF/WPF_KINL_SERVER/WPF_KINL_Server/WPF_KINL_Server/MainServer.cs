@@ -7,12 +7,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VoucherDB;
 
 namespace WPF_KINL_Server
 {
     public class MainServer
     {
         ClientManager _clientManager = new ClientManager();
+        GM_DBManager GM_DBManager = new GM_DBManager();
 
         public MainServer()
         {
