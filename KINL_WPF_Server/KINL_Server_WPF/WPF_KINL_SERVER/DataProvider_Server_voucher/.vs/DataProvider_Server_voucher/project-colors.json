@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "49ab6f86-5197-4839-8c5f-90589171cc34": {
+      "ProjectGuid": "49ab6f86-5197-4839-8c5f-90589171cc34",
+      "DisplayName": "DataProvider_Server_voucher",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}

@@ -15,6 +15,8 @@ namespace WPF_KINL_Server
         public StringBuilder currentMsg { get; set; }
         public string clientName { get; set; }
         public int clientNumber { get; set; }
+        public enum ClientType { User, Device};
+        public ClientType clientType { get; set; }
 
         public ClientData(TcpClient tcpClient)
         {

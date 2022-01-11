@@ -36,8 +36,12 @@
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.dataGridView2 = new System.Windows.Forms.DataGridView();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.SuspendLayout();
             // 
             // StateLabel
@@ -95,8 +99,36 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(516, 193);
+            this.dataGridView1.Size = new System.Drawing.Size(480, 217);
             this.dataGridView1.TabIndex = 5;
+            // 
+            // dataGridView2
+            // 
+            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView2.Location = new System.Drawing.Point(12, 296);
+            this.dataGridView2.Name = "dataGridView2";
+            this.dataGridView2.RowTemplate.Height = 23;
+            this.dataGridView2.Size = new System.Drawing.Size(419, 217);
+            this.dataGridView2.TabIndex = 6;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(13, 29);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(31, 12);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "User";
+            this.label1.Click += new System.EventHandler(this.label1_Click_1);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(15, 278);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(43, 12);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Device";
             // 
             // Server
             // 
@@ -105,6 +137,9 @@
             this.AutoScroll = true;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1180, 638);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.RefreshButton);
             this.Controls.Add(this.serverResetButton);
@@ -115,6 +150,7 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -128,6 +164,9 @@
         private System.Windows.Forms.BindingSource bindingSource1;
         private System.Drawing.Printing.PrintDocument printDocument1;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView dataGridView2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }
 
