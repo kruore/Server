@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Net;
 using System.Threading.Tasks;
+using System.Net.NetworkInformation;
 
 namespace DataProvider_Server_voucher
 {
@@ -18,6 +20,11 @@ namespace DataProvider_Server_voucher
         public enum ClientType { User, Device, IPhone, Watch};
         public ClientType clientType { get; set; }
 
+        //IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
+
+        //TcpConnectionInformation[] tcpConnInfoArray = properties.GetActiveTcpConnections();
+
+
         public ClientData(TcpClient tcpClient)
         {
             currentMsg = new StringBuilder();
@@ -31,10 +38,14 @@ namespace DataProvider_Server_voucher
 
             string[] temp = null;
             string[] temp2 = null;
+            string[] temp3 = null;
 
-            //temp = tcpClient.Client.RemoteEndPoint.ToString().Split(splitDivision);
-            temp = tcpClient.Client.LocalEndPoint.ToString().Split(splitDivision[0]);
-            temp2 = temp.ToString().Split(splitDivision[1]);
+            temp2 = tcpClient.Client.RemoteEndPoint.ToString().Split(splitDivision[1]);
+
+            //temp = tcpConnInfo.Client.LocalEndPoint.ToString().Split(splitDivision[0]);
+            //temp3 = ((IPEndPoint)tcpListener.LocalEndpoint).Port.ToString();
+
+            //temp2 = ((IPEndPoint)tcpClient.Client.LocalEndPoint).Port.ToString();          
             this.clientNumber = int.Parse(temp2[1]);
 
         }

@@ -35,8 +35,8 @@ namespace DataProvider_Server_voucher
 
                 Console.WriteLine("SomeClientConnect");
                 TcpClient newClient = acceptTask.Result;
-                Console.WriteLine(newClient.Client.LocalEndPoint.ToString());
-                Console.WriteLine(newClient.Client.RemoteEndPoint.ToString());
+                //Console.WriteLine(newClient.Client.LocalEndPoint.ToString());
+                //Console.WriteLine(newClient.Client.RemoteEndPoint.ToString());
 
                 _clientManager.AddClient(newClient);
             }

@@ -15,6 +15,7 @@ namespace DataProvider_Server_voucher
         public static ConcurrentDictionary<int, ClientData> clientDic = new ConcurrentDictionary<int, ClientData>();
         public static event Action<string, string> messageParsingAction = null;
         public static event Action<string, int, string> ChangeListViewAction = null;
+        public static event Action<string> PTP_Synchronized = null;
 
         public void AddClient(TcpClient newClient)
         {
@@ -23,8 +24,9 @@ namespace DataProvider_Server_voucher
             try
             {
                 newClient.GetStream().BeginRead(currentClient.readBuffer, 0, currentClient.readBuffer.Length, new AsyncCallback(DataReceived), currentClient);
-                Console.WriteLine(currentClient.clientNumber);
                 clientDic.TryAdd(currentClient.clientNumber, currentClient);
+                Console.WriteLine(currentClient.clientNumber);
+
             }
             catch (Exception e)
             {
@@ -39,10 +41,11 @@ namespace DataProvider_Server_voucher
 
             try
             {
+                //Console.WriteLine(client.tcpClient.Client.LocalEndPoint.ToString());
                 int byteLength = client.tcpClient.GetStream().EndRead(ar);
                 string strData = Encoding.Default.GetString(client.readBuffer, 0, byteLength);
                 client.tcpClient.GetStream().BeginRead(client.readBuffer, 0, client.readBuffer.Length, new AsyncCallback(DataReceived), client);
-
+       
                 if (string.IsNullOrEmpty(client.clientName))
                 {
                     if (ChangeListViewAction != null)
@@ -57,6 +60,7 @@ namespace DataProvider_Server_voucher
                             Console.WriteLine(accessLog);
                             ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_USER,null);
                             File.AppendAllText("AccessRecored.txt", accessLog + "\n");
+                            PTP_Synchronized.Invoke("Start");
                             return;
                         }
                     }
