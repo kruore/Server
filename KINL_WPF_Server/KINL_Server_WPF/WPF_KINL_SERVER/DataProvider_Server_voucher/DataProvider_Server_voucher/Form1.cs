@@ -18,6 +18,9 @@ namespace DataProvider_Server_voucher
         List<long> PTP_internetDelay = new List<long>();
         List<long> PTP_ServerDelay = new List<long>();
         List<long> PTP_ClientDelay = new List<long>();
+        float totalDelay = 0;
+        float serverDelays = 0;
+        float clientDelays = 0;
 
 
         List<string> msgList = new List<string>();
@@ -147,7 +150,7 @@ namespace DataProvider_Server_voucher
                             Console.WriteLine(ptpMsg[0]);
                             message += ";";
                             list.Add(message);
-                            if (list.Count>9)
+                            if (list.Count>10)
                             {
                                 CalculatePTP();
                             }
@@ -169,12 +172,6 @@ namespace DataProvider_Server_voucher
                     SendMsgToClient(item, sender);
                     //  Console.WriteLine(item.ToString());
                 }
-                //SendMsgToClient(msgList, sender);
-                //for (int i = 0; i < msgList.Count; i++)
-                //{
-
-
-                //}
             }
         }
 
@@ -187,6 +184,8 @@ namespace DataProvider_Server_voucher
             {
                 
                 string[] a = list[i].ToString().Split(',');
+                a[4] = a[4].TrimEnd(a[4][a[4].Length - 1]);
+
                 long server00 = Convert.ToInt64(a[1]);
                 long client00 = Convert.ToInt64(a[2]);
                 long server01 = Convert.ToInt64(a[3]);
@@ -200,6 +199,18 @@ namespace DataProvider_Server_voucher
                 PTP_ServerDelay.Add(serverDelay);
                 PTP_ClientDelay.Add(clientDelay);
             }
+            for(int j=0;j<list.Count;j++)
+            {
+                totalDelay += PTP_internetDelay[j];
+                serverDelays += PTP_ServerDelay[j];
+                clientDelays += PTP_ClientDelay[j];
+            }
+            totalDelay = totalDelay / list.Count;
+            serverDelays = serverDelays / list.Count;
+            clientDelays = clientDelays / list.Count;
+            Console.WriteLine("DELAY:"+totalDelay);
+            Console.WriteLine("SERVERDELAY:"+serverDelays);
+            Console.WriteLine("CLIENTDELAY:"+clientDelays);
         }
 
 
