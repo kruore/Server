@@ -53,7 +53,7 @@ namespace DataProvider_Server_voucher
             int i = 0;
 
             //  true = start
-            while (list.Count<10)
+            while (list.Count < 10)
             {
                 foreach (var item in ClientManager.clientDic)
                 {
@@ -71,9 +71,9 @@ namespace DataProvider_Server_voucher
                         catch (Exception e)
                         {
                             string sendStringData = $"<PTP>,{item.Key.ToString()},{preUnixMilliseconds}";
-                            Console.WriteLine(sendStringData);
+                            //Console.WriteLine(sendStringData);
                         }
-                        Thread.Sleep(1000);
+                        Thread.Sleep(100);
                         i++;
 
                         //if (i > 20)
@@ -91,6 +91,7 @@ namespace DataProvider_Server_voucher
             Console.WriteLine("END");
             conntectCheckThread = new Task(ConnectCheckLoop);
             conntectCheckThread.Start();
+            list.Clear();
             return;
         }
         private void ConnectCheckLoop()
@@ -121,6 +122,9 @@ namespace DataProvider_Server_voucher
         private void RemoveClient(ClientData targetClient)
         {
             ClientData result = null;
+            totalDelay.Remove(targetClient.clientNumber.ToString());
+            clientDelays.Remove(targetClient.clientNumber.ToString());
+            serverDelays.Remove(targetClient.clientNumber.ToString());
             ClientManager.clientDic.TryRemove(targetClient.clientNumber, out result);
             string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
             //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
@@ -137,31 +141,42 @@ namespace DataProvider_Server_voucher
                     if (message.Contains("<PTP>"))
                     {
                         string[] ptpMsg = message.Split(',');
-                        if (ptpMsg.Length < 6)
+                        if(totalDelay.ContainsKey(ptpMsg[1]))
                         {
-                            Console.WriteLine(ptpMsg);
-                            foreach (var item in ClientManager.clientDic)
+                            Console.WriteLine("이미 있음");
+                        }
+                        else
+                        {
+                            if (ptpMsg.Length < 6)
                             {
-                                timeOffset = DateTimeOffset.Now;
-                                preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                                ptpMsg[3] = ptpMsg[3].TrimEnd(ptpMsg[3][ptpMsg[3].Length - 1]);
-                                string sendStringData = $"{ptpMsg[0]},{ptpMsg[1]},{ptpMsg[2]},{ptpMsg[3]},{preUnixMilliseconds}";
-                                byte[] sendByteData = new byte[sendStringData.Length];
-                                sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                                item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                                Console.WriteLine(sendStringData);
+                                Console.WriteLine(ptpMsg);
+                                foreach (var item in ClientManager.clientDic)
+                                {
+                                    timeOffset = DateTimeOffset.Now;
+                                    preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
+                                    if (ptpMsg[3].Contains(";"))
+                                    {
+                                        ptpMsg[3] = ptpMsg[3].TrimEnd(ptpMsg[3][ptpMsg[3].Length - 1]);
+                                    }
+                                    string sendStringData = $"{ptpMsg[0]},{ptpMsg[1]},{ptpMsg[2]},{ptpMsg[3]},{preUnixMilliseconds}";
+                                    byte[] sendByteData = new byte[sendStringData.Length];
+                                    sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                                    item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                    Console.WriteLine(sendStringData);
+                                }
+                            }
+                            if (ptpMsg.Length >= 6 && ptpMsg.Length < 7)
+                            {
+                                Console.WriteLine(ptpMsg[0]);
+                                list.Add(message);
+                                if (list.Count == 10)
+                                {
+                                    CalculatePTP();
+                                }
+                                return;
                             }
                         }
-                        if (ptpMsg.Length >= 6 && ptpMsg.Length <7)
-                        {
-                            Console.WriteLine(ptpMsg[0]);
-                            list.Add(message);
-                            if (list.Count == 10)
-                            {
-                                CalculatePTP();
-                            }
-                            return;
-                        }
+                      
                     }
                 }
                 catch (Exception ex)
@@ -174,9 +189,13 @@ namespace DataProvider_Server_voucher
                 {
                     if (string.IsNullOrEmpty(item))
                         continue;
+                    if(!item.Contains(";"))
+                    {
+                        msgList.Add(item + ";");
+                    }
                     msgList.Add(item);
                     SendMsgToClient(item, sender);
-                    Console.WriteLine(item.ToString());
+                    //Console.WriteLine(item.ToString());
                 }
             }
         }
@@ -191,7 +210,10 @@ namespace DataProvider_Server_voucher
             for (int i = 0; i < list.Count; i++)
             {
                 string[] a = list[i].ToString().Split(',');
-                a[5] = a[5].TrimEnd(a[5][a[5].Length - 1]);
+                if (a[5].Contains(";"))
+                {
+                    a[5] = a[5].TrimEnd(a[5][a[5].Length - 1]);
+                }
                 long server00 = Convert.ToInt64(a[2]);
                 long client00 = Convert.ToInt64(a[3]);
                 long server01 = Convert.ToInt64(a[4]);
@@ -283,7 +305,7 @@ namespace DataProvider_Server_voucher
             }
             catch (Exception ex)
             {
-                 Console.WriteLine(msgList);
+                Console.WriteLine(msgList);
 
             }
         }
