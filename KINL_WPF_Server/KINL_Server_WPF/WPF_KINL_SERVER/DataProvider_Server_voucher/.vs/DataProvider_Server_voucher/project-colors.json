@@ -5,6 +5,11 @@
       "ProjectGuid": "49ab6f86-5197-4839-8c5f-90589171cc34",
       "DisplayName": "DataProvider_Server_voucher",
       "ColorIndex": 0
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "기타 파일",
+      "ColorIndex": -1
     }
   },
   "NextColorIndex": 1

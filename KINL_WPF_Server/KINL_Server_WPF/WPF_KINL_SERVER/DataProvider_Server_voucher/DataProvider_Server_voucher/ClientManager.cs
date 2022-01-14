@@ -25,7 +25,7 @@ namespace DataProvider_Server_voucher
             {
                 newClient.GetStream().BeginRead(currentClient.readBuffer, 0, currentClient.readBuffer.Length, new AsyncCallback(DataReceived), currentClient);
                 clientDic.TryAdd(currentClient.clientNumber, currentClient);
-                Console.WriteLine(currentClient.clientNumber);
+                Console.WriteLine("ClientNumber"+currentClient.clientNumber);
 
             }
             catch (Exception e)
