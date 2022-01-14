@@ -15,12 +15,9 @@ namespace DataProvider_Server_voucher
         private ObservableCollection<string> AirPotData = new ObservableCollection<string>();
         private ObservableCollection<string> WatchData = new ObservableCollection<string>();
         List<string> list = new List<string>();
-        List<long> PTP_internetDelay = new List<long>();
-        List<long> PTP_ServerDelay = new List<long>();
-        List<long> PTP_ClientDelay = new List<long>();
-        float totalDelay = 0;
-        float serverDelays = 0;
-        float clientDelays = 0;
+        Dictionary<string, long> totalDelay = new Dictionary<string, long>();
+        Dictionary<string, long> serverDelays = new Dictionary<string, long>();
+        Dictionary<string, long> clientDelays = new Dictionary<string, long>();
 
 
         List<string> msgList = new List<string>();
@@ -55,36 +52,46 @@ namespace DataProvider_Server_voucher
         {
             int i = 0;
 
-          //  true = start
-            while (PTP_Checker)
+            //  true = start
+            while (list.Count<10)
             {
                 foreach (var item in ClientManager.clientDic)
                 {
-                    try
+                    if (item.Value.clientNumber == item.Key)
                     {
-                        timeOffset = DateTimeOffset.Now;
-                        preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                        string sendStringData = $"<PTP>,{preUnixMilliseconds}";
-                        byte[] sendByteData = new byte[sendStringData.Length];
-                        sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                        item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        try
+                        {
+                            timeOffset = DateTimeOffset.Now;
+                            preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
+                            string sendStringData = $"<PTP>,{item.Key.ToString()},{preUnixMilliseconds}";
+                            byte[] sendByteData = new byte[sendStringData.Length];
+                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                            item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        }
+                        catch (Exception e)
+                        {
+                            string sendStringData = $"<PTP>,{item.Key.ToString()},{preUnixMilliseconds}";
+                            Console.WriteLine(sendStringData);
+                        }
+                        Thread.Sleep(1000);
+                        i++;
+
+                        //if (i > 20)
+                        //{
+                        //    PTP_Checker = false;
+                        //    Console.WriteLine("END");
+                        //    conntectCheckThread = new Task(ConnectCheckLoop);
+                        //    conntectCheckThread.Start();
+                        //    return;
+                        //}
                     }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("ERROR");
-                    }
-                    Thread.Sleep(100);
-                    i++;
-                }
-                if (i > 10)
-                {
-                    PTP_Checker = false;
-                    Console.WriteLine("END");
-                    conntectCheckThread = new Task(ConnectCheckLoop);
-                    conntectCheckThread.Start();
-                    return;
                 }
             }
+            PTP_Checker = false;
+            Console.WriteLine("END");
+            conntectCheckThread = new Task(ConnectCheckLoop);
+            conntectCheckThread.Start();
+            return;
         }
         private void ConnectCheckLoop()
         {
@@ -107,7 +114,7 @@ namespace DataProvider_Server_voucher
                         SaveFile();
                     }
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
             }
         }
 
@@ -125,32 +132,31 @@ namespace DataProvider_Server_voucher
         {
             lock (lockObj)
             {
-
                 try
                 {
                     if (message.Contains("<PTP>"))
                     {
                         string[] ptpMsg = message.Split(',');
-                        if (ptpMsg.Length < 5)
+                        if (ptpMsg.Length < 6)
                         {
                             Console.WriteLine(ptpMsg);
                             foreach (var item in ClientManager.clientDic)
                             {
                                 timeOffset = DateTimeOffset.Now;
                                 preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                                string sendStringData = $"{message},{preUnixMilliseconds}";
+                                ptpMsg[3] = ptpMsg[3].TrimEnd(ptpMsg[3][ptpMsg[3].Length - 1]);
+                                string sendStringData = $"{ptpMsg[0]},{ptpMsg[1]},{ptpMsg[2]},{ptpMsg[3]},{preUnixMilliseconds}";
                                 byte[] sendByteData = new byte[sendStringData.Length];
                                 sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                 item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                                 Console.WriteLine(sendStringData);
                             }
                         }
-                        if (ptpMsg.Length >= 5)
+                        if (ptpMsg.Length >= 6 && ptpMsg.Length <7)
                         {
                             Console.WriteLine(ptpMsg[0]);
-                            message += ";";
                             list.Add(message);
-                            if (list.Count>10)
+                            if (list.Count == 10)
                             {
                                 CalculatePTP();
                             }
@@ -160,9 +166,9 @@ namespace DataProvider_Server_voucher
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("ERROR"+ ex);
+                    Console.WriteLine("ERROR" + ex);
                 }
-                
+
                 string[] msgArray = message.Split(';');
                 foreach (var item in msgArray)
                 {
@@ -170,50 +176,49 @@ namespace DataProvider_Server_voucher
                         continue;
                     msgList.Add(item);
                     SendMsgToClient(item, sender);
-                    //  Console.WriteLine(item.ToString());
+                    Console.WriteLine(item.ToString());
                 }
             }
         }
-
-
         //PTP
 
         private void CalculatePTP()
         {
-            for(int i =0;i<list.Count;i++)
+            string UserNum = "";
+            long sumServerDelay = 0;
+            long sumClientDelay = 0;
+            long totalServerDelay = 0;
+            for (int i = 0; i < list.Count; i++)
             {
-                
                 string[] a = list[i].ToString().Split(',');
-                a[4] = a[4].TrimEnd(a[4][a[4].Length - 1]);
-
-                long server00 = Convert.ToInt64(a[1]);
-                long client00 = Convert.ToInt64(a[2]);
-                long server01 = Convert.ToInt64(a[3]);
-                long client01 = Convert.ToInt64(a[4]);
+                a[5] = a[5].TrimEnd(a[5][a[5].Length - 1]);
+                long server00 = Convert.ToInt64(a[2]);
+                long client00 = Convert.ToInt64(a[3]);
+                long server01 = Convert.ToInt64(a[4]);
+                long client01 = Convert.ToInt64(a[5]);
 
                 long serverDelay = server01 - server00;
                 long clientDelay = client01 - client00;
                 long serverAndClientDelay = server01 - client01;
 
-                PTP_internetDelay.Add(serverAndClientDelay);
-                PTP_ServerDelay.Add(serverDelay);
-                PTP_ClientDelay.Add(clientDelay);
+                sumServerDelay += serverDelay;
+                sumClientDelay += clientDelay;
+                totalServerDelay += serverAndClientDelay;
+                UserNum = a[1];
             }
-            for(int j=0;j<list.Count;j++)
+            long SD = sumServerDelay / 10;
+            long CD = sumClientDelay / 10;
+            long SCD = totalServerDelay / 10;
+            serverDelays.Add(UserNum, SD);
+            clientDelays.Add(UserNum, CD);
+            totalDelay.Add(UserNum, SCD);
+            foreach (var item in ClientManager.clientDic)
             {
-                totalDelay += PTP_internetDelay[j];
-                serverDelays += PTP_ServerDelay[j];
-                clientDelays += PTP_ClientDelay[j];
+                Console.WriteLine("DELAY:" + totalDelay[item.Value.clientNumber.ToString()]);
+                Console.WriteLine("SERVERDELAY:" + serverDelays[item.Value.clientNumber.ToString()]);
+                Console.WriteLine("CLIENTDELAY:" + clientDelays[item.Value.clientNumber.ToString()]);
             }
-            totalDelay = totalDelay / list.Count;
-            serverDelays = serverDelays / list.Count;
-            clientDelays = clientDelays / list.Count;
-            Console.WriteLine("DELAY:"+totalDelay);
-            Console.WriteLine("SERVERDELAY:"+serverDelays);
-            Console.WriteLine("CLIENTDELAY:"+clientDelays);
         }
-
-
         private void SendMsgToClient(string msgList, string sender)
         {
             try
@@ -249,7 +254,7 @@ namespace DataProvider_Server_voucher
                         ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage3);
                         return;
                     default:
-                      //  Console.WriteLine(msgList);
+                        Console.WriteLine(msgList);
                         break;
                 }
 
@@ -278,7 +283,7 @@ namespace DataProvider_Server_voucher
             }
             catch (Exception ex)
             {
-               // Console.WriteLine(msgList);
+                 Console.WriteLine(msgList);
 
             }
         }
