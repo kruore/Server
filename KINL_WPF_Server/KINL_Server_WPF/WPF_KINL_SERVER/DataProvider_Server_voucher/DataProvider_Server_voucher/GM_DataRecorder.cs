@@ -18,7 +18,7 @@ public class GM_DataRecorder
     private string str_DataCategory = string.Empty;
     object _lock = new object();
 
-    public Queue<string> Queue_Device = new Queue<string>();
+    public Dictionary<int, Queue<string>> Queue_Device = new Dictionary<int, Queue<string>>();
     public Queue<string> Queue_AirPot = new Queue<string>();
     public Queue<string> Queue_Watch = new Queue<string>();
 
@@ -31,11 +31,16 @@ public class GM_DataRecorder
         mainfolder_Path = rootpath = Directory.GetCurrentDirectory();
         mainfolder_Path = MakeFolder(mainFolderName);
     }
-    public void Enqueue_Data(string _Queue)
+    public void Enqueue_Data(int clientNumber, string _Queue)
     {
         lock (_lock)
         {
-            Queue_Device.Enqueue(_Queue);
+            if (!Queue_Device.ContainsKey(clientNumber))
+            {
+                Queue<string> a = new Queue<string>();
+                Queue_Device.Add(clientNumber, a);
+            }
+            Queue_Device[clientNumber].Enqueue(_Queue);
         }
     }
     public void Enqueue_Data_A(string _Queue)
@@ -53,20 +58,19 @@ public class GM_DataRecorder
         }
     }
     bool isCategoryPrinted_SW = false;
-    public bool WriteSteamingData_Batch_Device()
+    public bool WriteSteamingData_Batch_Device(int clientNumber, string clientName)
     {
         bool tempb = false;
 
         try
         {
-            string tempFileName = "DEVICE" + "_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            string tempFileName = clientName + "_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
             string m_str_DataCategory = string.Empty;
 
-            int totalCountoftheQueue = Queue_Device.Count;
-
-            //Debug.Log("Saving Data Starts. Queue Count : " + totalCountoftheQueue);
+            int totalCountoftheQueue = Queue_Device[clientNumber].Count;
+            Console.WriteLine("Saving Data Starts. Queue Count : " + totalCountoftheQueue);
 
             using (StreamWriter streamWriter = File.AppendText(file_Location))
             {
@@ -74,15 +78,16 @@ public class GM_DataRecorder
                 {
                     for (int i = 0; i < totalCountoftheQueue; i++)
                     {
-                        string stringData = Queue_Device.Dequeue();
+                        string stringData = Queue_Device[clientNumber].Dequeue();
 
                         if (stringData.Length > 0)
                         {
+                            Console.WriteLine(stringData.Length);
                             if (!isCategoryPrinted_SW)
                             {
+                                Console.WriteLine(isCategoryPrinted_SW);
                                 str_DataCategory =
-                                    "TimeStamp,"
-                                    + "Data";
+                                    "DeviceName,realTimeStamp,PTPtimeStamp,Data";
                                 streamWriter.WriteLine(str_DataCategory);
                                 isCategoryPrinted_SW = true;
                             }

@@ -14,7 +14,7 @@ namespace DataProvider_Server_voucher
     {
         public static ConcurrentDictionary<int, ClientData> clientDic = new ConcurrentDictionary<int, ClientData>();
         public static event Action<string, string> messageParsingAction = null;
-        public static event Action<string, int, string> ChangeListViewAction = null;
+        public static event Action<string,int,int, string> ChangeListViewAction = null;
         public static event Action<string> PTP_Synchronized = null;
 
         public void AddClient(TcpClient newClient)
@@ -55,10 +55,10 @@ namespace DataProvider_Server_voucher
                             string userName = strData.Substring(3);
                             Console.WriteLine(userName);
                             client.clientName = userName;
-                            ChangeListViewAction.Invoke(client.clientName, StaticDefine.ADD_USER,null);
+                            ChangeListViewAction.Invoke(client.clientName,client.clientNumber, StaticDefine.ADD_USER,null);
                             string accessLog = string.Format("[{0}] {1} Access Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), client.clientName);
                             Console.WriteLine(accessLog);
-                            ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_USER,null);
+                            ChangeListViewAction.Invoke(accessLog,client.clientNumber, StaticDefine.ADD_USER,null);
                             File.AppendAllText("AccessRecored.txt", accessLog + "\n");
                             PTP_Synchronized.Invoke("Start");
                             return;
