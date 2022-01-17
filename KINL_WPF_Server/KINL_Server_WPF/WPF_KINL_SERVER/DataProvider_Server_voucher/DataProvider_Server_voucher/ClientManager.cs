@@ -74,6 +74,7 @@ namespace DataProvider_Server_voucher
             }
             catch (Exception e)
             {
+                Console.WriteLine("asccccccccc"+e);
                 //RemoveClient(client);
             }
         }

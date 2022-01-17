@@ -95,7 +95,7 @@ public class GM_DataRecorder
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Console.WriteLine(";;;;;;;;;;"+e);
         }
         return tempb;
     }
@@ -141,7 +141,7 @@ public class GM_DataRecorder
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Console.WriteLine("1111111111"+e);
         }
         return tempb;
     }
@@ -187,7 +187,7 @@ public class GM_DataRecorder
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Console.WriteLine("1111112222222222222"+e);
         }
         return tempb;
     }

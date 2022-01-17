@@ -18,7 +18,7 @@ namespace DataProvider_Server_voucher
         Dictionary<string, long> totalDelay = new Dictionary<string, long>();
         Dictionary<string, long> serverDelays = new Dictionary<string, long>();
         Dictionary<string, long> clientDelays = new Dictionary<string, long>();
-
+        Dictionary<string, string> msgDic = new Dictionary<string, string>();
 
         List<string> msgList = new List<string>();
         //UNIX PTP
@@ -30,6 +30,8 @@ namespace DataProvider_Server_voucher
 
         Task conntectCheckThread = null;
         Task conntectPTPThread = null;
+        Task fileCheck = null;
+
 
 
         private bool DeviceSend = false;
@@ -71,8 +73,8 @@ namespace DataProvider_Server_voucher
                         }
                         catch (Exception e)
                         {
-                            string sendStringData = $"<PTP>,{item.Key.ToString()},{preUnixMilliseconds}";
-                            //Console.WriteLine(sendStringData);
+                            string sendStringData = $"ERROR<PTP>,{item.Key.ToString()},{preUnixMilliseconds}";
+                            Console.WriteLine(sendStringData);
                         }
                         Thread.Sleep(100);
                         i++;
@@ -157,7 +159,6 @@ namespace DataProvider_Server_voucher
                             }
                             if (ptpMsg.Length >= 6 && ptpMsg.Length < 7)
                             {
-                                Console.WriteLine(ptpMsg[0]);
                                 list.Add(message);
                                 if (list.Count == 10)
                                 {
@@ -173,8 +174,32 @@ namespace DataProvider_Server_voucher
                 {
                     Console.WriteLine("ERROR" + ex);
                 }
-
-                string[] msgArray = message.Split(';');
+                Console.WriteLine(message);
+                if (!msgDic.ContainsKey(GetClinetNumber(sender).ToString()))
+                {
+                    msgDic.Add(GetClinetNumber(sender).ToString(), message);
+                }
+                else
+                {
+                    msgDic[GetClinetNumber(sender).ToString()] += message;
+                }
+                string[] msgArray = new string[0];
+                if (msgDic[GetClinetNumber(sender).ToString()].LastIndexOf(';') == msgDic[GetClinetNumber(sender).ToString()].Length)
+                {
+                    msgArray = msgDic[GetClinetNumber(sender).ToString()].Split(';');
+                    msgDic[GetClinetNumber(sender).ToString()] = "";
+                }
+                else
+                {
+                    string[] temparray = msgDic[GetClinetNumber(sender).ToString()].Split(';');
+                    msgArray = new string[temparray.Length - 1];
+                    for (int i = 0; i < temparray.Length - 1; i++)
+                    {
+                        msgArray[i] = temparray[i];
+                    }
+                    msgDic[GetClinetNumber(sender).ToString()] = temparray[temparray.Length-1];
+                }
+                Console.WriteLine("msgDic" + msgDic[GetClinetNumber(sender).ToString()]);
                 foreach (var item in msgArray)
                 {
                     if (string.IsNullOrEmpty(item))
@@ -188,7 +213,7 @@ namespace DataProvider_Server_voucher
                         msgList.Add(item);
                     }
                     SendMsgToClient(item, sender);
-                    //Console.WriteLine(item.ToString());
+                    Console.WriteLine(item.ToString());
                 }
             }
         }
@@ -224,6 +249,7 @@ namespace DataProvider_Server_voucher
             long SD = sumServerDelay / 10;
             long CD = sumClientDelay / 10;
             long SCD = totalServerDelay / 10;
+
             serverDelays.Add(UserNum, SD);
             clientDelays.Add(UserNum, CD);
             totalDelay.Add(UserNum, SCD);
@@ -231,6 +257,7 @@ namespace DataProvider_Server_voucher
             //확인용
             foreach (var item in ClientManager.clientDic)
             {
+                Console.WriteLine("USERNUMBER" + UserNum);
                 Console.WriteLine("DELAY:" + totalDelay[item.Value.clientNumber.ToString()]);
                 Console.WriteLine("SERVERDELAY:" + serverDelays[item.Value.clientNumber.ToString()]);
                 Console.WriteLine("CLIENTDELAY:" + clientDelays[item.Value.clientNumber.ToString()]);
@@ -238,73 +265,119 @@ namespace DataProvider_Server_voucher
         }
         private void SendMsgToClient(string msgList, string sender)
         {
-            try
+            //try
+            //{
+            string parsedMessage = "";
+            string receiver = "";
+
+            //%^& DEVICE = Connect
+            //DEVCIE,TIME,DATA
+            string[] splitedMsg = msgList.Split(',');
+            //if(splitedMsg.Length < 3)
+            //{
+            //    return;
+            //}
+            receiver = splitedMsg[0];
+            parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
+
+            switch (receiver)
             {
-                string parsedMessage = "";
-                string receiver = "";
+                case "DEVICE":
+                    long tempTime = Convert.ToInt64(splitedMsg[1]);
+                    long PTPTime = totalDelay[GetClinetNumber(sender).ToString()];
+                    tempTime = (tempTime - PTPTime) + (serverDelays[GetClinetNumber(sender).ToString()] / 2 + clientDelays[GetClinetNumber(sender).ToString()] / 2);
+                    StringBuilder aaaa = new StringBuilder();
+                    aaaa = aaaa.Append(splitedMsg[0]+",");
+                    aaaa.Append(tempTime);
+                    for (int i = 1; i < splitedMsg.Length; i++)
+                    {
+                        aaaa.Append(","+splitedMsg[i]);
+                    }
 
-                //%^& DEVICE = Connect
-                //DEVCIE,TIME,DATA
-                string[] splitedMsg = msgList.Split(',');
-                //if(splitedMsg.Length < 3)
-                //{
-                //    return;
-                //}
-                receiver = splitedMsg[0];
-                parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
+                    Console.WriteLine(aaaa);
+                    string groupLogMessage = string.Format(@"{0},{1},{2},{3}.{4},{5},{6},{7}", splitedMsg[0], tempTime, splitedMsg[1], splitedMsg[2], splitedMsg[3], splitedMsg[4], splitedMsg[5], splitedMsg[6]);
+                    
+                    ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage);
+                    return;
+                case "AIRPOT":
+                    long tempTime1 = Convert.ToInt64(splitedMsg[1]);
+                    long PTPTime1 = totalDelay[GetClinetNumber(sender).ToString()];
+                    tempTime1 = (tempTime1 - PTPTime1) + (serverDelays[GetClinetNumber(sender).ToString()] / 2 + clientDelays[GetClinetNumber(sender).ToString()] / 2);
+                    StringBuilder aaaa1 = new StringBuilder();
+                    aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
+                    aaaa1.Append(tempTime1);
+                    for (int i = 1; i < splitedMsg.Length; i++)
+                    {
+                        aaaa1.Append("," + splitedMsg[i]);
+                    }
 
+                    Console.WriteLine(aaaa1);
+                    string groupLogMessage2 = string.Format(@"{0},{1},{2},{3},{4},{5}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], tempTime1, splitedMsg[1], splitedMsg[2], splitedMsg[3]);
+                    ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage2);
+                    return;
+                case "WATCH":
+                    long tempTime2 = Convert.ToInt64(splitedMsg[1]);
 
+                    long PTPTime2 = totalDelay[GetClinetNumber(sender).ToString()];
+                    long aaa = 0;
+                    
+                    if (!totalDelay.TryGetValue(GetClinetNumber(sender).ToString(), out aaa))
+                    {
+                        foreach (var name in totalDelay)
+                        {
+                            Console.WriteLine($"{GetClinetNumber(name.Key)},{name.Value},{sender}");
+                        }
+                    }
+                    tempTime2 = (tempTime2 - PTPTime2) + (serverDelays[GetClinetNumber(sender).ToString()] / 2 + clientDelays[GetClinetNumber(sender).ToString()] / 2);
+                    StringBuilder aaaa2 = new StringBuilder();
+                    aaaa2 = aaaa2.Append(splitedMsg[0]+",");
+                    aaaa2.Append(tempTime2);
+                    for (int i = 1; i < splitedMsg.Length; i++)
+                    {
+                        aaaa2.Append(","+splitedMsg[i]);
+                    }
 
-                switch (receiver)
-                {
-                    case "DEVICE":
-                        string groupLogMessage = string.Format(@"[{0}],[{1}],[{2}],[{3}].[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
-                        // Console.WriteLine(groupLogMessage);
-                        ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage);
-                        return;
-                    case "AIRPOT":
-                        string groupLogMessage2 = string.Format(@"[{0}],[{1}],[{2}],[{3}],[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
-                        // Console.WriteLine(groupLogMessage);
-                        ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage2);
-                        return;
-                    case "WATCH":
-                        string groupLogMessage3 = string.Format(@"[{0}],[{1}],[{2}],[{3}],[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
-                        //  Console.WriteLine(groupLogMessage);
-                        ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage3);
-                        return;
-                    default:
-                        Console.WriteLine(msgList);
-                        break;
-                }
-
-                //if (receiver.Contains("DEVICE"))
-                //{
-                //    string groupLogMessage = string.Format(@"[{0}],[{1}],[{2}],[{3}].[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
-                //    // Console.WriteLine(groupLogMessage);
-                //    ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage);
-
-                //    return;
-                //}
-                //if (receiver.Contains("AIRPOT"))
-                //{
-                //    string groupLogMessage = string.Format(@"[{0}],[{1}],[{2}],[{3}],[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
-                //    // Console.WriteLine(groupLogMessage);
-                //    ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage);
-                //    return;
-                //}
-                //if (receiver.Contains("WATCH"))
-                //{
-                //    string groupLogMessage = string.Format(@"[{0}],[{1}],[{2}],[{3}],[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
-                //    //  Console.WriteLine(groupLogMessage);
-                //    ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage);
-                //    return;
-                //}
+                    Console.WriteLine(aaaa2);
+                    string groupLogMessage3 = string.Format(@"{0},{1},{2},{3},{4},{5}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], tempTime2, splitedMsg[1], splitedMsg[2], splitedMsg[3]);
+                    //  Console.WriteLine(groupLogMessage);
+                    ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage3);
+                    return;
+                case "<TEST>":
+                    return;
+                default:
+                    Console.WriteLine("ERROR DEFAULT"+msgList);
+                    break;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(msgList);
 
-            }
+
+            //if (receiver.Contains("DEVICE"))
+            //{
+            //    string groupLogMessage = string.Format(@"[{0}],[{1}],[{2}],[{3}].[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
+            //    // Console.WriteLine(groupLogMessage);
+            //    ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage);
+
+            //    return;
+            //}
+            //if (receiver.Contains("AIRPOT"))
+            //{
+            //    string groupLogMessage = string.Format(@"[{0}],[{1}],[{2}],[{3}],[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
+            //    // Console.WriteLine(groupLogMessage);
+            //    ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage);
+            //    return;
+            //}
+            //if (receiver.Contains("WATCH"))
+            //{
+            //    string groupLogMessage = string.Format(@"[{0}],[{1}],[{2}],[{3}],[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
+            //    //  Console.WriteLine(groupLogMessage);
+            //    ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage);
+            //    return;
+            //}
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(msgList);
+
+            //}
         }
 
         private int GetClinetNumber(string targetClientName)

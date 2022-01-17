@@ -1,0 +1,14 @@
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\bin\Debug\VoucherApplication.exe.config
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\bin\Debug\VoucherApplication.exe
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\bin\Debug\VoucherApplication.pdb
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\bin\Debug\MetroFramework.Design.dll
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\bin\Debug\MetroFramework.dll
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\bin\Debug\MetroFramework.Fonts.dll
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.Form1.resources
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.Properties.Resources.resources
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.csproj.GenerateResource.cache
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.csproj.CoreCompileInputs.cache
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.csproj.CopyComplete
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.exe
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.pdb
+C:\Users\USER\source\repos\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.csprojAssemblyReference.cache
