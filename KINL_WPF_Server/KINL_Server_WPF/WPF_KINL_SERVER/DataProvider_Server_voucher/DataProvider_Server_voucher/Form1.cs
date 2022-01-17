@@ -11,9 +11,9 @@ namespace DataProvider_Server_voucher
     public partial class Form1 : Form
     {
         object lockObj = new object();
-        private Dictionary<int, ObservableCollection<string>> DeviceData = new Dictionary<int, ObservableCollection<string>>();
-        private Dictionary<int, ObservableCollection<string>> AirPotData = new Dictionary<int, ObservableCollection<string>>();
-        private Dictionary<int, ObservableCollection<string>> WatchData = new Dictionary<int, ObservableCollection<string>>();
+        private ObservableCollection<string> DeviceData = new ObservableCollection<string>();
+        private ObservableCollection<string> AirPotData = new ObservableCollection<string>();
+        private ObservableCollection<string> WatchData = new ObservableCollection<string>();
         List<string> list = new List<string>();
         Dictionary<string, long> totalDelay = new Dictionary<string, long>();
         Dictionary<string, long> serverDelays = new Dictionary<string, long>();
@@ -74,7 +74,7 @@ namespace DataProvider_Server_voucher
                             string sendStringData = $"<PTP>,{item.Key.ToString()},{preUnixMilliseconds}";
                             //Console.WriteLine(sendStringData);
                         }
-                        Thread.Sleep(10);
+                        Thread.Sleep(100);
                         i++;
                     }
                 }
@@ -104,7 +104,7 @@ namespace DataProvider_Server_voucher
                     {
                         RemoveClient(item.Value);
                         //Console.WriteLine(item.Value);
-                        SaveFile(item.Value.clientNumber, item.Value.clientName);
+                        SaveFile();
                     }
                 }
                 Thread.Sleep(1000);
@@ -117,10 +117,10 @@ namespace DataProvider_Server_voucher
             totalDelay.Remove(targetClient.clientNumber.ToString());
             clientDelays.Remove(targetClient.clientNumber.ToString());
             serverDelays.Remove(targetClient.clientNumber.ToString());
-            //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
             ClientManager.clientDic.TryRemove(targetClient.clientNumber, out result);
-            ChangeListView(result.clientName, targetClient.clientNumber, StaticDefine.REMOVE_USER_LIST, null);
             string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
+            //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
+            ChangeListView(result.clientName, StaticDefine.REMOVE_USER_LIST, null);
             Console.WriteLine(leaveLog);
         }
 
@@ -166,7 +166,7 @@ namespace DataProvider_Server_voucher
                                 return;
                             }
                         }
-                        return;
+
                     }
                 }
                 catch (Exception ex)
@@ -242,6 +242,7 @@ namespace DataProvider_Server_voucher
             {
                 string parsedMessage = "";
                 string receiver = "";
+
                 //%^& DEVICE = Connect
                 //DEVCIE,TIME,DATA
                 string[] splitedMsg = msgList.Split(',');
@@ -250,43 +251,30 @@ namespace DataProvider_Server_voucher
                 //    return;
                 //}
                 receiver = splitedMsg[0];
-                //parsedMessage = string.Format("SEND CLIENT:{0}", sender);
-                //Console.WriteLine(parsedMessage);
-                if (receiver.Contains("DEVICE"))
-                {
-                    string groupLogMessage = "";
-                    if (splitedMsg.Length > 8 && splitedMsg.Length < 11)
-                    {
-                        long tempTime = Convert.ToInt64(splitedMsg[1]);
-                        string receiverSender = receiver.Substring(0, receiver.Length - 6);
-                        int clientNumber = GetClinetNumber(receiver);
-                        Console.WriteLine(clientNumber);
-                        string data = "";
-                        data = splitedMsg[8].TrimEnd(splitedMsg[8][splitedMsg[8].Length - 1]);
-                        var offsetTime = tempTime - totalDelay[clientNumber.ToString()] + ((serverDelays[clientNumber.ToString()] / 2) + (clientDelays[clientNumber.ToString()] / 2));
-                        Console.WriteLine(data);
-                        groupLogMessage = string.Format($"{splitedMsg[0]},{splitedMsg[1]},{offsetTime.ToString()},{splitedMsg[2]},{splitedMsg[3]}.{splitedMsg[4]},{splitedMsg[5]},{splitedMsg[6]},{splitedMsg[7]},{data};");
-                        ChangeListView(receiver, clientNumber, StaticDefine.DATA_SEND_START, groupLogMessage);
-                        Console.WriteLine(groupLogMessage);
-                    }
-                    return;
-                }
-                else if (receiver.Contains("AIRPOT"))
-                {
+                parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
 
-                }
-                else if (receiver.Contains("WATCH"))
-                {
 
-                }
-                else if (receiver.Contains("<TEST>"))
+
+                switch (receiver)
                 {
-                    return;
-                }
-                else
-                {
-                    Console.WriteLine($"Doesn't correct protocol : {msgList}");
-                    return;
+                    case "DEVICE":
+                        string groupLogMessage = string.Format(@"[{0}],[{1}],[{2}],[{3}].[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
+                        // Console.WriteLine(groupLogMessage);
+                        ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage);
+                        return;
+                    case "AIRPOT":
+                        string groupLogMessage2 = string.Format(@"[{0}],[{1}],[{2}],[{3}],[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
+                        // Console.WriteLine(groupLogMessage);
+                        ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage2);
+                        return;
+                    case "WATCH":
+                        string groupLogMessage3 = string.Format(@"[{0}],[{1}],[{2}],[{3}],[{4}]", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], splitedMsg[1], splitedMsg[2], splitedMsg[3]);
+                        //  Console.WriteLine(groupLogMessage);
+                        ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage3);
+                        return;
+                    default:
+                        Console.WriteLine(msgList);
+                        break;
                 }
 
                 //if (receiver.Contains("DEVICE"))
@@ -315,6 +303,7 @@ namespace DataProvider_Server_voucher
             catch (Exception ex)
             {
                 Console.WriteLine(msgList);
+
             }
         }
 
@@ -329,48 +318,48 @@ namespace DataProvider_Server_voucher
             }
             return -1;
         }
-        private string GetClinetName(string targetClientName)
-        {
-            foreach (var item in ClientManager.clientDic)
-            {
-                if (item.Value.clientName == targetClientName)
-                {
-                    return item.Value.clientName;
-                }
-            }
-            return "";
-        }
 
-        private void ChangeListView(string a, int clientNumber, int protocool, string c)
+        private void ChangeListView(string a, int b, string c)
         {
-            try
+            switch (a)
             {
-                if (a.Contains("DEVICE"))
-                {
-                    if (protocool == StaticDefine.ADD_USER)
+                case "IOS":
+                    if (b == StaticDefine.ADD_USER)
                     {
                         listBox3.BeginInvoke((Action)(() =>
                         {
-                            ObservableCollection<string> lists = new ObservableCollection<string>();
                             listBox3.Items.Add(a + "Connect");
-                            if (!DeviceData.ContainsKey(clientNumber))
-                            {
-                                DeviceData.Add(clientNumber, lists);
-                            }
                         }));
                     }
-                    else if (protocool == StaticDefine.REMOVE_USER_LIST)
+                    else if (b == StaticDefine.REMOVE_USER_LIST)
                     {
                         listBox3.BeginInvoke((Action)(() =>
                         {
                             listBox3.Items.Add(a + "Disconnect");
                         }));
                     }
-                    else if (protocool == StaticDefine.DATA_SEND_START)
+                    break;
+                case "DEVICE":
+                    if (b == StaticDefine.ADD_USER)
+                    {
+                        listBox3.BeginInvoke((Action)(() =>
+                        {
+                            listBox3.Items.Add(a + "Connect");
+                        }));
+                    }
+                    else if (b == StaticDefine.REMOVE_USER_LIST)
+                    {
+                        listBox3.BeginInvoke((Action)(() =>
+                        {
+                            listBox3.Items.Add(a + "Disconnect");
+                        }));
+                    }
+                    else if (b == StaticDefine.DATA_SEND_START)
                     {
                         if (DeviceSend)
                         {
-                            DeviceData[clientNumber].Add(c);
+                            DeviceData.Add(c);
+                            //   Console.WriteLine("DATAADD");
                         }
                         else
                         {
@@ -381,55 +370,106 @@ namespace DataProvider_Server_voucher
                             DeviceSend = true;
                         }
                     }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
+                    break;
+                case "WATCH":
+                    if (b == StaticDefine.ADD_USER)
+                    {
+                        listBox2.BeginInvoke((Action)(() =>
+                        {
+                            listBox2.Items.Add(a + "Connect");
+                        }));
+                    }
+                    else if (b == StaticDefine.REMOVE_USER_LIST)
+                    {
+                        listBox2.BeginInvoke((Action)(() =>
+                        {
+                            listBox2.Items.Add(a + "Disconnect");
+                        }));
+                    }
+                    else if (b == StaticDefine.DATA_SEND_START)
+                    {
+                        if (Watch_DeviceSend)
+                        {
+                            WatchData.Add(c);
+                            // Console.WriteLine("DATAWATCH");
+                        }
+                        else
+                        {
+                            listBox2.BeginInvoke((Action)(() =>
+                            {
+                                listBox2.Items.Add(a + "Send");
+                            }));
+                            Watch_DeviceSend = true;
+                        }
+                    }
+                    break;
+
+                case "AIRPOT":
+                    if (b == StaticDefine.ADD_USER)
+                    {
+                        listBox1.BeginInvoke((Action)(() =>
+                        {
+                            listBox1.Items.Add(a + "Connect");
+                        }));
+                    }
+                    else if (b == StaticDefine.REMOVE_USER_LIST)
+                    {
+                        listBox1.BeginInvoke((Action)(() =>
+                        {
+                            listBox1.Items.Add(a + "Disconnect");
+                        }));
+                    }
+                    else if (b == StaticDefine.DATA_SEND_START)
+                    {
+                        if (AirPot_DeviceSend)
+                        {
+                            AirPotData.Add(c);
+                            // Console.WriteLine("DATAAIRPOT");
+                        }
+                        else
+                        {
+                            listBox1.BeginInvoke((Action)(() =>
+                            {
+                                listBox1.Items.Add(a + "Send");
+                            }));
+                            AirPot_DeviceSend = true;
+                        }
+                    }
+                    break;
             }
         }
-        private void SaveFile(int clientNumber, string clientName)
+        private void SaveFile()
         {
-            //SAVE
-            for (int i = 0; i < DeviceData[clientNumber].Count; i++)
+            //Console.WriteLine($"SAVED : {DeviceData.Count}");
+            //Console.WriteLine($"Client :{item.Value.clientName}");
+            //GM_DataRecorder.instance.MakeFolder(item.Value.clientName);
+            for (int i = 0; i < DeviceData.Count; i++)
             {
-                GM_DataRecorder.instance.Enqueue_Data(clientNumber, DeviceData[clientNumber][i].ToString());
+                GM_DataRecorder.instance.Enqueue_Data(DeviceData[i].ToString());
             }
-            if (DeviceData[clientNumber].Count > 0)
+            for (int i = 0; i < AirPotData.Count; i++)
             {
-                GM_DataRecorder.instance.WriteSteamingData_Batch_Device(clientNumber, clientName);
+                GM_DataRecorder.instance.Enqueue_Data_A(AirPotData[i].ToString());
             }
-            //if (WatchData[clientNumber].Count > 0)
-            //{
-            //    for (int i = 0; i < AirPotData[clientNumber].Count; i++)
-            //    {
-            //        GM_DataRecorder.instance.Enqueue_Data_A(AirPotData[clientNumber].ToString());
-            //    }
-            //    GM_DataRecorder.instance.WriteSteamingData_Batch_Watch();
-            //}
-            //if (AirPotData[clientNumber].Count > 0)
-            //{
-            //    for (int i = 0; i < WatchData.Count; i++)
-            //    {
-            //        GM_DataRecorder.instance.Enqueue_Data_W(WatchData[clientNumber].ToString());
-            //    }
-            //    GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot();
-            //}
-            if (DeviceData.ContainsKey(clientNumber))
+            for (int i = 0; i < WatchData.Count; i++)
             {
-                DeviceData[clientNumber].Clear();
-                DeviceData.Remove(clientNumber);
+                GM_DataRecorder.instance.Enqueue_Data_W(WatchData[i].ToString());
             }
-            //if (WatchData.ContainsKey(clientNumber))
-            //{
-            //    WatchData[clientNumber].Clear();
-            //    WatchData.Remove(clientNumber);
-            //}
-            //if (AirPotData.ContainsKey(clientNumber))
-            //{
-            //    AirPotData[clientNumber].Clear();
-            //    AirPotData.Remove(clientNumber);
-            //}
+            if (DeviceData.Count > 0)
+            {
+                GM_DataRecorder.instance.WriteSteamingData_Batch_Device();
+            }
+            if (WatchData.Count > 0)
+            {
+                GM_DataRecorder.instance.WriteSteamingData_Batch_Watch();
+            }
+            if (AirPotData.Count > 0)
+            {
+                GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot();
+            }
+            DeviceData.Clear();
+            WatchData.Clear();
+            AirPotData.Clear();
         }
 
         private void MainServerStart()
@@ -450,8 +490,7 @@ namespace DataProvider_Server_voucher
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Console.WriteLine(sender.ToString());
-            SaveFile(GetClinetNumber(sender.ToString()), GetClinetName(sender.ToString()));
+            SaveFile();
         }
     }
 }
