@@ -25,6 +25,8 @@ namespace KINL_Server_WPF
 
         public ClientData(TcpClient client)
         {
+
+            //Client Data Save
             this._client = client;
             this._recvData = new byte[1024];
             this._sendData = new byte[1024];
