@@ -25,7 +25,7 @@ namespace DataProvider_Server_voucher
             {
                 newClient.GetStream().BeginRead(currentClient.readBuffer, 0, currentClient.readBuffer.Length, new AsyncCallback(DataReceived), currentClient);
                 clientDic.TryAdd(currentClient.clientNumber, currentClient);
-                Console.WriteLine("ClientNumber"+currentClient.clientNumber);
+                Console.WriteLine("ClientNumber" + currentClient.clientNumber);
 
             }
             catch (Exception e)
@@ -45,7 +45,7 @@ namespace DataProvider_Server_voucher
                 int byteLength = client.tcpClient.GetStream().EndRead(ar);
                 string strData = Encoding.Default.GetString(client.readBuffer, 0, byteLength);
                 client.tcpClient.GetStream().BeginRead(client.readBuffer, 0, client.readBuffer.Length, new AsyncCallback(DataReceived), client);
-       
+
                 if (string.IsNullOrEmpty(client.clientName))
                 {
                     if (ChangeListViewAction != null)
@@ -55,12 +55,17 @@ namespace DataProvider_Server_voucher
                             string userName = strData.Substring(3);
                             Console.WriteLine(userName);
                             client.clientName = userName;
-                            ChangeListViewAction.Invoke(client.clientName, StaticDefine.ADD_USER,null);
+                            ChangeListViewAction.Invoke(client.clientName, StaticDefine.ADD_USER, null);
                             string accessLog = string.Format("[{0}] {1} Access Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), client.clientName);
                             Console.WriteLine(accessLog);
-                            ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_USER,null);
+                            ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_USER, null);
                             File.AppendAllText("AccessRecored.txt", accessLog + "\n");
-                            PTP_Synchronized.Invoke("Start");
+                            PTP_Synchronized.Invoke(client.clientName);
+                            if (client.clientName.Contains("DEVICE"))
+                            {
+                                Form1.clientNames = client.clientName;
+                                Console.WriteLine("DDD"+Form1.clientNames);
+                            }
                             return;
                         }
                     }
@@ -74,7 +79,7 @@ namespace DataProvider_Server_voucher
             }
             catch (Exception e)
             {
-                Console.WriteLine("asccccccccc"+e);
+                Console.WriteLine("asccccccccc" + e);
                 //RemoveClient(client);
             }
         }

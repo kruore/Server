@@ -26,7 +26,7 @@ namespace DataProvider_Server_voucher
         long UnixMilliseconds;
         DateTimeOffset timeOffset;
 
-
+        public static string clientNames;
 
         Task conntectCheckThread = null;
         Task conntectPTPThread = null;
@@ -74,9 +74,9 @@ namespace DataProvider_Server_voucher
                         catch (Exception e)
                         {
                             string sendStringData = $"ERROR<PTP>,{item.Key.ToString()},{preUnixMilliseconds}";
-                            Console.WriteLine(sendStringData);
+                            // Console.WriteLine(sendStringData);
                         }
-                        Thread.Sleep(100);
+                        Thread.Sleep(10);
                         i++;
                     }
                 }
@@ -100,13 +100,13 @@ namespace DataProvider_Server_voucher
                         byte[] sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                         item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                        Console.WriteLine(sendStringData);
+                        //     Console.WriteLine(sendStringData);
                     }
                     catch (Exception e)
                     {
+                        SaveFile(item.Value.clientNumber);
                         RemoveClient(item.Value);
                         //Console.WriteLine(item.Value);
-                        SaveFile();
                     }
                 }
                 Thread.Sleep(1000);
@@ -116,65 +116,23 @@ namespace DataProvider_Server_voucher
         private void RemoveClient(ClientData targetClient)
         {
             ClientData result = null;
+            Console.WriteLine(clientNames);
             totalDelay.Remove(targetClient.clientNumber.ToString());
             clientDelays.Remove(targetClient.clientNumber.ToString());
             serverDelays.Remove(targetClient.clientNumber.ToString());
             ClientManager.clientDic.TryRemove(targetClient.clientNumber, out result);
-            string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
-            //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
             ChangeListView(result.clientName, StaticDefine.REMOVE_USER_LIST, null);
-            Console.WriteLine(leaveLog);
+            //  string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
+            //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
+            //  Console.WriteLine(leaveLog);
         }
 
         private void MessageParsing(string sender, string message)
         {
             lock (lockObj)
             {
-                try
-                {
-                    if (message.Contains("<PTP>"))
-                    {
-                        string[] ptpMsg = message.Split(',');
-                        if (totalDelay.ContainsKey(ptpMsg[1]))
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            if (ptpMsg.Length < 6)
-                            {
-                                Console.WriteLine(ptpMsg);
-
-                                timeOffset = DateTimeOffset.Now;
-                                preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                                if (ptpMsg[3].Contains(";"))
-                                {
-                                    ptpMsg[3] = ptpMsg[3].TrimEnd(ptpMsg[3][ptpMsg[3].Length - 1]);
-                                }
-                                string sendStringData = $"{ptpMsg[0]},{ptpMsg[1]},{ptpMsg[2]},{ptpMsg[3]},{preUnixMilliseconds}";
-                                byte[] sendByteData = new byte[sendStringData.Length];
-                                sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                                ClientManager.clientDic[int.Parse(ptpMsg[1])].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                                Console.WriteLine(sendStringData);
-                            }
-                            if (ptpMsg.Length >= 6 && ptpMsg.Length < 7)
-                            {
-                                list.Add(message);
-                                if (list.Count == 10)
-                                {
-                                    CalculatePTP();
-                                }
-                                return;
-                            }
-                        }
-
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("ERROR" + ex);
-                }
-                Console.WriteLine(message);
+                //
+                //Console.WriteLine(message);
                 if (!msgDic.ContainsKey(GetClinetNumber(sender).ToString()))
                 {
                     msgDic.Add(GetClinetNumber(sender).ToString(), message);
@@ -197,9 +155,9 @@ namespace DataProvider_Server_voucher
                     {
                         msgArray[i] = temparray[i];
                     }
-                    msgDic[GetClinetNumber(sender).ToString()] = temparray[temparray.Length-1];
+                    msgDic[GetClinetNumber(sender).ToString()] = temparray[temparray.Length - 1];
                 }
-                Console.WriteLine("msgDic" + msgDic[GetClinetNumber(sender).ToString()]);
+                //Console.WriteLine("msgDic" + msgDic[GetClinetNumber(sender).ToString()]);
                 foreach (var item in msgArray)
                 {
                     if (string.IsNullOrEmpty(item))
@@ -213,7 +171,7 @@ namespace DataProvider_Server_voucher
                         msgList.Add(item);
                     }
                     SendMsgToClient(item, sender);
-                    Console.WriteLine(item.ToString());
+                    // Console.WriteLine(item.ToString());
                 }
             }
         }
@@ -225,8 +183,10 @@ namespace DataProvider_Server_voucher
             long sumServerDelay = 0;
             long sumClientDelay = 0;
             long totalServerDelay = 0;
+            long minServerDelay = 0;
             for (int i = 0; i < list.Count; i++)
             {
+
                 string[] a = list[i].ToString().Split(',');
                 if (a[5].Contains(";"))
                 {
@@ -240,13 +200,22 @@ namespace DataProvider_Server_voucher
                 long serverDelay = server01 - server00;
                 long clientDelay = client01 - client00;
                 long serverAndClientDelay = server01 - client01;
+                if (i == 0)
+                {
+                    minServerDelay = serverDelay;
+                }
+
+                if (minServerDelay > serverDelay)
+                {
+                    minServerDelay = serverDelay;
+                }
 
                 sumServerDelay += serverDelay;
                 sumClientDelay += clientDelay;
                 totalServerDelay += serverAndClientDelay;
                 UserNum = a[1];
             }
-            long SD = sumServerDelay / 10;
+            long SD = minServerDelay;
             long CD = sumClientDelay / 10;
             long SCD = totalServerDelay / 10;
 
@@ -279,30 +248,77 @@ namespace DataProvider_Server_voucher
             //}
             receiver = splitedMsg[0];
             parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
+            try
+            {
+                if (msgList.Contains("<PTP>"))
+                {
+                    string[] ptpMsg = msgList.Split(',');
+                    if (totalDelay.ContainsKey(ptpMsg[1]))
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        if (ptpMsg.Length < 6)
+                        {
+                            Console.WriteLine(ptpMsg);
+
+                            timeOffset = DateTimeOffset.Now;
+                            preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
+                            if (ptpMsg[3].Contains(";"))
+                            {
+                                ptpMsg[3] = ptpMsg[3].TrimEnd(ptpMsg[3][ptpMsg[3].Length - 1]);
+                            }
+                            string sendStringData = $"{ptpMsg[0]},{ptpMsg[1]},{ptpMsg[2]},{ptpMsg[3]},{preUnixMilliseconds}";
+                            byte[] sendByteData = new byte[sendStringData.Length];
+                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                            ClientManager.clientDic[int.Parse(ptpMsg[1])].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                            Console.WriteLine(sendStringData);
+                        }
+                        if (ptpMsg.Length >= 6 && ptpMsg.Length < 7)
+                        {
+                            list.Add(msgList);
+                            if (list.Count == 10)
+                            {
+                                CalculatePTP();
+                            }
+                            return;
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR" + ex);
+            }
+
+
+
 
             switch (receiver)
             {
                 case "DEVICE":
                     long tempTime = Convert.ToInt64(splitedMsg[1]);
                     long PTPTime = totalDelay[GetClinetNumber(sender).ToString()];
-                    tempTime = (tempTime - PTPTime) + (serverDelays[GetClinetNumber(sender).ToString()] / 2 + clientDelays[GetClinetNumber(sender).ToString()] / 2);
+                    tempTime = (tempTime + PTPTime) + (serverDelays[GetClinetNumber(sender).ToString()] / 2); ;
                     StringBuilder aaaa = new StringBuilder();
-                    aaaa = aaaa.Append(splitedMsg[0]+",");
+                    aaaa = aaaa.Append(splitedMsg[0] + ",");
                     aaaa.Append(tempTime);
                     for (int i = 1; i < splitedMsg.Length; i++)
                     {
-                        aaaa.Append(","+splitedMsg[i]);
+                        aaaa.Append("," + splitedMsg[i]);
                     }
 
                     Console.WriteLine(aaaa);
                     string groupLogMessage = string.Format(@"{0},{1},{2},{3}.{4},{5},{6},{7}", splitedMsg[0], tempTime, splitedMsg[1], splitedMsg[2], splitedMsg[3], splitedMsg[4], splitedMsg[5], splitedMsg[6]);
-                    
+
                     ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage);
                     return;
                 case "AIRPOT":
                     long tempTime1 = Convert.ToInt64(splitedMsg[1]);
                     long PTPTime1 = totalDelay[GetClinetNumber(sender).ToString()];
-                    tempTime1 = (tempTime1 - PTPTime1) + (serverDelays[GetClinetNumber(sender).ToString()] / 2 + clientDelays[GetClinetNumber(sender).ToString()] / 2);
+                    tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[GetClinetNumber(sender).ToString()] / 2);
                     StringBuilder aaaa1 = new StringBuilder();
                     aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
                     aaaa1.Append(tempTime1);
@@ -310,7 +326,6 @@ namespace DataProvider_Server_voucher
                     {
                         aaaa1.Append("," + splitedMsg[i]);
                     }
-
                     Console.WriteLine(aaaa1);
                     string groupLogMessage2 = string.Format(@"{0},{1},{2},{3},{4},{5}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], tempTime1, splitedMsg[1], splitedMsg[2], splitedMsg[3]);
                     ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage2);
@@ -320,7 +335,7 @@ namespace DataProvider_Server_voucher
 
                     long PTPTime2 = totalDelay[GetClinetNumber(sender).ToString()];
                     long aaa = 0;
-                    
+
                     if (!totalDelay.TryGetValue(GetClinetNumber(sender).ToString(), out aaa))
                     {
                         foreach (var name in totalDelay)
@@ -328,13 +343,13 @@ namespace DataProvider_Server_voucher
                             Console.WriteLine($"{GetClinetNumber(name.Key)},{name.Value},{sender}");
                         }
                     }
-                    tempTime2 = (tempTime2 - PTPTime2) + (serverDelays[GetClinetNumber(sender).ToString()] / 2 + clientDelays[GetClinetNumber(sender).ToString()] / 2);
+                    tempTime2 = (tempTime2 + PTPTime2) - (serverDelays[GetClinetNumber(sender).ToString()] / 2);
                     StringBuilder aaaa2 = new StringBuilder();
-                    aaaa2 = aaaa2.Append(splitedMsg[0]+",");
+                    aaaa2 = aaaa2.Append(splitedMsg[0] + ",");
                     aaaa2.Append(tempTime2);
                     for (int i = 1; i < splitedMsg.Length; i++)
                     {
-                        aaaa2.Append(","+splitedMsg[i]);
+                        aaaa2.Append("," + splitedMsg[i]);
                     }
 
                     Console.WriteLine(aaaa2);
@@ -345,7 +360,7 @@ namespace DataProvider_Server_voucher
                 case "<TEST>":
                     return;
                 default:
-                    Console.WriteLine("ERROR DEFAULT"+msgList);
+                    Console.WriteLine("ERROR DEFAULT" + msgList);
                     break;
             }
 
@@ -390,6 +405,17 @@ namespace DataProvider_Server_voucher
                 }
             }
             return -1;
+        }
+        private string GetClinetName()
+        {
+            foreach (var item in ClientManager.clientDic)
+            {
+                if (item.Value.clientName.ToString().Contains("DEVICE"))
+                {
+                    return item.Value.clientName;
+                }
+            }
+            return "";
         }
 
         private void ChangeListView(string a, int b, string c)
@@ -511,38 +537,50 @@ namespace DataProvider_Server_voucher
                     break;
             }
         }
-        private void SaveFile()
+        private void SaveFile(int abc)
         {
+            string userToken = clientNames;
+            Console.WriteLine("USER: " + userToken);
+            Console.WriteLine("TOKENNUMBER"+ GetClinetNumber(userToken));
             //Console.WriteLine($"SAVED : {DeviceData.Count}");
             //Console.WriteLine($"Client :{item.Value.clientName}");
             //GM_DataRecorder.instance.MakeFolder(item.Value.clientName);
-            for (int i = 0; i < DeviceData.Count; i++)
+            if (GetClinetNumber(userToken) == abc)
             {
-                GM_DataRecorder.instance.Enqueue_Data(DeviceData[i].ToString());
+
+                for (int i = 0; i < DeviceData.Count; i++)
+                {
+                    GM_DataRecorder.instance.Enqueue_Data(DeviceData[i].ToString());
+                }
+                if (DeviceData.Count > 0)
+                {
+                    GM_DataRecorder.instance.WriteSteamingData_Batch_Device(userToken);
+                }
+                DeviceData.Clear();
             }
-            for (int i = 0; i < AirPotData.Count; i++)
+            else
             {
-                GM_DataRecorder.instance.Enqueue_Data_A(AirPotData[i].ToString());
+                for (int i = 0; i < AirPotData.Count; i++)
+                {
+                    GM_DataRecorder.instance.Enqueue_Data_A(AirPotData[i].ToString());
+                }
+                for (int i = 0; i < WatchData.Count; i++)
+                {
+                    GM_DataRecorder.instance.Enqueue_Data_W(WatchData[i].ToString());
+                }
+
+                if (WatchData.Count > 0)
+                {
+                    GM_DataRecorder.instance.WriteSteamingData_Batch_Watch(userToken);
+                }
+                if (AirPotData.Count > 0)
+                {
+                    GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot(userToken);
+                }
+
+                WatchData.Clear();
+                AirPotData.Clear();
             }
-            for (int i = 0; i < WatchData.Count; i++)
-            {
-                GM_DataRecorder.instance.Enqueue_Data_W(WatchData[i].ToString());
-            }
-            if (DeviceData.Count > 0)
-            {
-                GM_DataRecorder.instance.WriteSteamingData_Batch_Device();
-            }
-            if (WatchData.Count > 0)
-            {
-                GM_DataRecorder.instance.WriteSteamingData_Batch_Watch();
-            }
-            if (AirPotData.Count > 0)
-            {
-                GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot();
-            }
-            DeviceData.Clear();
-            WatchData.Clear();
-            AirPotData.Clear();
         }
 
         private void MainServerStart()
@@ -563,7 +601,7 @@ namespace DataProvider_Server_voucher
 
         private void button1_Click(object sender, EventArgs e)
         {
-            SaveFile();
+            //SaveFile();
         }
     }
 }
