@@ -239,6 +239,8 @@ namespace DataProvider_Server_voucher
             string parsedMessage = "";
             string receiver = "";
 
+            msgList= msgList.Replace("^", ",");
+
             //%^& DEVICE = Connect
             //DEVCIE,TIME,DATA
             string[] splitedMsg = msgList.Split(',');
@@ -293,9 +295,6 @@ namespace DataProvider_Server_voucher
                 Console.WriteLine("ERROR" + ex);
             }
 
-
-
-
             switch (receiver)
             {
                 case "DEVICE":
@@ -309,10 +308,7 @@ namespace DataProvider_Server_voucher
                     {
                         aaaa.Append("," + splitedMsg[i]);
                     }
-
-                    Console.WriteLine(aaaa);
-                    string groupLogMessage = string.Format(@"{0},{1},{2},{3}.{4},{5},{6},{7}", splitedMsg[0], tempTime, splitedMsg[1], splitedMsg[2], splitedMsg[3], splitedMsg[4], splitedMsg[5], splitedMsg[6]);
-
+                    string groupLogMessage = aaaa.ToString();
                     ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage);
                     return;
                 case "AIRPOT":
@@ -326,8 +322,7 @@ namespace DataProvider_Server_voucher
                     {
                         aaaa1.Append("," + splitedMsg[i]);
                     }
-                    Console.WriteLine(aaaa1);
-                    string groupLogMessage2 = string.Format(@"{0},{1},{2},{3},{4},{5}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], tempTime1, splitedMsg[1], splitedMsg[2], splitedMsg[3]);
+                    string groupLogMessage2 = aaaa1.ToString();
                     ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage2);
                     return;
                 case "WATCH":
@@ -351,9 +346,8 @@ namespace DataProvider_Server_voucher
                     {
                         aaaa2.Append("," + splitedMsg[i]);
                     }
-
                     Console.WriteLine(aaaa2);
-                    string groupLogMessage3 = string.Format(@"{0},{1},{2},{3},{4},{5}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), splitedMsg[0], tempTime2, splitedMsg[1], splitedMsg[2], splitedMsg[3]);
+                    string groupLogMessage3 = aaaa2.ToString();
                     //  Console.WriteLine(groupLogMessage);
                     ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage3);
                     return;

@@ -52,13 +52,16 @@ public class GM_DataRecorder
             Queue_Watch.Enqueue(_Queue);
         }
     }
-    bool isCategoryPrinted_SW = false;
+    bool isCategoryPrinted_DV = false;
+    bool isCategoryPrinted_W = false;
+    bool isCategoryPrinted_A = false;
     public bool WriteSteamingData_Batch_Device(string DeviceName)
     {
         bool tempb = false;
 
         try
         {
+            isCategoryPrinted_DV = false;
             string tempFileName = $"{DeviceName}_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
@@ -78,13 +81,21 @@ public class GM_DataRecorder
 
                         if (stringData.Length > 0)
                         {
-                            if (!isCategoryPrinted_SW)
+                            if (!isCategoryPrinted_DV)
                             {
                                 str_DataCategory =
-                                    "TimeStamp,"
-                                    + "Data";
+                                   "DeviceName,"
+                                   +"PTPTime,"
+                                   + "UnixTime,"
+                                   + "DistanceMM,"
+                                   + "DistanceCM,"
+                                   + "Weight,"
+                                   + "Count,"
+                                   + "DistanceADC,"
+                                   + "WeightADC,"
+                                   +"DeviceName(Current)";
                                 streamWriter.WriteLine(str_DataCategory);
-                                isCategoryPrinted_SW = true;
+                                isCategoryPrinted_DV = true;
                             }
                             streamWriter.WriteLine(stringData);
                         }
@@ -105,6 +116,7 @@ public class GM_DataRecorder
 
         try
         {
+            isCategoryPrinted_W = false;
             string tempFileName = $"{DeviceName}_" +"WATCH"+ DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
@@ -124,13 +136,24 @@ public class GM_DataRecorder
 
                         if (stringData.Length > 0)
                         {
-                            if (!isCategoryPrinted_SW)
+                            if (!isCategoryPrinted_W)
                             {
                                 str_DataCategory =
-                                    "TimeStamp,"
-                                    + "Data";
+                                    "Device,"
+                                    + "PTPTime,"
+                                    + "UnixTime,"
+                                    + "Protocool,"
+                                    + "CurrentDeviceTime,"
+                                    + "AccX,"
+                                    + "AccY,"
+                                    + "AccZ,"
+                                    + "GyroX,"
+                                    + "GyroY,"
+                                    + "GyroZ,"
+                                    + "HeartRate"
+                                    ;
                                 streamWriter.WriteLine(str_DataCategory);
-                                isCategoryPrinted_SW = true;
+                                isCategoryPrinted_W = true;
                             }
                             streamWriter.WriteLine(stringData);
                         }
@@ -151,6 +174,7 @@ public class GM_DataRecorder
 
         try
         {
+            isCategoryPrinted_A = false;
             string tempFileName = $"{DeviceName}_" + "AIRPOT_"+ DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
@@ -159,7 +183,7 @@ public class GM_DataRecorder
             int totalCountoftheQueue = Queue_AirPot.Count;
 
             //Debug.Log("Saving Data Starts. Queue Count : " + totalCountoftheQueue);
-
+             
             using (StreamWriter streamWriter = File.AppendText(file_Location))
             {
                 while (Queue_AirPot.Count != 0)
@@ -170,13 +194,23 @@ public class GM_DataRecorder
 
                         if (stringData.Length > 0)
                         {
-                            if (!isCategoryPrinted_SW)
+                            if (!isCategoryPrinted_A)
                             {
                                 str_DataCategory =
-                                    "TimeStamp,"
-                                    + "Data";
+                                    "Device,"
+                                    + "PTPTime,"
+                                    + "UnixTime,"
+                                    + "Protocool,"
+                                    + "CurrentDeviceTime,"
+                                    + "AccX,"
+                                    + "AccY,"
+                                    + "AccZ,"
+                                    + "GyroX,"
+                                    + "GyroY,"
+                                    + "GyroZ,"
+                                    ;
                                 streamWriter.WriteLine(str_DataCategory);
-                                isCategoryPrinted_SW = true;
+                                isCategoryPrinted_A = true;
                             }
                             streamWriter.WriteLine(stringData);
                         }
