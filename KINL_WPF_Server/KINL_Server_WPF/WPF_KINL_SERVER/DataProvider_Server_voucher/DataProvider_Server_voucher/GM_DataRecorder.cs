@@ -18,9 +18,9 @@ public class GM_DataRecorder
     private string str_DataCategory = string.Empty;
     object _lock = new object();
 
-    public Queue<string> Queue_Device = new Queue<string>();
-    public Queue<string> Queue_AirPot = new Queue<string>();
-    public Queue<string> Queue_Watch = new Queue<string>();
+    public Dictionary<string, Queue<string>> Queue_Device = new Dictionary<string, Queue<string>>();
+    public Dictionary<string, Queue<string>> Queue_AirPot = new Dictionary<string, Queue<string>>();
+    public Dictionary<string, Queue<string>> Queue_Watch = new Dictionary<string, Queue<string>>();
 
     public GM_DataRecorder()
     {
@@ -31,31 +31,46 @@ public class GM_DataRecorder
         mainfolder_Path = rootpath = Directory.GetCurrentDirectory();
         mainfolder_Path = MakeFolder(mainFolderName);
     }
-    public void Enqueue_Data(string _Queue)
+    public void Enqueue_Data(string clientName, string _Queue)
     {
         lock (_lock)
         {
-            Queue_Device.Enqueue(_Queue);
+            Queue<string> list = new Queue<string>();
+            if (!Queue_Device.ContainsKey(clientName))
+            {
+                Queue_Device.Add(clientName, list);
+            }
+            Queue_Device[clientName].Enqueue(_Queue);
         }
     }
-    public void Enqueue_Data_A(string _Queue)
+    public void Enqueue_Data_A(string clientName, string _Queue)
     {
         lock (_lock)
         {
-            Queue_AirPot.Enqueue(_Queue);
+            Queue<string> list = new Queue<string>();
+            if (!Queue_AirPot.ContainsKey(clientName))
+            {
+                Queue_AirPot.Add(clientName, list);
+            }
+            Queue_AirPot[clientName].Enqueue(_Queue);
         }
     }
-    public void Enqueue_Data_W(string _Queue)
+    public void Enqueue_Data_W(string clientName, string _Queue)
     {
         lock (_lock)
         {
-            Queue_Watch.Enqueue(_Queue);
+            Queue<string> list = new Queue<string>();
+            if (!Queue_Watch.ContainsKey(clientName))
+            {
+                Queue_Watch.Add(clientName, list);
+            }
+            Queue_Watch[clientName].Enqueue(_Queue);
         }
     }
     bool isCategoryPrinted_DV = false;
     bool isCategoryPrinted_W = false;
     bool isCategoryPrinted_A = false;
-    public bool WriteSteamingData_Batch_Device(string DeviceName)
+    public bool WriteSteamingData_Batch_Device(string DeviceName, string clientNumber)
     {
         bool tempb = false;
 
@@ -77,7 +92,7 @@ public class GM_DataRecorder
                 {
                     for (int i = 0; i < totalCountoftheQueue; i++)
                     {
-                        string stringData = Queue_Device.Dequeue();
+                        string stringData = Queue_Device[clientNumber].Dequeue();
 
                         if (stringData.Length > 0)
                         {
@@ -85,7 +100,7 @@ public class GM_DataRecorder
                             {
                                 str_DataCategory =
                                    "DeviceName,"
-                                   +"PTPTime,"
+                                   + "PTPTime,"
                                    + "UnixTime,"
                                    + "DistanceMM,"
                                    + "DistanceCM,"
@@ -93,7 +108,7 @@ public class GM_DataRecorder
                                    + "Count,"
                                    + "DistanceADC,"
                                    + "WeightADC,"
-                                   +"DeviceName(Current)";
+                                   + "DeviceName(Current)";
                                 streamWriter.WriteLine(str_DataCategory);
                                 isCategoryPrinted_DV = true;
                             }
@@ -106,18 +121,18 @@ public class GM_DataRecorder
         }
         catch (Exception e)
         {
-            Console.WriteLine(";;;;;;;;;;"+e);
+            Console.WriteLine(";;;;;;;;;;" + e);
         }
         return tempb;
     }
-    public bool WriteSteamingData_Batch_Watch(string DeviceName)
+    public bool WriteSteamingData_Batch_Watch(string DeviceName, string clientNumber)
     {
         bool tempb = false;
 
         try
         {
             isCategoryPrinted_W = false;
-            string tempFileName = $"{DeviceName}_" +"WATCH"+ DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            string tempFileName = $"{DeviceName}_" + "WATCH" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
             string m_str_DataCategory = string.Empty;
@@ -132,7 +147,7 @@ public class GM_DataRecorder
                 {
                     for (int i = 0; i < totalCountoftheQueue; i++)
                     {
-                        string stringData = Queue_Watch.Dequeue();
+                        string stringData = Queue_Watch[clientNumber].Dequeue();
 
                         if (stringData.Length > 0)
                         {
@@ -164,18 +179,18 @@ public class GM_DataRecorder
         }
         catch (Exception e)
         {
-            Console.WriteLine("1111111111"+e);
+            Console.WriteLine("1111111111" + e);
         }
         return tempb;
     }
-    public bool WriteSteamingData_Batch_AirPot(string DeviceName)
+    public bool WriteSteamingData_Batch_AirPot(string DeviceName, string clientNumber)
     {
         bool tempb = false;
 
         try
         {
             isCategoryPrinted_A = false;
-            string tempFileName = $"{DeviceName}_" + "AIRPOT_"+ DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            string tempFileName = $"{DeviceName}_" + "AIRPOT_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
             string m_str_DataCategory = string.Empty;
@@ -183,14 +198,14 @@ public class GM_DataRecorder
             int totalCountoftheQueue = Queue_AirPot.Count;
 
             //Debug.Log("Saving Data Starts. Queue Count : " + totalCountoftheQueue);
-             
+
             using (StreamWriter streamWriter = File.AppendText(file_Location))
             {
                 while (Queue_AirPot.Count != 0)
                 {
                     for (int i = 0; i < totalCountoftheQueue; i++)
                     {
-                        string stringData = Queue_AirPot.Dequeue();
+                        string stringData = Queue_AirPot[clientNumber].Dequeue();
 
                         if (stringData.Length > 0)
                         {
@@ -221,7 +236,7 @@ public class GM_DataRecorder
         }
         catch (Exception e)
         {
-            Console.WriteLine("1111112222222222222"+e);
+            Console.WriteLine("1111112222222222222" + e);
         }
         return tempb;
     }

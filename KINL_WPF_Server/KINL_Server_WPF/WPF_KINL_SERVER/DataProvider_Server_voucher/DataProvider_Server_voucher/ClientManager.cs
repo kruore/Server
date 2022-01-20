@@ -14,7 +14,7 @@ namespace DataProvider_Server_voucher
     {
         public static ConcurrentDictionary<int, ClientData> clientDic = new ConcurrentDictionary<int, ClientData>();
         public static event Action<string, string> messageParsingAction = null;
-        public static event Action<string, int, string> ChangeListViewAction = null;
+        public static event Action<string, int, string,string> ChangeListViewAction = null;
         public static event Action<string> PTP_Synchronized = null;
 
         public void AddClient(TcpClient newClient)
@@ -25,7 +25,6 @@ namespace DataProvider_Server_voucher
             {
                 newClient.GetStream().BeginRead(currentClient.readBuffer, 0, currentClient.readBuffer.Length, new AsyncCallback(DataReceived), currentClient);
                 clientDic.TryAdd(currentClient.clientNumber, currentClient);
-                Console.WriteLine("ClientNumber" + currentClient.clientNumber);
 
             }
             catch (Exception e)
@@ -52,13 +51,14 @@ namespace DataProvider_Server_voucher
                     {
                         if (CheckID(strData))
                         {
-                            string userName = strData.Substring(3);
+                            string[] str = strData.Split(';');
+                            string userName = str[0].Substring(3);
                             Console.WriteLine(userName);
                             client.clientName = userName;
-                            ChangeListViewAction.Invoke(client.clientName, StaticDefine.ADD_USER, null);
+                            ChangeListViewAction.Invoke(client.clientName, StaticDefine.ADD_USER, null,client.clientNumber.ToString());
                             string accessLog = string.Format("[{0}] {1} Access Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), client.clientName);
                             Console.WriteLine(accessLog);
-                            ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_USER, null);
+                            ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_USER, null,null);
                             File.AppendAllText("AccessRecored.txt", accessLog + "\n");
                             PTP_Synchronized.Invoke(client.clientName);
                             if (client.clientName.Contains("DEVICE"))
