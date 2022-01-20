@@ -217,7 +217,7 @@ namespace DataProvider_Server_voucher
             clientDelays.Remove(targetClient.clientNumber.ToString());
             serverDelays.Remove(targetClient.clientNumber.ToString());
             ClientManager.clientDic.TryRemove(targetClient.clientNumber, out result);
-            ChangeListView(result.clientName, StaticDefine.REMOVE_USER_LIST, null,null);
+            ChangeListView(result.clientName, StaticDefine.REMOVE_USER_LIST, null, null);
             //  string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
             //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
             //  Console.WriteLine(leaveLog);
@@ -230,7 +230,6 @@ namespace DataProvider_Server_voucher
                 if (!msgDic.ContainsKey(GetClinetNumber(sender).ToString()))
                 {
                     msgDic.Add(GetClinetNumber(sender).ToString(), message);
-                    Console.WriteLine($"KEY 추가됨 : {GetClinetNumber(sender).ToString()}");
                 }
                 else
                 {
@@ -351,25 +350,35 @@ namespace DataProvider_Server_voucher
                         aaaa.Append("," + splitedMsg[i]);
                     }
                     string groupLogMessage = aaaa.ToString();
-                    ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage,GetClinetNumber(sender).ToString());
+                    ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage, GetClinetNumber(sender).ToString());
                     return;
                 case "AIRPOT":
                     if (!totalDelay.ContainsKey(GetClinetNumber(sender).ToString()))
                     {
                         return;
                     }
-                    long tempTime1 = Convert.ToInt64(splitedMsg[1]);
-                    long PTPTime1 = totalDelay[GetClinetNumber(sender).ToString()];
-                    tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[GetClinetNumber(sender).ToString()] / 2);
-                    StringBuilder aaaa1 = new StringBuilder();
-                    aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
-                    aaaa1.Append(tempTime1);
-                    for (int i = 1; i < splitedMsg.Length; i++)
+                    try
                     {
-                        aaaa1.Append("," + splitedMsg[i]);
+                        if (splitedMsg.Length == 11)
+                        {
+                            long tempTime1 = Convert.ToInt64(splitedMsg[1]);
+                            long PTPTime1 = totalDelay[GetClinetNumber(sender).ToString()];
+                            tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[GetClinetNumber(sender).ToString()] / 2);
+                            StringBuilder aaaa1 = new StringBuilder();
+                            aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
+                            aaaa1.Append(tempTime1);
+                            for (int i = 1; i < splitedMsg.Length; i++)
+                            {
+                                aaaa1.Append("," + splitedMsg[i]);
+                            }
+                            string groupLogMessage2 = aaaa1.ToString();
+                            ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage2, GetClinetNumber(sender).ToString());
+                        }
                     }
-                    string groupLogMessage2 = aaaa1.ToString();
-                    ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage2, GetClinetNumber(sender).ToString());
+                    catch (Exception ex)
+                    {
+                        return;
+                    }
                     return;
                 case "WATCH":
                     if (!totalDelay.ContainsKey(GetClinetNumber(sender).ToString()))
@@ -453,7 +462,7 @@ namespace DataProvider_Server_voucher
 
 
         // VIEW CHANGED
-        private void ChangeListView(string a, int b, string c,string senderPort)
+        private void ChangeListView(string a, int b, string c, string senderPort)
         {
             string clientNumbers = GetClinetNumber(a).ToString();
             string iosNumbers = "";

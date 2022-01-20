@@ -159,12 +159,13 @@ public class GM_DataRecorder
                                     + "UnixTime,"
                                     + "Protocool,"
                                     + "CurrentDeviceTime,"
-                                    + "AccX,"
-                                    + "AccY,"
-                                    + "AccZ,"
+                         
                                     + "GyroX,"
                                     + "GyroY,"
                                     + "GyroZ,"
+                                    + "AccX,"
+                                    + "AccY,"
+                                    + "AccZ,"
                                     + "HeartRate"
                                     ;
                                 streamWriter.WriteLine(str_DataCategory);
@@ -217,12 +218,12 @@ public class GM_DataRecorder
                                     + "UnixTime,"
                                     + "Protocool,"
                                     + "CurrentDeviceTime,"
-                                    + "AccX,"
-                                    + "AccY,"
-                                    + "AccZ,"
                                     + "GyroX,"
                                     + "GyroY,"
                                     + "GyroZ,"
+                                    + "AccX,"
+                                    + "AccY,"
+                                    + "AccZ,"
                                     ;
                                 streamWriter.WriteLine(str_DataCategory);
                                 isCategoryPrinted_A = true;
