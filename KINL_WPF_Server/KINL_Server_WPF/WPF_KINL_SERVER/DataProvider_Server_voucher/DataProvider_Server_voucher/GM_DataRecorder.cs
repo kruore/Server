@@ -88,32 +88,32 @@ public class GM_DataRecorder
 
             using (StreamWriter streamWriter = File.AppendText(file_Location))
             {
-                while (Queue_Device.Count != 0)
+                while (Queue_Device[clientNumber].Count != 0)
                 {
-                    for (int i = 0; i < totalCountoftheQueue; i++)
-                    {
-                        string stringData = Queue_Device[clientNumber].Dequeue();
+                    string stringData = Queue_Device[clientNumber].Dequeue();
 
-                        if (stringData.Length > 0)
+                    if (stringData.Length > 0)
+                    {
+                        if (!isCategoryPrinted_DV)
                         {
-                            if (!isCategoryPrinted_DV)
-                            {
-                                str_DataCategory =
-                                   "DeviceName,"
-                                   + "PTPTime,"
-                                   + "UnixTime,"
-                                   + "DistanceMM,"
-                                   + "DistanceCM,"
-                                   + "Weight,"
-                                   + "Count,"
-                                   + "DistanceADC,"
-                                   + "WeightADC,"
-                                   + "DeviceName(Current)";
-                                streamWriter.WriteLine(str_DataCategory);
-                                isCategoryPrinted_DV = true;
-                            }
-                            streamWriter.WriteLine(stringData);
+                            str_DataCategory =
+                               "DeviceName,"
+                               + "PTPTime,"
+                               + "UnixTime,"
+                               + "protocool,"
+                               + "CurrentDeviceTime,"
+                               + "DistanceMM,"
+                               + "DistanceCM,"
+                               + "Weight,"
+                               + "Count,"
+                               + "DistanceADC,"
+                               + "WeightADC,"
+                               + "DeviceName(Current)";
+                            streamWriter.WriteLine(str_DataCategory);
+                            isCategoryPrinted_DV = true;
                         }
+                        streamWriter.WriteLine(stringData);
+
                     }
                 }
             }
@@ -137,42 +137,39 @@ public class GM_DataRecorder
 
             string m_str_DataCategory = string.Empty;
 
-            int totalCountoftheQueue = Queue_Watch.Count;
+            int totalCountoftheQueue = Queue_Watch[clientNumber].Count;
 
             //Debug.Log("Saving Data Starts. Queue Count : " + totalCountoftheQueue);
 
             using (StreamWriter streamWriter = File.AppendText(file_Location))
             {
-                while (Queue_Watch.Count != 0)
+                while (Queue_Watch[clientNumber].Count != 0)
                 {
-                    for (int i = 0; i < totalCountoftheQueue; i++)
-                    {
-                        string stringData = Queue_Watch[clientNumber].Dequeue();
+                    string stringData = Queue_Watch[clientNumber].Dequeue();
 
-                        if (stringData.Length > 0)
+                    if (stringData.Length > 0)
+                    {
+                        if (!isCategoryPrinted_W)
                         {
-                            if (!isCategoryPrinted_W)
-                            {
-                                str_DataCategory =
-                                    "Device,"
-                                    + "PTPTime,"
-                                    + "UnixTime,"
-                                    + "Protocool,"
-                                    + "CurrentDeviceTime,"
-                         
-                                    + "GyroX,"
-                                    + "GyroY,"
-                                    + "GyroZ,"
-                                    + "AccX,"
-                                    + "AccY,"
-                                    + "AccZ,"
-                                    + "HeartRate"
-                                    ;
-                                streamWriter.WriteLine(str_DataCategory);
-                                isCategoryPrinted_W = true;
-                            }
-                            streamWriter.WriteLine(stringData);
+                            str_DataCategory =
+                                "Device,"
+                                + "PTPTime,"
+                                + "UnixTime,"
+                                + "Protocool,"
+                                + "CurrentDeviceTime,"
+
+                                + "GyroX,"
+                                + "GyroY,"
+                                + "GyroZ,"
+                                + "AccX,"
+                                + "AccY,"
+                                + "AccZ,"
+                                + "HeartRate"
+                                ;
+                            streamWriter.WriteLine(str_DataCategory);
+                            isCategoryPrinted_W = true;
                         }
+                        streamWriter.WriteLine(stringData);
                     }
                 }
             }
@@ -196,40 +193,38 @@ public class GM_DataRecorder
 
             string m_str_DataCategory = string.Empty;
 
-            int totalCountoftheQueue = Queue_AirPot.Count;
+             int totalCountoftheQueue = Queue_AirPot[clientNumber].Count;
 
             //Debug.Log("Saving Data Starts. Queue Count : " + totalCountoftheQueue);
 
             using (StreamWriter streamWriter = File.AppendText(file_Location))
             {
-                while (Queue_AirPot.Count != 0)
+                while (Queue_AirPot[clientNumber].Count != 0)
                 {
-                    for (int i = 0; i < totalCountoftheQueue; i++)
-                    {
-                        string stringData = Queue_AirPot[clientNumber].Dequeue();
 
-                        if (stringData.Length > 0)
+                    string stringData = Queue_AirPot[clientNumber].Dequeue();
+
+                    if (stringData.Length > 0)
+                    {
+                        if (!isCategoryPrinted_A)
                         {
-                            if (!isCategoryPrinted_A)
-                            {
-                                str_DataCategory =
-                                    "Device,"
-                                    + "PTPTime,"
-                                    + "UnixTime,"
-                                    + "Protocool,"
-                                    + "CurrentDeviceTime,"
-                                    + "GyroX,"
-                                    + "GyroY,"
-                                    + "GyroZ,"
-                                    + "AccX,"
-                                    + "AccY,"
-                                    + "AccZ,"
-                                    ;
-                                streamWriter.WriteLine(str_DataCategory);
-                                isCategoryPrinted_A = true;
-                            }
-                            streamWriter.WriteLine(stringData);
+                            str_DataCategory =
+                                "Device,"
+                                + "PTPTime,"
+                                + "UnixTime,"
+                                + "Protocool,"
+                                + "CurrentDeviceTime,"
+                                + "GyroX,"
+                                + "GyroY,"
+                                + "GyroZ,"
+                                + "AccX,"
+                                + "AccY,"
+                                + "AccZ,"
+                                ;
+                            streamWriter.WriteLine(str_DataCategory);
+                            isCategoryPrinted_A = true;
                         }
+                        streamWriter.WriteLine(stringData);
                     }
                 }
             }

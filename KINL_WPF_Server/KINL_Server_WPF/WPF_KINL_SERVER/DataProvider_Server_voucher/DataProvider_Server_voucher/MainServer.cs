@@ -24,7 +24,7 @@ namespace DataProvider_Server_voucher
 
         private void ServerStart()
         {
-            TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, 4646));
+            TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, 4545));
             listener.Start();
             Console.WriteLine("Server Opened");
 

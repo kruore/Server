@@ -1,4 +1,3 @@
-C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\DataProvider_Server_voucher\DataProvider_Server_voucher\obj\Debug\DataProvider_Server_voucher.csproj.AssemblyReference.cache
 C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\DataProvider_Server_voucher\DataProvider_Server_voucher\obj\Debug\DataProvider_Server_voucher.csproj.SuggestedBindingRedirects.cache
 C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\DataProvider_Server_voucher\DataProvider_Server_voucher\obj\Debug\DataProvider_Server_voucher.Form1.resources
 C:\Users\user\Documents\GitHub\Server\KINL_WPF_Server\KINL_Server_WPF\WPF_KINL_SERVER\DataProvider_Server_voucher\DataProvider_Server_voucher\obj\Debug\DataProvider_Server_voucher.Properties.Resources.resources
