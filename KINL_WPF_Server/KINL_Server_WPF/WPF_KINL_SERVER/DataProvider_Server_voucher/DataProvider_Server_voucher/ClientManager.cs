@@ -55,10 +55,10 @@ namespace DataProvider_Server_voucher
                             string userName = str[0].Substring(3);
                             Console.WriteLine(userName);
                             client.clientName = userName;
-                            ChangeListViewAction.Invoke(client.clientName, StaticDefine.ADD_USER, null,client.clientNumber.ToString());
+                            ChangeListViewAction.Invoke(client.clientNumber.ToString(), StaticDefine.ADD_USER, null,client.clientNumber.ToString());
                             string accessLog = string.Format("[{0}] {1} Access Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), client.clientName);
                             Console.WriteLine(accessLog);
-                            ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_USER, null,null);
+                           // ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_USER, null,null);
                             File.AppendAllText("AccessRecored.txt", accessLog + "\n");
                             PTP_Synchronized.Invoke(client.clientName);
                             if (client.clientName.Contains("DEVICE"))

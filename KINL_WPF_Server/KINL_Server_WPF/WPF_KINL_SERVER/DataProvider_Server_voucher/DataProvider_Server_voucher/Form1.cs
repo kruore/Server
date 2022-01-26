@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Sockets;
 using System.Windows.Forms;
 
 namespace DataProvider_Server_voucher
@@ -178,7 +180,8 @@ namespace DataProvider_Server_voucher
             //확인용
             foreach (var item in ClientManager.clientDic)
             {
-                Console.WriteLine("USERNUMBER" + UserNum);
+                Console.WriteLine("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
+                Console.WriteLine("USERNUMBER" + item.Value.clientNumber);
                 Console.WriteLine("DELAY:" + totalDelay[item.Value.clientNumber.ToString()]);
                 Console.WriteLine("SERVERDELAY:" + serverDelays[item.Value.clientNumber.ToString()]);
                 Console.WriteLine("CLIENTDELAY:" + clientDelays[item.Value.clientNumber.ToString()]);
@@ -189,6 +192,7 @@ namespace DataProvider_Server_voucher
         {
             while (true)
             {
+
                 foreach (var item in ClientManager.clientDic)
                 {
                     try
@@ -221,8 +225,9 @@ namespace DataProvider_Server_voucher
             {
                 ChangeListView(result.clientName, StaticDefine.REMOVE_USER_LIST, null, null);
             }
-            catch(Exception e) {
-                Console.WriteLine( e);
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
             //  string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
             //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
@@ -260,7 +265,7 @@ namespace DataProvider_Server_voucher
                 //Console.WriteLine("msgDic" + msgDic[GetClinetNumber(sender).ToString()]);
                 foreach (var item in msgArray)
                 {
-                     if (string.IsNullOrEmpty(item))
+                    if (string.IsNullOrEmpty(item))
                         continue;
                     if (!item.Contains(";"))
                     {
@@ -356,10 +361,10 @@ namespace DataProvider_Server_voucher
                         aaaa.Append("," + splitedMsg[i]);
                     }
                     string groupLogMessage = aaaa.ToString();
-                    ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage, GetClinetNumber(sender).ToString());
+                    ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage, "DEVICE");
                     return;
                 case "AIRPOT":
-                         if (!totalDelay.ContainsKey(GetClinetNumber(sender).ToString()))
+                    if (!totalDelay.ContainsKey(GetClinetNumber(sender).ToString()))
                     {
                         return;
                     }
@@ -367,19 +372,19 @@ namespace DataProvider_Server_voucher
                     {
                         //if (splitedMsg.Length == 11)
                         //{
-                            long tempTime1 = Convert.ToInt64(splitedMsg[1]);
-                            long PTPTime1 = totalDelay[GetClinetNumber(sender).ToString()];
-                            tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[GetClinetNumber(sender).ToString()] / 2);
-                            StringBuilder aaaa1 = new StringBuilder();
-                            aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
-                            aaaa1.Append(tempTime1);
-                            for (int i = 1; i < splitedMsg.Length; i++)
-                            {
-                                aaaa1.Append("," + splitedMsg[i]);
-                            }
-                            string groupLogMessage2 = aaaa1.ToString();
-                            Console.WriteLine(aaaa1);
-                            ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage2, GetClinetNumber(sender).ToString());
+                        long tempTime1 = Convert.ToInt64(splitedMsg[1]);
+                        long PTPTime1 = totalDelay[GetClinetNumber(sender).ToString()];
+                        tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[GetClinetNumber(sender).ToString()] / 2);
+                        StringBuilder aaaa1 = new StringBuilder();
+                        aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
+                        aaaa1.Append(tempTime1);
+                        for (int i = 1; i < splitedMsg.Length; i++)
+                        {
+                            aaaa1.Append("," + splitedMsg[i]);
+                        }
+                        string groupLogMessage2 = aaaa1.ToString();
+                        Console.WriteLine(aaaa1);
+                        ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage2, "AIRPOT");
                         //}
                     }
                     catch (Exception ex)
@@ -418,7 +423,7 @@ namespace DataProvider_Server_voucher
                             Console.WriteLine(aaaa2);
                             string groupLogMessage3 = aaaa2.ToString();
                             //  Console.WriteLine(groupLogMessage);
-                            ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage3, GetClinetNumber(sender).ToString());
+                            ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage3, "WATCH");
                         }
                     }
                     catch (Exception ex)
@@ -445,8 +450,8 @@ namespace DataProvider_Server_voucher
         // UTILL
 
         private int GetClinetNumber(string targetClientName)
-         {
-            foreach (var item   in ClientManager.clientDic)
+        {
+            foreach (var item in ClientManager.clientDic)
             {
                 if (item.Value.clientName == targetClientName)
                 {
@@ -455,11 +460,11 @@ namespace DataProvider_Server_voucher
             }
             return -1;
         }
-        private string GetClinetName()
+        private string GetClinetName(string clinetPortNumber)
         {
             foreach (var item in ClientManager.clientDic)
             {
-                if (item.Value.clientName.ToString().Contains("DEVICE"))
+                if (item.Value.clientNumber == int.Parse(clinetPortNumber))
                 {
                     return item.Value.clientName;
                 }
@@ -469,136 +474,137 @@ namespace DataProvider_Server_voucher
 
 
         // VIEW CHANGED
-        private void ChangeListView(string a, int b, string c, string senderPort)
+        private void ChangeListView(string clientNumber, int protocool, string decodeData, string deviceType)
         {
-            string clientNumbers = GetClinetNumber(a).ToString();
+            string clientName = GetClinetName(clientNumber);
+            // string clientNumbers = clientNumber;
             string iosNumbers = "";
 
-            if (a.Contains("DEVICE"))
+            if (clientName.Contains("DEVICE"))
             {
-                if (b == StaticDefine.ADD_USER)
+                if (protocool == StaticDefine.ADD_USER)
                 {
                     listBox3.BeginInvoke((Action)(() =>
                     {
                         ObservableCollection<string> list = new ObservableCollection<string>();
-                        DeviceData.Add(GetClinetNumber(a).ToString(), list);
-                        DeviceSend.Add(GetClinetNumber(a).ToString(), false);
-                        listBox3.Items.Add(a + "Connect");
+                        DeviceData.Add(clientNumber, list);
+                        DeviceSend.Add(clientNumber, false);
+                        listBox3.Items.Add("DEVICE : " + clientNumber + "Connect");
                     }));
                 }
-                else if (b == StaticDefine.REMOVE_USER_LIST)
+                else if (protocool == StaticDefine.REMOVE_USER_LIST)
                 {
                     listBox3.BeginInvoke((Action)(() =>
                     {
-                        listBox3.Items.Add(a + "Disconnect");
+                        listBox3.Items.Add("DEVICE : " + clientNumber + "Disconnect");
                     }));
                 }
-                else if (b == StaticDefine.DATA_SEND_START)
+                else if (protocool == StaticDefine.DATA_SEND_START)
                 {
-                    if (DeviceSend[GetClinetNumber(a).ToString()] == true)
+                    if (DeviceSend[clientNumber] == true)
                     {
-                        DeviceData[GetClinetNumber(a).ToString()].Add(c);
+                        DeviceData[clientNumber].Add(decodeData);
                         //   Console.WriteLine("DATAADD");
                     }
                     else
                     {
                         listBox3.BeginInvoke((Action)(() =>
                         {
-                            listBox3.Items.Add(a + "Send");
+                            listBox3.Items.Add("DEVICE:" + clientNumber + "Send");
                         }));
-                        DeviceSend[GetClinetNumber(a).ToString()] = true;
+                        DeviceSend[clientNumber] = true;
                     }
                 }
             }
-            switch (a)
+            switch (deviceType)
             {
                 case "IOS":
-                    if (b == StaticDefine.ADD_USER)
+                    if (protocool == StaticDefine.ADD_USER)
                     {
                         listBox3.BeginInvoke((Action)(() =>
                         {
-                            Console.WriteLine(clientNumbers);
-                            listBox3.Items.Add(a + "Connect");
-                            Watch_DeviceSend.Add(clientNumbers, false);
-                            AirPot_DeviceSend.Add(clientNumbers, false);
+                            Console.WriteLine(clientNumber);
+                            listBox3.Items.Add("IOS" + clientName + "Connect");
+                            Watch_DeviceSend.Add(clientNumber, false);
+                            AirPot_DeviceSend.Add(clientNumber, false);
                             ObservableCollection<string> watchList = new ObservableCollection<string>();
                             ObservableCollection<string> airpotList = new ObservableCollection<string>();
-                            WatchData.Add(clientNumbers, watchList);
-                            AirPotData.Add(clientNumbers, airpotList);
-                         }));
+                            WatchData.Add(clientNumber, watchList);
+                            AirPotData.Add(clientNumber, airpotList);
+                        }));
                     }
-                    else if (b == StaticDefine.REMOVE_USER_LIST)
+                    else if (protocool == StaticDefine.REMOVE_USER_LIST)
                     {
                         listBox3.BeginInvoke((Action)(() =>
                         {
-                            listBox3.Items.Add(a + "Disconnect");
+                            listBox3.Items.Add("IOS:" + clientNumber + "Disconnect");
                         }));
                     }
                     break;
                 case "WATCH":
-                    if (b == StaticDefine.ADD_USER)
+                    if (protocool == StaticDefine.ADD_USER)
                     {
                         listBox2.BeginInvoke((Action)(() =>
                         {
-                            listBox2.Items.Add(a + "Connect");
+                            listBox2.Items.Add("IOS:" + clientNumber + "Connect");
                         }));
                     }
-                    else if (b == StaticDefine.REMOVE_USER_LIST)
+                    else if (protocool == StaticDefine.REMOVE_USER_LIST)
                     {
                         listBox2.BeginInvoke((Action)(() =>
                         {
-                            listBox2.Items.Add(a + "Disconnect");
+                            listBox2.Items.Add("IOS:" + clientNumber + "Disconnect");
                         }));
                     }
-                    else if (b == StaticDefine.DATA_SEND_START)
+                    else if (protocool == StaticDefine.DATA_SEND_START)
                     {
-                        if (Watch_DeviceSend[senderPort])
+                        if (Watch_DeviceSend[clientNumber])
                         {
-                          //  Console.WriteLine(senderPort);
-                            WatchData[senderPort].Add(c);
+                            //  Console.WriteLine(senderPort);
+                            WatchData[clientNumber].Add(decodeData);
                             // Console.WriteLine("DATAWATCH");
                         }
                         else
                         {
                             listBox2.BeginInvoke((Action)(() =>
                             {
-                                listBox2.Items.Add(a + "Send");
+                                listBox2.Items.Add("IOS:" + clientNumber + "Send");
                             }));
-                            Watch_DeviceSend[senderPort] = true;
+                            Watch_DeviceSend[clientNumber] = true;
                         }
                     }
                     break;
 
                 case "AIRPOT":
-                    if (b == StaticDefine.ADD_USER)
+                    if (protocool == StaticDefine.ADD_USER)
                     {
                         listBox1.BeginInvoke((Action)(() =>
                         {
-                            listBox1.Items.Add(a + "Connect");
+                            listBox1.Items.Add("AIRPOT:" + clientNumber + "Connect");
                         }));
                     }
-                    else if (b == StaticDefine.REMOVE_USER_LIST)
+                    else if (protocool == StaticDefine.REMOVE_USER_LIST)
                     {
                         listBox1.BeginInvoke((Action)(() =>
                         {
-                            listBox1.Items.Add(a + "Disconnect");
+                            listBox1.Items.Add("AIRPOT:" + clientNumber + "Disconnect");
                         }));
                     }
-                    else if (b == StaticDefine.DATA_SEND_START)
+                    else if (protocool == StaticDefine.DATA_SEND_START)
                     {
-                        if (AirPot_DeviceSend[senderPort])
+                        if (AirPot_DeviceSend[clientNumber])
                         {
-                            Console.WriteLine(senderPort);
-                            AirPotData[senderPort].Add(c);
+                            Console.WriteLine(clientNumber);
+                            AirPotData[clientNumber].Add(decodeData);
                             // Console.WriteLine("DATAAIRPOT");
                         }
                         else
                         {
                             listBox1.BeginInvoke((Action)(() =>
                             {
-                                listBox1.Items.Add(a + "Send");
+                                listBox1.Items.Add("AIRPOT:" + clientNumber + "Send");
                             }));
-                            AirPot_DeviceSend[senderPort] = true;
+                            AirPot_DeviceSend[clientNumber] = true;
                         }
                     }
                     break;
@@ -652,7 +658,7 @@ namespace DataProvider_Server_voucher
                 }
                 if (AirPotData.Count > 0)
                 {
-                    GM_DataRecorder.instance.  WriteSteamingData_Batch_AirPot(userToken, abc.ToString());
+                    GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot(userToken, abc.ToString());
                 }
 
                 WatchData[abc.ToString()].Clear();
