@@ -60,7 +60,7 @@ namespace DataProvider_Server_voucher
                             Console.WriteLine(accessLog);
                            // ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_USER, null,null);
                             File.AppendAllText("AccessRecored.txt", accessLog + "\n");
-                            PTP_Synchronized.Invoke(client.clientName);
+                            PTP_Synchronized.Invoke(client.clientNumber.ToString());
                             if (client.clientName.Contains("DEVICE"))
                             {
                                 Form1.clientNames = client.clientName;
@@ -73,7 +73,7 @@ namespace DataProvider_Server_voucher
 
                 if (messageParsingAction != null)
                 {
-                    messageParsingAction.BeginInvoke(client.clientName, strData, null, null);
+                    messageParsingAction.BeginInvoke(client.clientNumber.ToString(), strData, null, null);
                 }
 
             }

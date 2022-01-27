@@ -70,14 +70,14 @@ public class GM_DataRecorder
     bool isCategoryPrinted_DV = false;
     bool isCategoryPrinted_W = false;
     bool isCategoryPrinted_A = false;
-    public bool WriteSteamingData_Batch_Device(string DeviceName, string clientNumber)
+    public bool WriteSteamingData_Batch_Device(string clientNumber, string clientName)
     {
         bool tempb = false;
 
         try
         {
             isCategoryPrinted_DV = false;
-            string tempFileName = $"{DeviceName}_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            string tempFileName = $"{clientName}_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
             string m_str_DataCategory = string.Empty;
@@ -118,6 +118,7 @@ public class GM_DataRecorder
                 }
             }
             tempb = true;
+            isCategoryPrinted_DV = false;
         }
         catch (Exception e)
         {

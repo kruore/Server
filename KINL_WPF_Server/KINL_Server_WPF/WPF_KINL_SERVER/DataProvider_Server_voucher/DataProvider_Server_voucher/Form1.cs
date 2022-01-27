@@ -66,26 +66,30 @@ namespace DataProvider_Server_voucher
         {
             lock (_ptpLock)
             {
-                if (!PTPlist.ContainsKey(GetClinetNumber(a).ToString()))
+                if (!PTPlist.ContainsKey(a.ToString()))
                 {
                     List<string> tempList = new List<string>();
-                    PTPlist.Add(GetClinetNumber(a).ToString(), tempList);
-                    while (PTPlist[GetClinetNumber(a).ToString()].Count < 10)
+                    PTPlist.Add(a.ToString(), tempList);
+                    while (PTPlist[a.ToString()].Count < 10)
                     {
                         try
                         {
                             timeOffset = DateTimeOffset.Now;
                             preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                            string sendStringData = $"<PTP>,{GetClinetNumber(a).ToString()},{preUnixMilliseconds}";
+                            string sendStringData = $"<PTP>,{a.ToString()},{preUnixMilliseconds}";
                             byte[] sendByteData = new byte[sendStringData.Length];
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                            foreach (var att in ClientManager.clientDic)
+                            if (ClientManager.clientDic.ContainsKey(int.Parse(a)))
                             {
-                                if (att.Value.clientNumber == GetClinetNumber(a))
-                                {
-                                    att.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                                }
+                                ClientManager.clientDic[int.Parse(a)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                             }
+                            //foreach (var att in ClientManager.clientDic)
+                            //{
+                            //    if (att.Value.clientNumber == GetClinetNumber(a))
+                            //    {
+                            //        att.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                            //    }
+                            //}
                         }
                         catch (Exception e)
                         {
@@ -96,34 +100,34 @@ namespace DataProvider_Server_voucher
                         Thread.Sleep(10);
                     }
                 }
-                else
-                {
-                    while (PTPlist[GetClinetNumber(a).ToString()].Count < 10)
-                    {
-                        try
-                        {
-                            timeOffset = DateTimeOffset.Now;
-                            preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                            string sendStringData = $"<PTP>,{GetClinetNumber(a).ToString()},{preUnixMilliseconds}";
-                            byte[] sendByteData = new byte[sendStringData.Length];
-                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                            foreach (var att in ClientManager.clientDic)
-                            {
-                                if (att.Value.clientNumber == GetClinetNumber(a))
-                                {
-                                    att.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("ERROR");
-                            break;
-                            //return;
-                        }
-                        Thread.Sleep(10);
-                    }
-                }
+                //else
+                //{
+                //    while (PTPlist[a.ToString()].Count < 10)
+                //    {
+                //        try
+                //        {
+                //            timeOffset = DateTimeOffset.Now;
+                //            preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
+                //            string sendStringData = $"<PTP>,{a.ToString()},{preUnixMilliseconds}";
+                //            byte[] sendByteData = new byte[sendStringData.Length];
+                //            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                //            //foreach (var att in ClientManager.clientDic)
+                //            //{
+                //            //    if (att.Value.clientNumber == a)
+                //            //    {
+                //            //        att.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                //            //    }
+                //            //}
+                //        }
+                //        catch (Exception e)
+                //        {
+                //            Console.WriteLine("ERROR");
+                //            break;
+                //            //return;
+                //        }
+                //        Thread.Sleep(10);
+                //    }
+                //}
                 Console.WriteLine("END");
                 conntectCheckThread = new Task(ConnectCheckLoop);
                 conntectCheckThread.Start();
@@ -139,9 +143,9 @@ namespace DataProvider_Server_voucher
             long totalServerDelay = 0;
             long minServerDelay = 0;
 
-            for (int i = 0; i < PTPlist[GetClinetNumber(sender).ToString()].Count; i++)
+            for (int i = 0; i < PTPlist[sender.ToString()].Count; i++)
             {
-                string[] a = PTPlist[GetClinetNumber(sender).ToString()][i].Split(',');
+                string[] a = PTPlist[sender.ToString()][i].Split(',');
 
                 if (a[5].Contains(";"))
                 {
@@ -174,9 +178,9 @@ namespace DataProvider_Server_voucher
             long CD = sumClientDelay / 10;
             long SCD = totalServerDelay / 10;
 
-            serverDelays.Add(UserNum, SD);
-            clientDelays.Add(UserNum, CD);
-            totalDelay.Add(UserNum, SCD);
+            serverDelays.Add(sender, SD);
+            clientDelays.Add(sender, CD);
+            totalDelay.Add(sender, SCD);
             //확인용
             foreach (var item in ClientManager.clientDic)
             {
@@ -192,7 +196,6 @@ namespace DataProvider_Server_voucher
         {
             while (true)
             {
-
                 foreach (var item in ClientManager.clientDic)
                 {
                     try
@@ -215,52 +218,52 @@ namespace DataProvider_Server_voucher
         private void RemoveClient(ClientData targetClient)
         {
             ClientData result = null;
-            Console.WriteLine(clientNames);
+            try
+            {
+                ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
+            }
+            catch (Exception e)
+            {
+                //Console.WriteLine(e);
+                Console.WriteLine("EEEEEEEEEEEEEEEEEEEEEEE");
+            }
+            ClientManager.clientDic.TryRemove(targetClient.clientNumber, out result);
             PTPlist.Remove(targetClient.clientNumber.ToString());
             totalDelay.Remove(targetClient.clientNumber.ToString());
             clientDelays.Remove(targetClient.clientNumber.ToString());
             serverDelays.Remove(targetClient.clientNumber.ToString());
-            ClientManager.clientDic.TryRemove(targetClient.clientNumber, out result);
-            try
-            {
-                ChangeListView(result.clientName, StaticDefine.REMOVE_USER_LIST, null, null);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            //  string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
+            string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
             //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
-            //  Console.WriteLine(leaveLog);
+            Console.WriteLine(leaveLog);
         }
 
         private void MessageParsing(string sender, string message)
         {
             lock (lockObj)
             {
-                if (!msgDic.ContainsKey(GetClinetNumber(sender).ToString()))
+                if (!msgDic.ContainsKey(sender))
                 {
-                    msgDic.Add(GetClinetNumber(sender).ToString(), message);
+                    msgDic.Add(sender, message);
                 }
                 else
                 {
-                    msgDic[GetClinetNumber(sender).ToString()] += message;
+                    msgDic[sender] += message;
                 }
                 string[] msgArray = new string[0];
-                if (msgDic[GetClinetNumber(sender).ToString()].LastIndexOf(';') == msgDic[GetClinetNumber(sender).ToString()].Length)
+                if (msgDic[sender].LastIndexOf(';') == msgDic[sender].Length)
                 {
-                    msgArray = msgDic[GetClinetNumber(sender).ToString()].Split(';');
-                    msgDic[GetClinetNumber(sender).ToString()] = "";
+                    msgArray = msgDic[sender].Split(';');
+                    msgDic[sender] = "";
                 }
                 else
                 {
-                    string[] temparray = msgDic[GetClinetNumber(sender).ToString()].Split(';');
+                    string[] temparray = msgDic[sender].Split(';');
                     msgArray = new string[temparray.Length - 1];
                     for (int i = 0; i < temparray.Length - 1; i++)
                     {
                         msgArray[i] = temparray[i];
                     }
-                    msgDic[GetClinetNumber(sender).ToString()] = temparray[temparray.Length - 1];
+                    msgDic[sender] = temparray[temparray.Length - 1];
                 }
                 //Console.WriteLine("msgDic" + msgDic[GetClinetNumber(sender).ToString()]);
                 foreach (var item in msgArray)
@@ -308,7 +311,7 @@ namespace DataProvider_Server_voucher
             switch (receiver)
             {
                 case "<PTP>":
-                    if (totalDelay.ContainsKey(GetClinetNumber(sender).ToString()))
+                    if (totalDelay.ContainsKey(sender))
                     {
                         return;
                     }
@@ -316,7 +319,7 @@ namespace DataProvider_Server_voucher
                     {
                         if (splitedMsg.Length < 6)
                         {
-                            Console.WriteLine(splitedMsg);
+                        //    Console.WriteLine(splitedMsg);
 
                             timeOffset = DateTimeOffset.Now;
                             preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
@@ -327,8 +330,8 @@ namespace DataProvider_Server_voucher
                             string sendStringData = $"{splitedMsg[0]},{splitedMsg[1]},{splitedMsg[2]},{splitedMsg[3]},{preUnixMilliseconds}";
                             byte[] sendByteData = new byte[sendStringData.Length];
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                            ClientManager.clientDic[GetClinetNumber(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                            Console.WriteLine(sendStringData);
+                            ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                         //   Console.WriteLine(sendStringData);
                         }
                         if (splitedMsg.Length >= 6 && splitedMsg.Length < 7)
                         {
@@ -336,8 +339,8 @@ namespace DataProvider_Server_voucher
                             {
                                 return;
                             }
-                            PTPlist[GetClinetNumber(sender).ToString()].Add(msgList);
-                            if (PTPlist[GetClinetNumber(sender).ToString()].Count == 10)
+                            PTPlist[sender].Add(msgList);
+                            if (PTPlist[sender].Count == 10)
                             {
                                 CalculatePTP(sender);
                             }
@@ -346,13 +349,13 @@ namespace DataProvider_Server_voucher
                     }
                     break;
                 case "DEVICE":
-                    if (!totalDelay.ContainsKey(GetClinetNumber(sender).ToString()))
+                    if (!totalDelay.ContainsKey(sender))
                     {
                         return;
                     }
                     long tempTime = Convert.ToInt64(splitedMsg[1]);
-                    long PTPTime = totalDelay[GetClinetNumber(sender).ToString()];
-                    tempTime = (tempTime + PTPTime) + (serverDelays[GetClinetNumber(sender).ToString()] / 2); ;
+                    long PTPTime = totalDelay[sender];
+                    tempTime = (tempTime + PTPTime) + (serverDelays[sender] / 2); ;
                     StringBuilder aaaa = new StringBuilder();
                     aaaa = aaaa.Append(splitedMsg[0] + ",");
                     aaaa.Append(tempTime);
@@ -364,7 +367,7 @@ namespace DataProvider_Server_voucher
                     ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage, "DEVICE");
                     return;
                 case "AIRPOT":
-                    if (!totalDelay.ContainsKey(GetClinetNumber(sender).ToString()))
+                    if (!totalDelay.ContainsKey(sender))
                     {
                         return;
                     }
@@ -373,8 +376,8 @@ namespace DataProvider_Server_voucher
                         //if (splitedMsg.Length == 11)
                         //{
                         long tempTime1 = Convert.ToInt64(splitedMsg[1]);
-                        long PTPTime1 = totalDelay[GetClinetNumber(sender).ToString()];
-                        tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[GetClinetNumber(sender).ToString()] / 2);
+                        long PTPTime1 = totalDelay[sender];
+                        tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[sender] / 2);
                         StringBuilder aaaa1 = new StringBuilder();
                         aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
                         aaaa1.Append(tempTime1);
@@ -383,7 +386,7 @@ namespace DataProvider_Server_voucher
                             aaaa1.Append("," + splitedMsg[i]);
                         }
                         string groupLogMessage2 = aaaa1.ToString();
-                        Console.WriteLine(aaaa1);
+                     //   Console.WriteLine(aaaa1);
                         ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage2, "AIRPOT");
                         //}
                     }
@@ -393,7 +396,7 @@ namespace DataProvider_Server_voucher
                     }
                     return;
                 case "WATCH":
-                    if (!totalDelay.ContainsKey(GetClinetNumber(sender).ToString()))
+                    if (!totalDelay.ContainsKey(sender))
                     {
                         return;
                     }
@@ -402,17 +405,17 @@ namespace DataProvider_Server_voucher
                         if (splitedMsg.Length == 11)
                         {
                             long tempTime2 = Convert.ToInt64(splitedMsg[1]);
-                            long PTPTime2 = totalDelay[GetClinetNumber(sender).ToString()];
+                            long PTPTime2 = totalDelay[sender];
                             long aaa = 0;
 
-                            if (!totalDelay.TryGetValue(GetClinetNumber(sender).ToString(), out aaa))
+                            if (!totalDelay.TryGetValue(sender, out aaa))
                             {
                                 foreach (var name in totalDelay)
                                 {
                                     Console.WriteLine($"{GetClinetNumber(name.Key)},{name.Value},{sender}");
                                 }
                             }
-                            tempTime2 = (tempTime2 + PTPTime2) - (serverDelays[GetClinetNumber(sender).ToString()] / 2);
+                            tempTime2 = (tempTime2 + PTPTime2) - (serverDelays[sender] / 2);
                             StringBuilder aaaa2 = new StringBuilder();
                             aaaa2 = aaaa2.Append(splitedMsg[0] + ",");
                             aaaa2.Append(tempTime2);
@@ -420,7 +423,7 @@ namespace DataProvider_Server_voucher
                             {
                                 aaaa2.Append("," + splitedMsg[i]);
                             }
-                            Console.WriteLine(aaaa2);
+                        //    Console.WriteLine(aaaa2);
                             string groupLogMessage3 = aaaa2.ToString();
                             //  Console.WriteLine(groupLogMessage);
                             ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage3, "WATCH");
@@ -432,13 +435,13 @@ namespace DataProvider_Server_voucher
                     }
                     return;
                 case "<TEST>":
-                    if (!totalDelay.ContainsKey(GetClinetNumber(sender).ToString()))
+                    if (!totalDelay.ContainsKey(sender))
                     {
                         return;
                     }
                     return;
                 default:
-                    if (!totalDelay.ContainsKey(GetClinetNumber(sender).ToString()))
+                    if (!totalDelay.ContainsKey(sender))
                     {
                         return;
                     }
@@ -479,7 +482,7 @@ namespace DataProvider_Server_voucher
             string clientName = GetClinetName(clientNumber);
             // string clientNumbers = clientNumber;
             string iosNumbers = "";
-
+           // Console.WriteLine(clientName);
             if (clientName.Contains("DEVICE"))
             {
                 if (protocool == StaticDefine.ADD_USER)
@@ -614,56 +617,56 @@ namespace DataProvider_Server_voucher
 
         //FILE SAVED
 
-        private void SaveFile(int abc)
+        private void SaveFile(int sender)
         {
-            string userToken = clientNames;
-            Console.WriteLine("USER: " + userToken);
-            Console.WriteLine("TOKENNUMBER" + GetClinetNumber(userToken));
-            //Console.WriteLine($"SAVED : {DeviceData.Count}");
-            //Console.WriteLine($"Client :{item.Value.clientName}");
-            //GM_DataRecorder.instance.MakeFolder(item.Value.clientName);
-            if (GetClinetNumber(userToken) == abc)
+            Console.WriteLine($"SAVED : {DeviceData[sender.ToString()].Count}");
+            Console.WriteLine($"Client :{sender}");
+            //GM_DataRecorder.instance.MakeFolder(DeviceData[sender.ToString()]);
+            for (int i = 0; i < DeviceData[sender.ToString()].Count; i++)
             {
-                for (int i = 0; i < DeviceData[abc.ToString()].Count; i++)
-                {
-                    GM_DataRecorder.instance.Enqueue_Data(abc.ToString(), DeviceData[abc.ToString()][i].ToString());
-                }
-                if (DeviceData.Count > 0)
-                {
-                    GM_DataRecorder.instance.WriteSteamingData_Batch_Device(userToken, abc.ToString());
-                }
-                DeviceData.Clear();
+                GM_DataRecorder.instance.Enqueue_Data(sender.ToString(), DeviceData[sender.ToString()][i].ToString());
             }
-            else
+            if (DeviceData[sender.ToString()].Count > 0)
             {
-                if (AirPotData[abc.ToString()].Count > 1)
+                foreach (var clientNames in ClientManager.clientDic.Values)
                 {
-
-                    for (int i = 0; i < AirPotData[abc.ToString()].Count; i++)
+                    if (clientNames.clientNumber == sender)
                     {
-                        GM_DataRecorder.instance.Enqueue_Data_A(abc.ToString(), AirPotData[abc.ToString()][i].ToString());
+                        GM_DataRecorder.instance.WriteSteamingData_Batch_Device(sender.ToString(), clientNames.clientName);
                     }
                 }
-                if (WatchData[abc.ToString()].Count > 1)
-                {
-                    for (int i = 0; i < WatchData[abc.ToString()].Count; i++)
-                    {
-                        GM_DataRecorder.instance.Enqueue_Data_W(abc.ToString(), WatchData[abc.ToString()][i].ToString());
-                    }
-                }
-
-                if (WatchData.Count > 0)
-                {
-                    GM_DataRecorder.instance.WriteSteamingData_Batch_Watch(userToken, abc.ToString());
-                }
-                if (AirPotData.Count > 0)
-                {
-                    GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot(userToken, abc.ToString());
-                }
-
-                WatchData[abc.ToString()].Clear();
-                AirPotData[abc.ToString()].Clear();
+                DeviceData[sender.ToString()].Clear();
             }
+            //else
+            //{
+            //    if (AirPotData[abc.ToString()].Count > 1)
+            //    {
+
+            //        for (int i = 0; i < AirPotData[abc.ToString()].Count; i++)
+            //        {
+            //            GM_DataRecorder.instance.Enqueue_Data_A(abc.ToString(), AirPotData[sender][i].ToString());
+            //        }
+            //    }
+            //    if (WatchData[abc.ToString()].Count > 1)
+            //    {
+            //        for (int i = 0; i < WatchData[abc.ToString()].Count; i++)
+            //        {
+            //            GM_DataRecorder.instance.Enqueue_Data_W(abc.ToString(), WatchData[sender][i].ToString());
+            //        }
+            //    }
+
+            //    if (WatchData.Count > 0)
+            //    {
+            //        GM_DataRecorder.instance.WriteSteamingData_Batch_Watch(GetClinetName(sender), sender);
+            //    }
+            //    if (AirPotData.Count > 0)
+            //    {
+            //        GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot(GetClinetName(sender), sender);
+            //    }
+
+            //    WatchData[sender].Clear();
+            //    AirPotData[sender].Clear();
+            //}
         }
 
 
