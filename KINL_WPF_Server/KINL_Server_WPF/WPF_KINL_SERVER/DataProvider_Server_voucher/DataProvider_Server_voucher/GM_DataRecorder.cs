@@ -126,14 +126,14 @@ public class GM_DataRecorder
         }
         return tempb;
     }
-    public bool WriteSteamingData_Batch_Watch(string DeviceName, string clientNumber)
+    public bool WriteSteamingData_Batch_Watch(string clientNumber, string clientName)
     {
         bool tempb = false;
 
         try
         {
             isCategoryPrinted_W = false;
-            string tempFileName = $"{DeviceName}_" + "WATCH" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            string tempFileName = $"{clientName}_" + "WATCH" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
             string m_str_DataCategory = string.Empty;
@@ -182,14 +182,14 @@ public class GM_DataRecorder
         }
         return tempb;
     }
-    public bool WriteSteamingData_Batch_AirPot(string DeviceName, string clientNumber)
+    public bool WriteSteamingData_Batch_AirPot(string clientNumber, string clientName)
     {
         bool tempb = false;
 
         try
         {
             isCategoryPrinted_A = false;
-            string tempFileName = $"{DeviceName}_" + "AIRPOT_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            string tempFileName = $"{clientName}_" + "AIRPOT_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
             string m_str_DataCategory = string.Empty;

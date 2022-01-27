@@ -319,7 +319,7 @@ namespace DataProvider_Server_voucher
                     {
                         if (splitedMsg.Length < 6)
                         {
-                        //    Console.WriteLine(splitedMsg);
+                            //    Console.WriteLine(splitedMsg);
 
                             timeOffset = DateTimeOffset.Now;
                             preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
@@ -331,7 +331,7 @@ namespace DataProvider_Server_voucher
                             byte[] sendByteData = new byte[sendStringData.Length];
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                         //   Console.WriteLine(sendStringData);
+                            //   Console.WriteLine(sendStringData);
                         }
                         if (splitedMsg.Length >= 6 && splitedMsg.Length < 7)
                         {
@@ -386,8 +386,8 @@ namespace DataProvider_Server_voucher
                             aaaa1.Append("," + splitedMsg[i]);
                         }
                         string groupLogMessage2 = aaaa1.ToString();
-                     //   Console.WriteLine(aaaa1);
-                        ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage2, "AIRPOT");
+                        //   Console.WriteLine(aaaa1);
+                        ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage2, "AIRPOT");
                         //}
                     }
                     catch (Exception ex)
@@ -423,10 +423,10 @@ namespace DataProvider_Server_voucher
                             {
                                 aaaa2.Append("," + splitedMsg[i]);
                             }
-                        //    Console.WriteLine(aaaa2);
+                            //    Console.WriteLine(aaaa2);
                             string groupLogMessage3 = aaaa2.ToString();
                             //  Console.WriteLine(groupLogMessage);
-                            ChangeListView(receiver, StaticDefine.DATA_SEND_START, groupLogMessage3, "WATCH");
+                            ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage3, "WATCH");
                         }
                     }
                     catch (Exception ex)
@@ -482,7 +482,7 @@ namespace DataProvider_Server_voucher
             string clientName = GetClinetName(clientNumber);
             // string clientNumbers = clientNumber;
             string iosNumbers = "";
-           // Console.WriteLine(clientName);
+            // Console.WriteLine(clientName);
             if (clientName.Contains("DEVICE"))
             {
                 if (protocool == StaticDefine.ADD_USER)
@@ -519,98 +519,103 @@ namespace DataProvider_Server_voucher
                     }
                 }
             }
-            switch (deviceType)
+
+            else
             {
-                case "IOS":
-                    if (protocool == StaticDefine.ADD_USER)
+                if (protocool == StaticDefine.ADD_USER)
+                {
+                    Watch_DeviceSend.Add(clientNumber, false);
+                    AirPot_DeviceSend.Add(clientNumber, false);
+                    ObservableCollection<string> watchList = new ObservableCollection<string>();
+                    ObservableCollection<string> airpotList = new ObservableCollection<string>();
+                    WatchData.Add(clientNumber, watchList);
+                    AirPotData.Add(clientNumber, airpotList);
+                    listBox3.BeginInvoke((Action)(() =>
                     {
-                        listBox3.BeginInvoke((Action)(() =>
-                        {
-                            Console.WriteLine(clientNumber);
-                            listBox3.Items.Add("IOS" + clientName + "Connect");
-                            Watch_DeviceSend.Add(clientNumber, false);
-                            AirPot_DeviceSend.Add(clientNumber, false);
-                            ObservableCollection<string> watchList = new ObservableCollection<string>();
-                            ObservableCollection<string> airpotList = new ObservableCollection<string>();
-                            WatchData.Add(clientNumber, watchList);
-                            AirPotData.Add(clientNumber, airpotList);
-                        }));
-                    }
-                    else if (protocool == StaticDefine.REMOVE_USER_LIST)
+                        Console.WriteLine(clientNumber);
+                        listBox3.Items.Add("IOS" + clientName + "Connect");
+
+                    }));
+                }
+                else if (protocool == StaticDefine.REMOVE_USER_LIST)
+                {
+                    listBox3.BeginInvoke((Action)(() =>
                     {
-                        listBox3.BeginInvoke((Action)(() =>
-                        {
-                            listBox3.Items.Add("IOS:" + clientNumber + "Disconnect");
-                        }));
-                    }
-                    break;
-                case "WATCH":
-                    if (protocool == StaticDefine.ADD_USER)
-                    {
-                        listBox2.BeginInvoke((Action)(() =>
-                        {
-                            listBox2.Items.Add("IOS:" + clientNumber + "Connect");
-                        }));
-                    }
-                    else if (protocool == StaticDefine.REMOVE_USER_LIST)
-                    {
-                        listBox2.BeginInvoke((Action)(() =>
-                        {
-                            listBox2.Items.Add("IOS:" + clientNumber + "Disconnect");
-                        }));
-                    }
-                    else if (protocool == StaticDefine.DATA_SEND_START)
-                    {
-                        if (Watch_DeviceSend[clientNumber])
-                        {
-                            //  Console.WriteLine(senderPort);
-                            WatchData[clientNumber].Add(decodeData);
-                            // Console.WriteLine("DATAWATCH");
-                        }
-                        else
+                        listBox3.Items.Add("IOS:" + clientNumber + "Disconnect");
+                    }));
+                }
+
+                switch (deviceType)
+                {
+
+                    case "WATCH":
+                        if (protocool == StaticDefine.ADD_USER)
                         {
                             listBox2.BeginInvoke((Action)(() =>
                             {
-                                listBox2.Items.Add("IOS:" + clientNumber + "Send");
+                                listBox2.Items.Add("IOS:" + clientNumber + "Connect");
                             }));
-                            Watch_DeviceSend[clientNumber] = true;
                         }
-                    }
-                    break;
+                        else if (protocool == StaticDefine.REMOVE_USER_LIST)
+                        {
+                            listBox2.BeginInvoke((Action)(() =>
+                            {
+                                listBox2.Items.Add("IOS:" + clientNumber + "Disconnect");
+                            }));
+                        }
+                        else if (protocool == StaticDefine.DATA_SEND_START)
+                        {
+                            if (Watch_DeviceSend[clientNumber])
+                            {
+                                //  Console.WriteLine(senderPort);
+                                WatchData[clientNumber].Add(decodeData);
+                                // Console.WriteLine("DATAWATCH");
+                            }
+                            else
+                            {
+                                listBox2.BeginInvoke((Action)(() =>
+                                {
+                                    listBox2.Items.Add("IOS:" + clientNumber + "Send");
+                                }));
+                                Watch_DeviceSend[clientNumber] = true;
+                            }
+                        }
+                        break;
 
-                case "AIRPOT":
-                    if (protocool == StaticDefine.ADD_USER)
-                    {
-                        listBox1.BeginInvoke((Action)(() =>
-                        {
-                            listBox1.Items.Add("AIRPOT:" + clientNumber + "Connect");
-                        }));
-                    }
-                    else if (protocool == StaticDefine.REMOVE_USER_LIST)
-                    {
-                        listBox1.BeginInvoke((Action)(() =>
-                        {
-                            listBox1.Items.Add("AIRPOT:" + clientNumber + "Disconnect");
-                        }));
-                    }
-                    else if (protocool == StaticDefine.DATA_SEND_START)
-                    {
-                        if (AirPot_DeviceSend[clientNumber])
-                        {
-                            Console.WriteLine(clientNumber);
-                            AirPotData[clientNumber].Add(decodeData);
-                            // Console.WriteLine("DATAAIRPOT");
-                        }
-                        else
+                    case "AIRPOT":
+                        if (protocool == StaticDefine.ADD_USER)
                         {
                             listBox1.BeginInvoke((Action)(() =>
                             {
-                                listBox1.Items.Add("AIRPOT:" + clientNumber + "Send");
+                                listBox1.Items.Add("AIRPOT:" + clientNumber + "Connect");
                             }));
-                            AirPot_DeviceSend[clientNumber] = true;
                         }
-                    }
-                    break;
+                        else if (protocool == StaticDefine.REMOVE_USER_LIST)
+                        {
+                            listBox1.BeginInvoke((Action)(() =>
+                            {
+                                listBox1.Items.Add("AIRPOT:" + clientNumber + "Disconnect");
+                            }));
+                        }
+                        else if (protocool == StaticDefine.DATA_SEND_START)
+                        {
+                            if (AirPot_DeviceSend[clientNumber])
+                            {
+                                //Console.WriteLine(clientNumber);
+                                AirPotData[clientNumber].Add(decodeData);
+                                // Console.WriteLine("DATAAIRPOT");
+                            }
+                            else
+                            {
+                                listBox1.BeginInvoke((Action)(() =>
+                                {
+                                    listBox1.Items.Add("AIRPOT:" + clientNumber + "Send");
+                                }));
+                                AirPot_DeviceSend[clientNumber] = true;
+                            }
+                        }
+                        break;
+                }
             }
         }
 
@@ -619,55 +624,71 @@ namespace DataProvider_Server_voucher
 
         private void SaveFile(int sender)
         {
-            Console.WriteLine($"SAVED : {DeviceData[sender.ToString()].Count}");
-            Console.WriteLine($"Client :{sender}");
-            //GM_DataRecorder.instance.MakeFolder(DeviceData[sender.ToString()]);
-            for (int i = 0; i < DeviceData[sender.ToString()].Count; i++)
+            string SaveConfig = GetClinetName(sender.ToString());
+            if (SaveConfig.Contains("DEVICE"))
             {
-                GM_DataRecorder.instance.Enqueue_Data(sender.ToString(), DeviceData[sender.ToString()][i].ToString());
-            }
-            if (DeviceData[sender.ToString()].Count > 0)
-            {
-                foreach (var clientNames in ClientManager.clientDic.Values)
+                for (int i = 0; i < DeviceData[sender.ToString()].Count; i++)
                 {
-                    if (clientNames.clientNumber == sender)
+                    GM_DataRecorder.instance.Enqueue_Data(sender.ToString(), DeviceData[sender.ToString()][i].ToString());
+                }
+                if (DeviceData[sender.ToString()].Count > 0)
+                {
+                    foreach (var clientNames in ClientManager.clientDic.Values)
                     {
-                        GM_DataRecorder.instance.WriteSteamingData_Batch_Device(sender.ToString(), clientNames.clientName);
+                        if (clientNames.clientNumber == sender)
+                        {
+                            GM_DataRecorder.instance.WriteSteamingData_Batch_Device(sender.ToString(), clientNames.clientName);
+                        }
+                    }
+                    DeviceData[sender.ToString()].Clear();
+                }
+            }
+            else
+            {
+                Console.WriteLine("IOS");
+                if (AirPotData[sender.ToString()].Count > 1)
+                {
+
+                    for (int i = 0; i < AirPotData[sender.ToString()].Count; i++)
+                    {
+                        GM_DataRecorder.instance.Enqueue_Data_A(sender.ToString(), AirPotData[sender.ToString()][i].ToString());
                     }
                 }
-                DeviceData[sender.ToString()].Clear();
+                if (WatchData[sender.ToString()].Count > 1)
+                {
+                    for (int i = 0; i < WatchData[sender.ToString()].Count; i++)
+                    {
+                        GM_DataRecorder.instance.Enqueue_Data_W(sender.ToString(), WatchData[sender.ToString()][i].ToString());
+                    }
+                }
+
+                if (WatchData[sender.ToString()].Count > 0)
+                {
+                    foreach (var clientNames in ClientManager.clientDic.Values)
+                    {
+                        if (clientNames.clientNumber == sender)
+                        {
+                            GM_DataRecorder.instance.WriteSteamingData_Batch_Watch(sender.ToString(), clientNames.clientName);
+                        }
+                    }
+
+                    WatchData[sender.ToString()].Clear();
+                }
+                if (AirPotData[sender.ToString()].Count > 0)
+                {
+                    foreach (var clientNames in ClientManager.clientDic.Values)
+                    {
+                        if (clientNames.clientNumber == sender)
+                        {
+                            GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot(sender.ToString(), clientNames.clientName);
+                        }
+                    }
+                    AirPotData[sender.ToString()].Clear();
+                }
             }
-            //else
-            //{
-            //    if (AirPotData[abc.ToString()].Count > 1)
-            //    {
-
-            //        for (int i = 0; i < AirPotData[abc.ToString()].Count; i++)
-            //        {
-            //            GM_DataRecorder.instance.Enqueue_Data_A(abc.ToString(), AirPotData[sender][i].ToString());
-            //        }
-            //    }
-            //    if (WatchData[abc.ToString()].Count > 1)
-            //    {
-            //        for (int i = 0; i < WatchData[abc.ToString()].Count; i++)
-            //        {
-            //            GM_DataRecorder.instance.Enqueue_Data_W(abc.ToString(), WatchData[sender][i].ToString());
-            //        }
-            //    }
-
-            //    if (WatchData.Count > 0)
-            //    {
-            //        GM_DataRecorder.instance.WriteSteamingData_Batch_Watch(GetClinetName(sender), sender);
-            //    }
-            //    if (AirPotData.Count > 0)
-            //    {
-            //        GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot(GetClinetName(sender), sender);
-            //    }
-
-            //    WatchData[sender].Clear();
-            //    AirPotData[sender].Clear();
-            //}
         }
+
+
 
 
         //INIT
