@@ -76,7 +76,7 @@ namespace DataProvider_Server_voucher
                         {
                             timeOffset = DateTimeOffset.Now;
                             preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                            string sendStringData = $"<PTP>,{a.ToString()},{preUnixMilliseconds}";
+                            string sendStringData = $"<PTP>,{a.ToString()},{preUnixMilliseconds};";
                             byte[] sendByteData = new byte[sendStringData.Length];
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             if (ClientManager.clientDic.ContainsKey(int.Parse(a)))
@@ -97,7 +97,7 @@ namespace DataProvider_Server_voucher
                             break;
                             //return;
                         }
-                        Thread.Sleep(10);
+                        Thread.Sleep(30);
                     }
                 }
                 //else
@@ -209,6 +209,7 @@ namespace DataProvider_Server_voucher
                     {
                         SaveFile(item.Value.clientNumber);
                         RemoveClient(item.Value);
+                        
                     }
                 }
                 Thread.Sleep(2000);
@@ -293,176 +294,255 @@ namespace DataProvider_Server_voucher
             //{
             string parsedMessage = "";
             string receiver = "";
-
+            string sendStringData = "";
+            byte[] sendByteData = new byte[sendStringData.Length];
             msgList = msgList.Replace("^", ",");
             if (msgList.Contains("<PTP>"))
             {
                 Console.WriteLine(msgList);
             }
 
-            //#1,iosName,DeviceName
-            // 동기화
-            //#1,1,2= true
-            //#2,DeviceName,
-            //#2,Data
-            //#3,DataSend = Ios, Device Client
-            //#4 Save= IOS send , server Recive
-            //#5,DeviceName - Discnnect = IOS
-            //server = ios,device disconnect
 
-            //%^& DEVICE = Connect
-            //DEVCIE,TIME,DATA
-            string[] splitedMsg = msgList.Split(',');
-            //if(splitedMsg.Length < 3)
-            //{
-            //    return;
-            //}
-            receiver = splitedMsg[0];
-            parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
-            switch (receiver)
+            if (msgList.Substring(0, 1) == "#")
             {
-                case "<PTP>":
-                    if (totalDelay.ContainsKey(sender))
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        if (splitedMsg.Length < 6)
+                string[] splitedMsgs = msgList.Split(',');
+                //#1,iosName,DeviceName
+                // 동기화
+                //#1,1(ios),2(device)= true
+                //#2,DeviceData Recived(Start)
+                //#3
+                //#4 Save= IOS send , server Recive
+                //#5,DeviceName - Discnnect = IOS
+                //server = ios,device disconnect
+                switch (msgList.Substring(0, 2))
+                {
+                    case "#1":
+                        sendStringData = "#2";
+                        sendByteData = new byte[sendStringData.Length];
+                        sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                        try
                         {
-                            //    Console.WriteLine(splitedMsg);
+                            string connectIos = splitedMsgs[1];
+                            int connectIosNumber = GetClinetNumber(splitedMsgs[2]);
 
-                            timeOffset = DateTimeOffset.Now;
-                            preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                            if (splitedMsg[3].Contains(";"))
-                            {
-                                splitedMsg[3] = splitedMsg[3].TrimEnd(splitedMsg[3][splitedMsg[3].Length - 1]);
-                            }
-                            string sendStringData = $"{splitedMsg[0]},{splitedMsg[1]},{splitedMsg[2]},{splitedMsg[3]},{preUnixMilliseconds}";
-                            byte[] sendByteData = new byte[sendStringData.Length];
-                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                            ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                            //   Console.WriteLine(sendStringData);
+                            string connectDevice = splitedMsgs[2];
+                            int connectDeviceNumber = GetClinetNumber(splitedMsgs[3]);
+
+                            ClientManager.clientDic[connectIosNumber].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                            ClientManager.clientDic[connectDeviceNumber].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                         }
-                        if (splitedMsg.Length >= 6 && splitedMsg.Length < 7)
+                        catch (Exception e)
                         {
-                            if (splitedMsg[2].Contains("<PTP>") || splitedMsg[3].Contains("<PTP>"))
-                            {
-                                return;
-                            }
-                            PTPlist[sender].Add(msgList);
-                            if (PTPlist[sender].Count == 10)
-                            {
-                                CalculatePTP(sender);
-                            }
+                            Console.WriteLine("Connection Error");
                             return;
                         }
-                    }
-                    break;
-                case "DEVICE":
-                    if (!totalDelay.ContainsKey(sender))
-                    {
-                        return;
-                    }
-                    long tempTime = Convert.ToInt64(splitedMsg[1]);
-                    long PTPTime = totalDelay[sender];
-                    tempTime = (tempTime + PTPTime) + (serverDelays[sender] / 2); ;
-                    StringBuilder aaaa = new StringBuilder();
-                    aaaa = aaaa.Append(splitedMsg[0] + ",");
-                    aaaa.Append(tempTime);
-                    for (int i = 1; i < splitedMsg.Length; i++)
-                    {
-                        aaaa.Append("," + splitedMsg[i]);
-                    }
-                    string groupLogMessage = aaaa.ToString();
-                    ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage, "DEVICE");
-                    return;
-                case "AIRPOT":
-                    if (!totalDelay.ContainsKey(sender))
-                    {
-                        return;
-                    }
-                    try
-                    {
-                        //if (splitedMsg.Length == 11)
-                        //{
-                        long tempTime1 = Convert.ToInt64(splitedMsg[1]);
-                        long PTPTime1 = totalDelay[sender];
-                        tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[sender] / 2);
-                        StringBuilder aaaa1 = new StringBuilder();
-                        aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
-                        aaaa1.Append(tempTime1);
+                        break;
+
+                    case "#2":
+                        //#2,DeviceData Recived(Start)
+                        sendStringData = "#2";
+                        sendByteData = new byte[sendStringData.Length];
+                        sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                        try
+                        {
+                            string connectDevice = splitedMsgs[1];
+                            int connectDeviceNumber_local = GetClinetNumber(splitedMsgs[1]);
+
+                            ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("RESEND ERROR");
+                            return;
+                        }
+                        break;
+
+                    //#3 = Data End
+                    case "#3":
+
+                        sendStringData = "#3";
+                        sendByteData = new byte[sendStringData.Length];
+                        sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                        try
+                        {
+                            string connectDevices = splitedMsgs[1];
+                            int connectDeviceNumbers = GetClinetNumber(splitedMsgs[1]);
+                            ClientManager.clientDic[connectDeviceNumbers].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Stop Send Data Error");
+                            return;
+                        }
+                        break;
+
+                    // Save
+                    case "#4":
+                        SaveFile(int.Parse(sender));
+                        SaveFile(GetClinetNumber(splitedMsgs[1]));
+                        break;
+
+                    case "#5":
+                        // ERROR = disconnected device or ios callback
+                        break;
+
+                    //Close Socket;
+                    case "#9":
+                        RemoveClient(ClientManager.clientDic[int.Parse(sender)]);
+                        break;
+                }
+                return;
+            }
+            else
+            {
+                string[] splitedMsg = msgList.Split(',');
+
+                receiver = splitedMsg[0];
+                parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
+                switch (receiver)
+                {
+                    case "<PTP>":
+                        if (totalDelay.ContainsKey(sender))
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            if (splitedMsg.Length < 6)
+                            {
+                                //    Console.WriteLine(splitedMsg);
+
+                                timeOffset = DateTimeOffset.Now;
+                                preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
+                                if (splitedMsg[3].Contains(";"))
+                                {
+                                    splitedMsg[3] = splitedMsg[3].TrimEnd(splitedMsg[3][splitedMsg[3].Length - 1]);
+                                    Console.WriteLine(splitedMsg[3]);
+                                }
+                                sendStringData = $"{splitedMsg[0]},{splitedMsg[1]},{splitedMsg[2]},{splitedMsg[3]},{preUnixMilliseconds};";
+                                sendByteData = new byte[sendStringData.Length];
+                                sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                                ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                            }
+                            else if (splitedMsg.Length >= 6 && splitedMsg.Length < 7)
+                            {
+                                if (splitedMsg[2].Contains("<PTP>") || splitedMsg[3].Contains("<PTP>"))
+                                {
+                                    return;
+                                }
+                                PTPlist[sender].Add(msgList);
+                                if (PTPlist[sender].Count == 10)
+                                {
+                                    CalculatePTP(sender);
+                                }
+                                return;
+                            }
+                        }
+                        break;
+                    case "DEVICE":
+                        if (!totalDelay.ContainsKey(sender))
+                        {
+                            return;
+                        }
+                        long tempTime = Convert.ToInt64(splitedMsg[1]);
+                        long PTPTime = totalDelay[sender];
+                        tempTime = (tempTime + PTPTime) + (serverDelays[sender] / 2); ;
+                        StringBuilder aaaa = new StringBuilder();
+                        aaaa = aaaa.Append(splitedMsg[0] + ",");
+                        aaaa.Append(tempTime);
                         for (int i = 1; i < splitedMsg.Length; i++)
                         {
-                            aaaa1.Append("," + splitedMsg[i]);
+                            aaaa.Append("," + splitedMsg[i]);
                         }
-                        string groupLogMessage2 = aaaa1.ToString();
-                        //   Console.WriteLine(aaaa1);
-                        ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage2, "AIRPOT");
-                        //}
-                    }
-                    catch (Exception ex)
-                    {
+                        string groupLogMessage = aaaa.ToString();
+                        ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage, "DEVICE");
                         return;
-                    }
-                    return;
-                case "WATCH":
-                    if (!totalDelay.ContainsKey(sender))
-                    {
-                        return;
-                    }
-                    try
-                    {
-                        if (splitedMsg.Length == 11)
+                    case "AIRPOT":
+                        if (!totalDelay.ContainsKey(sender))
                         {
-                            long tempTime2 = Convert.ToInt64(splitedMsg[1]);
-                            long PTPTime2 = totalDelay[sender];
-                            long aaa = 0;
-
-                            if (!totalDelay.TryGetValue(sender, out aaa))
-                            {
-                                foreach (var name in totalDelay)
-                                {
-                                    Console.WriteLine($"{GetClinetNumber(name.Key)},{name.Value},{sender}");
-                                }
-                            }
-                            tempTime2 = (tempTime2 + PTPTime2) - (serverDelays[sender] / 2);
-                            StringBuilder aaaa2 = new StringBuilder();
-                            aaaa2 = aaaa2.Append(splitedMsg[0] + ",");
-                            aaaa2.Append(tempTime2);
+                            return;
+                        }
+                        try
+                        {
+                            //if (splitedMsg.Length == 11)
+                            //{
+                            long tempTime1 = Convert.ToInt64(splitedMsg[1]);
+                            long PTPTime1 = totalDelay[sender];
+                            tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[sender] / 2);
+                            StringBuilder aaaa1 = new StringBuilder();
+                            aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
+                            aaaa1.Append(tempTime1);
                             for (int i = 1; i < splitedMsg.Length; i++)
                             {
-                                aaaa2.Append("," + splitedMsg[i]);
+                                aaaa1.Append("," + splitedMsg[i]);
                             }
-                            //    Console.WriteLine(aaaa2);
-                            string groupLogMessage3 = aaaa2.ToString();
-                            //  Console.WriteLine(groupLogMessage);
-                            ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage3, "WATCH");
+                            string groupLogMessage2 = aaaa1.ToString();
+                            //   Console.WriteLine(aaaa1);
+                            ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage2, "AIRPOT");
+                            //}
                         }
-                    }
-                    catch (Exception ex)
-                    {
+                        catch (Exception ex)
+                        {
+                            return;
+                        }
                         return;
-                    }
-                    return;
-                case "<TEST>":
-                    if (!totalDelay.ContainsKey(sender))
-                    {
+                    case "WATCH":
+                        if (!totalDelay.ContainsKey(sender))
+                        {
+                            return;
+                        }
+                        try
+                        {
+                            if (splitedMsg.Length == 11)
+                            {
+                                long tempTime2 = Convert.ToInt64(splitedMsg[1]);
+                                long PTPTime2 = totalDelay[sender];
+                                long aaa = 0;
+
+                                if (!totalDelay.TryGetValue(sender, out aaa))
+                                {
+                                    foreach (var name in totalDelay)
+                                    {
+                                        Console.WriteLine($"{GetClinetNumber(name.Key)},{name.Value},{sender}");
+                                    }
+                                }
+                                tempTime2 = (tempTime2 + PTPTime2) - (serverDelays[sender] / 2);
+                                StringBuilder aaaa2 = new StringBuilder();
+                                aaaa2 = aaaa2.Append(splitedMsg[0] + ",");
+                                aaaa2.Append(tempTime2);
+                                for (int i = 1; i < splitedMsg.Length; i++)
+                                {
+                                    aaaa2.Append("," + splitedMsg[i]);
+                                }
+                                //    Console.WriteLine(aaaa2);
+                                string groupLogMessage3 = aaaa2.ToString();
+                                //  Console.WriteLine(groupLogMessage);
+                                ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage3, "WATCH");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            return;
+                        }
                         return;
-                    }
-                    return;
-                default:
-                    if (!totalDelay.ContainsKey(sender))
-                    {
+                    case "<TEST>":
+                        if (!totalDelay.ContainsKey(sender))
+                        {
+                            return;
+                        }
                         return;
-                    }
-                    Console.WriteLine("ERROR DEFAULT" + msgList);
-                    break;
+                    default:
+                        if (!totalDelay.ContainsKey(sender))
+                        {
+                            return;
+                        }
+                        Console.WriteLine("ERROR DEFAULT" + msgList);
+                        break;
+                }
             }
         }
 
         // UTILL
-
         private int GetClinetNumber(string targetClientName)
         {
             foreach (var item in ClientManager.clientDic)
@@ -474,6 +554,7 @@ namespace DataProvider_Server_voucher
             }
             return -1;
         }
+
         private string GetClinetName(string clinetPortNumber)
         {
             foreach (var item in ClientManager.clientDic)
@@ -654,7 +735,7 @@ namespace DataProvider_Server_voucher
                     DeviceData[sender.ToString()].Clear();
                 }
             }
-            else
+            else if (SaveConfig.Contains("IOS"))
             {
                 Console.WriteLine("IOS");
                 if (AirPotData[sender.ToString()].Count > 1)
