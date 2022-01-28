@@ -299,6 +299,17 @@ namespace DataProvider_Server_voucher
             {
                 Console.WriteLine(msgList);
             }
+
+            //#1,iosName,DeviceName
+            // 동기화
+            //#1,1,2= true
+            //#2,DeviceName,
+            //#2,Data
+            //#3,DataSend = Ios, Device Client
+            //#4 Save= IOS send , server Recive
+            //#5,DeviceName - Discnnect = IOS
+            //server = ios,device disconnect
+
             //%^& DEVICE = Connect
             //DEVCIE,TIME,DATA
             string[] splitedMsg = msgList.Split(',');
@@ -711,6 +722,11 @@ namespace DataProvider_Server_voucher
         private void button1_Click(object sender, EventArgs e)
         {
             //SaveFile();
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
