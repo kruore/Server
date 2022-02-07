@@ -26,3 +26,4 @@ D:\GitHub\Server\VoucherClient\VoucherApplication\VoucherApplication\obj\Debug\V
 D:\GitHub\Server\VoucherClient\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.csproj.CopyComplete
 D:\GitHub\Server\VoucherClient\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.exe
 D:\GitHub\Server\VoucherClient\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.pdb
+D:\GitHub\Server\VoucherClient\VoucherApplication\VoucherApplication\obj\Debug\VoucherApplication.csproj.AssemblyReference.cache

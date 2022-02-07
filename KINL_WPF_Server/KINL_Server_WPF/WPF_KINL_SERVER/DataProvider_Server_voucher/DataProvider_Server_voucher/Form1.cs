@@ -31,7 +31,7 @@ namespace DataProvider_Server_voucher
         //메세지 간이 저장 공간
         Dictionary<string, string> msgDic = new Dictionary<string, string>();
 
-        //메세지 정리
+        //메세지 정리1644221081875
         List<string> msgList = new List<string>();
 
         //UNIX PTP
@@ -209,7 +209,6 @@ namespace DataProvider_Server_voucher
                     {
                         SaveFile(item.Value.clientNumber);
                         RemoveClient(item.Value);
-                        
                     }
                 }
                 Thread.Sleep(2000);
@@ -233,9 +232,9 @@ namespace DataProvider_Server_voucher
             totalDelay.Remove(targetClient.clientNumber.ToString());
             clientDelays.Remove(targetClient.clientNumber.ToString());
             serverDelays.Remove(targetClient.clientNumber.ToString());
-            string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
+           // string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
             //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
-            Console.WriteLine(leaveLog);
+           // Console.WriteLine(leaveLog);
         }
 
         private void MessageParsing(string sender, string message)
@@ -322,6 +321,8 @@ namespace DataProvider_Server_voucher
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                         try
                         {
+
+                            Console.WriteLine("Device Connected");
                             string connectIos = splitedMsgs[1];
                             int connectIosNumber = GetClinetNumber(splitedMsgs[2]);
 

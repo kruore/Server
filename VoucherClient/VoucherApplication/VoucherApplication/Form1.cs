@@ -120,7 +120,7 @@ namespace VoucherApplication
             {
                 dataqueue.Clear();
             }
-            string temp = initialis+"_"+index +"_"+weight;
+            string temp = initialis + "_" + index + "_" + weight;
             Login(temp);
 
             string[] port = SerialPort.GetPortNames();
@@ -225,10 +225,10 @@ namespace VoucherApplication
                         timeOffset = DateTimeOffset.Now;
                         //Debug.Log(receivedstring);
                         UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                        byte[] buf = Encoding.Default.GetBytes($"DEVICE,{UnixMilliseconds.ToString()+","+receivedstring};");
+                        byte[] buf = Encoding.Default.GetBytes($"DEVICE,{UnixMilliseconds.ToString() + "," + receivedstring};");
                         client.GetStream().Write(buf, 0, buf.Length);
                         DataRecorder.instance.Queue_ex_01.Enqueue(UnixMilliseconds.ToString() + "," + receivedstring);
-                        string data = preUnixMilliseconds+"delay:" + (UnixMilliseconds - preUnixMilliseconds).ToString() + "count:" + DataRecorder.instance.Queue_ex_01.Count.ToString() + ",time" + DateTime.Now.ToString("HHmmss.fff") + ",data:" + receivedstring;
+                        string data = preUnixMilliseconds + "delay:" + (UnixMilliseconds - preUnixMilliseconds).ToString() + "count:" + DataRecorder.instance.Queue_ex_01.Count.ToString() + ",time" + DateTime.Now.ToString("HHmmss.fff") + ",data:" + receivedstring;
                         DataTextBox.Invoke(new Action(() => SetDataText(data)));
                         //if(DataTextBox.TextLength)
                         //Console.Write((UnixMilliseconds - preUnixMilliseconds).ToString() + "\n");
@@ -371,14 +371,46 @@ namespace VoucherApplication
 
                     string message = Encoding.UTF8.GetString(buffer, 0, bytes);
 
-                    byte[] sendbuffer = new byte[1024];
-                    timeOffset = DateTimeOffset.Now;
-                    preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                    string sendData = $"{message},{preUnixMilliseconds};";
-                    byte[] byteData = new byte[sendData.Length];
-                    byteData = Encoding.UTF8.GetBytes(sendData);
-                    client.GetStream().Write(byteData, 0, byteData.Length);
+                    string[] splited = message.Split(';');
 
+                    for(int i = 0; i < splited.Length; i++)
+                    {
+                        if(splited[i].Equals(""))
+                        {
+                            return;
+                        }
+                        string[] splited_Data = splited[i].Split(',');
+                        Console.WriteLine(splited.Count);
+                        if (splited_Data.Length > 0)
+                        {
+
+                            if (splited_Data[0].Equals("<PTP>"))
+                            {
+                                byte[] sendbuffer = new byte[1024];
+                                timeOffset = DateTimeOffset.Now;
+                                preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
+                                string sendString = splited[i];
+                                string sendData = $"{sendString},{preUnixMilliseconds};";
+                                byte[] byteData = new byte[sendData.Length];
+                                byteData = Encoding.UTF8.GetBytes(sendData);
+                                client.GetStream().Write(byteData, 0, byteData.Length);
+                                Console.WriteLine(sendString);
+                            }
+                            else if (splited_Data[0].Equals("#2"))
+                            {
+                                //DATA SEND!!!
+                                Console.WriteLine("DATA SEND");
+                            }
+                            else if (splited_Data[0].Equals("#3"))
+                            {
+                                Console.WriteLine("DATA SEND STOP");
+                            }
+                        }
+
+                    }
+
+
+                
                 }
                 catch (Exception e)
                 {
@@ -386,15 +418,10 @@ namespace VoucherApplication
                 }
             }
 
-
-
             //    while (true)
             //    {
             //        try
             //        {
-
-
-
             //            byte[] receiveByte = new byte[client.ReceiveBufferSize];
             //            client.GetStream().ReadAsync(receiveByte, 0, (int)client.ReceiveBufferSize);
             //            receiveMessage = Encoding.UTF8.GetString(receiveByte);
