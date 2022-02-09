@@ -97,7 +97,7 @@ namespace DataProvider_Server_voucher
                             break;
                             //return;
                         }
-                        Thread.Sleep(30);
+                        Thread.Sleep(1);
                     }
                 }
                 //else

@@ -372,45 +372,48 @@ namespace VoucherApplication
                     string message = Encoding.UTF8.GetString(buffer, 0, bytes);
 
                     string[] splited = message.Split(';');
-
-                    for(int i = 0; i < splited.Length; i++)
+                    Console.WriteLine(message);
+                    for (int i = 0; i < splited.Length; i++)
                     {
-                        if(splited[i].Equals(""))
+                        if (splited[i].Equals(""))
                         {
-                            return;
+                            continue;
                         }
-                        string[] splited_Data = splited[i].Split(',');
-                        Console.WriteLine(splited.Count);
-                        if (splited_Data.Length > 0)
+                        else
                         {
+                            string[] splited_Data = splited[i].Split(',');
+                            //   Console.WriteLine(splited.Count);
+                            if (splited_Data.Length > 0)
+                            {
 
-                            if (splited_Data[0].Equals("<PTP>"))
-                            {
-                                byte[] sendbuffer = new byte[1024];
-                                timeOffset = DateTimeOffset.Now;
-                                preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                                string sendString = splited[i];
-                                string sendData = $"{sendString},{preUnixMilliseconds};";
-                                byte[] byteData = new byte[sendData.Length];
-                                byteData = Encoding.UTF8.GetBytes(sendData);
-                                client.GetStream().Write(byteData, 0, byteData.Length);
-                                Console.WriteLine(sendString);
-                            }
-                            else if (splited_Data[0].Equals("#2"))
-                            {
-                                //DATA SEND!!!
-                                Console.WriteLine("DATA SEND");
-                            }
-                            else if (splited_Data[0].Equals("#3"))
-                            {
-                                Console.WriteLine("DATA SEND STOP");
+                                if (splited_Data[0].Equals("<PTP>"))
+                                {
+                                    byte[] sendbuffer = new byte[1024];
+                                    timeOffset = DateTimeOffset.Now;
+                                    preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
+                                    string sendString = splited[i];
+                                    string sendData = $"{sendString},{preUnixMilliseconds};";
+                                    byte[] byteData = new byte[sendData.Length];
+                                    byteData = Encoding.UTF8.GetBytes(sendData);
+                                    client.GetStream().Write(byteData, 0, byteData.Length);
+                                    Console.WriteLine(sendString);
+                                }
+                                else if (splited_Data[0].Equals("#2"))
+                                {
+                                    //DATA SEND!!!
+                                    Console.WriteLine("DATA SEND");
+                                }
+                                else if (splited_Data[0].Equals("#3"))
+                                {
+                                    Console.WriteLine("DATA SEND STOP");
+                                }
                             }
                         }
 
                     }
 
 
-                
+
                 }
                 catch (Exception e)
                 {
