@@ -336,12 +336,13 @@ namespace VoucherApplication
             {
                 string parsedName = "%^&";
                 //parsedName += a;
-                parsedName += "DEVICE";
+                parsedName += "6_DEVICE";
 
                 clientNAME = parsedName;
 
                 client = new TcpClient();
                 client.Connect("210.94.216.195", 4545);
+              //  client.Connect("210.94.167.45", 4545);
                 byte[] byteData = new byte[parsedName.Length];
                 byteData = Encoding.UTF8.GetBytes(parsedName);
                 client.GetStream().Write(byteData, 0, byteData.Length);
@@ -362,7 +363,6 @@ namespace VoucherApplication
             {
                 try
                 {
-
                     netStream = client.GetStream();
 
                     int BUFFERSIZE = client.ReceiveBufferSize;
@@ -400,20 +400,43 @@ namespace VoucherApplication
                                 }
                                 else if (splited_Data[0].Equals("#2"))
                                 {
-                                    //DATA SEND!!!
-                                    Console.WriteLine("DATA SEND");
+                                    if (recorddata)
+                                    {
+                                        recorddata = false;
+                                        if (rTh.ThreadState == System.Threading.ThreadState.Unstarted)
+                                        {
+                                            rTh.Start();
+                                        }
+                                        else if (rTh.ThreadState == System.Threading.ThreadState.Suspended)
+                                        {
+                                            rTh.Resume();
+                                            SetDataText("Resume");
+                                        }
+                                        else if (rTh.ThreadState == System.Threading.ThreadState.Running)
+                                        {
+                                            while (rTh.ThreadState != System.Threading.ThreadState.Suspended)
+                                            {
+                                                Thread.Sleep(1);
+                                            }
+                                            rTh.Resume();
+                                            SetDataText("RunningAndSuspended");
+                                        }
+                                    }
+                                    if (stream != null)
+                                    {
+                                        stream.Close();
+                                        stream = null;
+                                    }
+                                    return;
                                 }
                                 else if (splited_Data[0].Equals("#3"))
                                 {
-                                    Console.WriteLine("DATA SEND STOP");
+
                                 }
                             }
                         }
 
                     }
-
-
-
                 }
                 catch (Exception e)
                 {

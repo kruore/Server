@@ -12,12 +12,19 @@ namespace DataProvider_Server_voucher
 {
     public partial class Form1 : Form
     {
+        string testContain;
+
+
         object lockObj = new object();
         object _ptpLock = new object();
 
+        //Connect Checker
+
+        private Dictionary<int, int> deviceConnection = new Dictionary<int, int>();
+
         //실제 저장장소
         private Dictionary<string, ObservableCollection<string>> DeviceData = new Dictionary<string, ObservableCollection<string>>();
-        private Dictionary<string, ObservableCollection<string>> AirPotData = new Dictionary<string, ObservableCollection<string>>();
+        private Dictionary<string, ObservableCollection<string>> AirpodData = new Dictionary<string, ObservableCollection<string>>();
         private Dictionary<string, ObservableCollection<string>> WatchData = new Dictionary<string, ObservableCollection<string>>();
 
         //PTP 할때 사용
@@ -48,7 +55,7 @@ namespace DataProvider_Server_voucher
 
         private Dictionary<string, bool> DeviceSend = new Dictionary<string, bool>();
         private Dictionary<string, bool> Watch_DeviceSend = new Dictionary<string, bool>();
-        private Dictionary<string, bool> AirPot_DeviceSend = new Dictionary<string, bool>();
+        private Dictionary<string, bool> Airpod_DeviceSend = new Dictionary<string, bool>();
 
         private bool PTP_Checker = true;
 
@@ -97,7 +104,7 @@ namespace DataProvider_Server_voucher
                             break;
                             //return;
                         }
-                        Thread.Sleep(1);
+                        Thread.Sleep(20);
                     }
                 }
                 //else
@@ -232,13 +239,12 @@ namespace DataProvider_Server_voucher
             totalDelay.Remove(targetClient.clientNumber.ToString());
             clientDelays.Remove(targetClient.clientNumber.ToString());
             serverDelays.Remove(targetClient.clientNumber.ToString());
-           // string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
-            //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
-           // Console.WriteLine(leaveLog);
         }
 
         private void MessageParsing(string sender, string message)
         {
+            Console.WriteLine(message);
+            testContain += message;
             lock (lockObj)
             {
                 if (!msgDic.ContainsKey(sender))
@@ -279,6 +285,7 @@ namespace DataProvider_Server_voucher
                         msgList.Add(item);
                     }
                     SendMsgToClient(item, sender);
+
                     // Console.WriteLine(item.ToString());
                 }
             }
@@ -291,18 +298,20 @@ namespace DataProvider_Server_voucher
         {
             //try
             //{
+            Console.WriteLine("MSG: "+ msgList);
             string parsedMessage = "";
             string receiver = "";
             string sendStringData = "";
             byte[] sendByteData = new byte[sendStringData.Length];
             msgList = msgList.Replace("^", ",");
-            if (msgList.Contains("<PTP>"))
-            {
-                Console.WriteLine(msgList);
-            }
+            //Console.WriteLine(msgList);
+            //if (msgList.Contains("<PTP>"))
+            //{
+            //    Console.WriteLine(msgList);
+            //}
 
-
-            if (msgList.Substring(0, 1) == "#")
+            //    if (msgList.Substring(0, 1) == "#")
+            if (msgList.Contains("#"))
             {
                 string[] splitedMsgs = msgList.Split(',');
                 //#1,iosName,DeviceName
@@ -315,19 +324,24 @@ namespace DataProvider_Server_voucher
                 //server = ios,device disconnect
                 switch (msgList.Substring(0, 2))
                 {
+
+                    //Connect
+                    // #1 , IOS, DEVICE
                     case "#1":
-                        sendStringData = "#2";
+                        sendStringData = "#2;";
                         sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+
                         try
                         {
-
                             Console.WriteLine("Device Connected");
                             string connectIos = splitedMsgs[1];
-                            int connectIosNumber = GetClinetNumber(splitedMsgs[2]);
+                            int connectIosNumber = GetClinetNumber(splitedMsgs[1]);
 
                             string connectDevice = splitedMsgs[2];
-                            int connectDeviceNumber = GetClinetNumber(splitedMsgs[3]);
+                            int connectDeviceNumber = GetClinetNumber(splitedMsgs[2]);
+
+                            deviceConnection.Add(connectIosNumber, connectDeviceNumber);
 
                             ClientManager.clientDic[connectIosNumber].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                             ClientManager.clientDic[connectDeviceNumber].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
@@ -341,14 +355,14 @@ namespace DataProvider_Server_voucher
 
                     case "#2":
                         //#2,DeviceData Recived(Start)
-                        sendStringData = "#2";
+                        sendStringData = "#2;";
                         sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                         try
                         {
-                            string connectDevice = splitedMsgs[1];
-                            int connectDeviceNumber_local = GetClinetNumber(splitedMsgs[1]);
-
+                            int value = 0;
+                            deviceConnection.TryGetValue(int.Parse(sender), out value);
+                            int connectDeviceNumber_local = value;
                             ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                         }
                         catch (Exception e)
@@ -361,7 +375,7 @@ namespace DataProvider_Server_voucher
                     //#3 = Data End
                     case "#3":
 
-                        sendStringData = "#3";
+                        sendStringData = "#3;";
                         sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                         try
@@ -378,6 +392,7 @@ namespace DataProvider_Server_voucher
                         break;
 
                     // Save
+                    // #4 , IOS, DEVICE
                     case "#4":
                         SaveFile(int.Parse(sender));
                         SaveFile(GetClinetNumber(splitedMsgs[1]));
@@ -412,18 +427,24 @@ namespace DataProvider_Server_voucher
                             if (splitedMsg.Length < 6)
                             {
                                 //    Console.WriteLine(splitedMsg);
-
-                                timeOffset = DateTimeOffset.Now;
-                                preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                                if (splitedMsg[3].Contains(";"))
+                                if (splitedMsg.Equals(""))
                                 {
-                                    splitedMsg[3] = splitedMsg[3].TrimEnd(splitedMsg[3][splitedMsg[3].Length - 1]);
-                                    Console.WriteLine(splitedMsg[3]);
+
                                 }
-                                sendStringData = $"{splitedMsg[0]},{splitedMsg[1]},{splitedMsg[2]},{splitedMsg[3]},{preUnixMilliseconds};";
-                                sendByteData = new byte[sendStringData.Length];
-                                sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                                ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                else
+                                {
+                                    timeOffset = DateTimeOffset.Now;
+                                    preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
+                                    if (splitedMsg[3].Contains(";"))
+                                    {
+                                        splitedMsg[3] = splitedMsg[3].TrimEnd(splitedMsg[3][splitedMsg[3].Length - 1]);
+                                        Console.WriteLine(splitedMsg[3]);
+                                    }
+                                    sendStringData = $"{splitedMsg[0]},{splitedMsg[1]},{splitedMsg[2]},{splitedMsg[3]},{preUnixMilliseconds};";
+                                    sendByteData = new byte[sendStringData.Length];
+                                    sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                                    ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                }
                             }
                             else if (splitedMsg.Length >= 6 && splitedMsg.Length < 7)
                             {
@@ -458,7 +479,7 @@ namespace DataProvider_Server_voucher
                         string groupLogMessage = aaaa.ToString();
                         ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage, "DEVICE");
                         return;
-                    case "AIRPOT":
+                    case "Airpod":
                         if (!totalDelay.ContainsKey(sender))
                         {
                             return;
@@ -479,7 +500,7 @@ namespace DataProvider_Server_voucher
                             }
                             string groupLogMessage2 = aaaa1.ToString();
                             //   Console.WriteLine(aaaa1);
-                            ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage2, "AIRPOT");
+                            ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage2, "Airpod");
                             //}
                         }
                         catch (Exception ex)
@@ -618,11 +639,11 @@ namespace DataProvider_Server_voucher
                 if (protocool == StaticDefine.ADD_USER)
                 {
                     Watch_DeviceSend.Add(clientNumber, false);
-                    AirPot_DeviceSend.Add(clientNumber, false);
+                    Airpod_DeviceSend.Add(clientNumber, false);
                     ObservableCollection<string> watchList = new ObservableCollection<string>();
-                    ObservableCollection<string> airpotList = new ObservableCollection<string>();
+                    ObservableCollection<string> AirpodList = new ObservableCollection<string>();
                     WatchData.Add(clientNumber, watchList);
-                    AirPotData.Add(clientNumber, airpotList);
+                    AirpodData.Add(clientNumber, AirpodList);
                     listBox3.BeginInvoke((Action)(() =>
                     {
                         Console.WriteLine(clientNumber);
@@ -675,36 +696,36 @@ namespace DataProvider_Server_voucher
                         }
                         break;
 
-                    case "AIRPOT":
+                    case "Airpod":
                         if (protocool == StaticDefine.ADD_USER)
                         {
                             listBox1.BeginInvoke((Action)(() =>
                             {
-                                listBox1.Items.Add("AIRPOT:" + clientNumber + "Connect");
+                                listBox1.Items.Add("Airpod:" + clientNumber + "Connect");
                             }));
                         }
                         else if (protocool == StaticDefine.REMOVE_USER_LIST)
                         {
                             listBox1.BeginInvoke((Action)(() =>
                             {
-                                listBox1.Items.Add("AIRPOT:" + clientNumber + "Disconnect");
+                                listBox1.Items.Add("Airpod:" + clientNumber + "Disconnect");
                             }));
                         }
                         else if (protocool == StaticDefine.DATA_SEND_START)
                         {
-                            if (AirPot_DeviceSend[clientNumber])
+                            if (Airpod_DeviceSend[clientNumber])
                             {
                                 //Console.WriteLine(clientNumber);
-                                AirPotData[clientNumber].Add(decodeData);
-                                // Console.WriteLine("DATAAIRPOT");
+                                AirpodData[clientNumber].Add(decodeData);
+                                // Console.WriteLine("DATAAirpod");
                             }
                             else
                             {
                                 listBox1.BeginInvoke((Action)(() =>
                                 {
-                                    listBox1.Items.Add("AIRPOT:" + clientNumber + "Send");
+                                    listBox1.Items.Add("Airpod:" + clientNumber + "Send");
                                 }));
-                                AirPot_DeviceSend[clientNumber] = true;
+                                Airpod_DeviceSend[clientNumber] = true;
                             }
                         }
                         break;
@@ -739,12 +760,12 @@ namespace DataProvider_Server_voucher
             else if (SaveConfig.Contains("IOS"))
             {
                 Console.WriteLine("IOS");
-                if (AirPotData[sender.ToString()].Count > 1)
+                if (AirpodData[sender.ToString()].Count > 1)
                 {
 
-                    for (int i = 0; i < AirPotData[sender.ToString()].Count; i++)
+                    for (int i = 0; i < AirpodData[sender.ToString()].Count; i++)
                     {
-                        GM_DataRecorder.instance.Enqueue_Data_A(sender.ToString(), AirPotData[sender.ToString()][i].ToString());
+                        GM_DataRecorder.instance.Enqueue_Data_A(sender.ToString(), AirpodData[sender.ToString()][i].ToString());
                     }
                 }
                 if (WatchData[sender.ToString()].Count > 1)
@@ -767,16 +788,16 @@ namespace DataProvider_Server_voucher
 
                     WatchData[sender.ToString()].Clear();
                 }
-                if (AirPotData[sender.ToString()].Count > 0)
+                if (AirpodData[sender.ToString()].Count > 0)
                 {
                     foreach (var clientNames in ClientManager.clientDic.Values)
                     {
                         if (clientNames.clientNumber == sender)
                         {
-                            GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot(sender.ToString(), clientNames.clientName);
+                            GM_DataRecorder.instance.WriteSteamingData_Batch_Airpod(sender.ToString(), clientNames.clientName);
                         }
                     }
-                    AirPotData[sender.ToString()].Clear();
+                    AirpodData[sender.ToString()].Clear();
                 }
             }
         }

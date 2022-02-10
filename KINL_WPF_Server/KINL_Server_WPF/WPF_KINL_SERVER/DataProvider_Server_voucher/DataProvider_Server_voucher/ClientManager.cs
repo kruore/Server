@@ -56,6 +56,7 @@ namespace DataProvider_Server_voucher
                             Console.WriteLine(userName);
                             client.clientName = userName;
                             ChangeListViewAction.Invoke(client.clientNumber.ToString(), StaticDefine.ADD_USER, null,client.clientNumber.ToString());
+                            messageParsingAction.BeginInvoke(client.clientNumber.ToString(), strData, null, null);
                             string accessLog = string.Format("[{0}] {1} Access Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), client.clientName);
                             Console.WriteLine(accessLog);
                            // ChangeListViewAction.Invoke(accessLog, StaticDefine.ADD_USER, null,null);

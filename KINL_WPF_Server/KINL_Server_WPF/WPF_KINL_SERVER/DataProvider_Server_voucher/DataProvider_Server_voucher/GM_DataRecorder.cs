@@ -19,7 +19,7 @@ public class GM_DataRecorder
     object _lock = new object();
 
     public Dictionary<string, Queue<string>> Queue_Device = new Dictionary<string, Queue<string>>();
-    public Dictionary<string, Queue<string>> Queue_AirPot = new Dictionary<string, Queue<string>>();
+    public Dictionary<string, Queue<string>> Queue_Airpod = new Dictionary<string, Queue<string>>();
     public Dictionary<string, Queue<string>> Queue_Watch = new Dictionary<string, Queue<string>>();
 
     public GM_DataRecorder()
@@ -48,11 +48,11 @@ public class GM_DataRecorder
         lock (_lock)
         {
             Queue<string> list = new Queue<string>();
-            if (!Queue_AirPot.ContainsKey(clientName))
+            if (!Queue_Airpod.ContainsKey(clientName))
             {
-                Queue_AirPot.Add(clientName, list);
+                Queue_Airpod.Add(clientName, list);
             }
-            Queue_AirPot[clientName].Enqueue(_Queue);
+            Queue_Airpod[clientName].Enqueue(_Queue);
         }
     }
     public void Enqueue_Data_W(string clientName, string _Queue)
@@ -182,28 +182,28 @@ public class GM_DataRecorder
         }
         return tempb;
     }
-    public bool WriteSteamingData_Batch_AirPot(string clientNumber, string clientName)
+    public bool WriteSteamingData_Batch_Airpod(string clientNumber, string clientName)
     {
         bool tempb = false;
 
         try
         {
             isCategoryPrinted_A = false;
-            string tempFileName = $"{clientName}_" + "AIRPOT_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            string tempFileName = $"{clientName}_" + "AIRPOD_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
             string m_str_DataCategory = string.Empty;
 
-             int totalCountoftheQueue = Queue_AirPot[clientNumber].Count;
+             int totalCountoftheQueue = Queue_Airpod[clientNumber].Count;
 
             //Debug.Log("Saving Data Starts. Queue Count : " + totalCountoftheQueue);
 
             using (StreamWriter streamWriter = File.AppendText(file_Location))
             {
-                while (Queue_AirPot[clientNumber].Count != 0)
+                while (Queue_Airpod[clientNumber].Count != 0)
                 {
 
-                    string stringData = Queue_AirPot[clientNumber].Dequeue();
+                    string stringData = Queue_Airpod[clientNumber].Dequeue();
 
                     if (stringData.Length > 0)
                     {
