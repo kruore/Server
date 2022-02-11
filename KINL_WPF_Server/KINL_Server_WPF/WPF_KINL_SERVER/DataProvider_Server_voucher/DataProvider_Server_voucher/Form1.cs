@@ -424,6 +424,15 @@ namespace DataProvider_Server_voucher
                         }
                         else
                         {
+                            for (int i = 1; i < splitedMsg.Length; i++)
+                            {
+                                long a;
+                                if (!long.TryParse(splitedMsg[i], out a))
+                                {
+                                    Console.WriteLine(splitedMsg + "\n" + msgList);
+                                    return;
+                                }
+                            }
                             if (splitedMsg.Length < 6)
                             {
                                 //    Console.WriteLine(splitedMsg);
