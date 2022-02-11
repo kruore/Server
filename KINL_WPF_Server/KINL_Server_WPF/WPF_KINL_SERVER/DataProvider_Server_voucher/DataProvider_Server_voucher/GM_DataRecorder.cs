@@ -77,7 +77,7 @@ public class GM_DataRecorder
         try
         {
             isCategoryPrinted_DV = false;
-            string tempFileName = $"{clientName}_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_Device.txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
             string m_str_DataCategory = string.Empty;
@@ -133,7 +133,7 @@ public class GM_DataRecorder
         try
         {
             isCategoryPrinted_W = false;
-            string tempFileName = $"{clientName}_" + "WATCH" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_WATCH.txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
             string m_str_DataCategory = string.Empty;
@@ -189,7 +189,7 @@ public class GM_DataRecorder
         try
         {
             isCategoryPrinted_A = false;
-            string tempFileName = $"{clientName}_" + "AIRPOT_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+            string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_AirPot.txt";
             string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
             string m_str_DataCategory = string.Empty;

@@ -52,6 +52,7 @@ namespace DataProvider_Server_voucher
 
         private bool PTP_Checker = true;
 
+        private string DeviceNameDefault;
         public Form1()
         {
             InitializeComponent();
@@ -142,7 +143,6 @@ namespace DataProvider_Server_voucher
             long sumClientDelay = 0;
             long totalServerDelay = 0;
             long minServerDelay = 0;
-
             for (int i = 0; i < PTPlist[sender.ToString()].Count; i++)
             {
                 string[] a = PTPlist[sender.ToString()][i].Split(',');
@@ -232,9 +232,9 @@ namespace DataProvider_Server_voucher
             totalDelay.Remove(targetClient.clientNumber.ToString());
             clientDelays.Remove(targetClient.clientNumber.ToString());
             serverDelays.Remove(targetClient.clientNumber.ToString());
-            string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
+            //   string leaveLog = string.Format("[{0}] {1} Leave Server", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), result.clientName);
             //ChangeListView(leaveLog, StaticDefine.ADD_ACCESS_LIST);
-            Console.WriteLine(leaveLog);
+            // Console.WriteLine(leaveLog);
         }
 
         private void MessageParsing(string sender, string message)
@@ -328,12 +328,22 @@ namespace DataProvider_Server_voucher
                     }
                     else
                     {
+                        for (int i = 1; i < splitedMsg.Length; i++)
+                        {
+                            long a;
+                            if (!long.TryParse(splitedMsg[i], out a))
+                            {
+                                Console.WriteLine(splitedMsg + "\n" + msgList);
+                                return;
+                            }
+                        }
                         if (splitedMsg.Length < 6)
                         {
                             //    Console.WriteLine(splitedMsg);
 
                             timeOffset = DateTimeOffset.Now;
                             preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
+                            
                             if (splitedMsg[3].Contains(";"))
                             {
                                 splitedMsg[3] = splitedMsg[3].TrimEnd(splitedMsg[3][splitedMsg[3].Length - 1]);
@@ -344,9 +354,10 @@ namespace DataProvider_Server_voucher
                             ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                             //   Console.WriteLine(sendStringData);
                         }
+
                         if (splitedMsg.Length >= 6 && splitedMsg.Length < 7)
                         {
-                            if (splitedMsg[2].Contains("<PTP>") || splitedMsg[3].Contains("<PTP>"))
+                            if (splitedMsg[2].Contains("<") || splitedMsg[3].Contains(">"))
                             {
                                 return;
                             }
@@ -653,6 +664,7 @@ namespace DataProvider_Server_voucher
                     }
                     DeviceData[sender.ToString()].Clear();
                 }
+                DeviceNameDefault = GetClinetName(sender.ToString());
             }
             else
             {
@@ -679,7 +691,7 @@ namespace DataProvider_Server_voucher
                     {
                         if (clientNames.clientNumber == sender)
                         {
-                            GM_DataRecorder.instance.WriteSteamingData_Batch_Watch(sender.ToString(), clientNames.clientName);
+                            GM_DataRecorder.instance.WriteSteamingData_Batch_Watch(sender.ToString(), DeviceNameDefault);
                         }
                     }
 
@@ -691,7 +703,7 @@ namespace DataProvider_Server_voucher
                     {
                         if (clientNames.clientNumber == sender)
                         {
-                            GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot(sender.ToString(), clientNames.clientName);
+                            GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot(sender.ToString(), DeviceNameDefault);
                         }
                     }
                     AirPotData[sender.ToString()].Clear();
