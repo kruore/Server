@@ -21,7 +21,7 @@ namespace DataProvider_Server_voucher
         //Connect Checker
 
         private Dictionary<int, int> deviceConnection = new Dictionary<int, int>();
-
+        int server_threadDelay = 20;
         //실제 저장장소
         private Dictionary<string, ObservableCollection<string>> DeviceData = new Dictionary<string, ObservableCollection<string>>();
         private Dictionary<string, ObservableCollection<string>> AirpodData = new Dictionary<string, ObservableCollection<string>>();
@@ -104,7 +104,7 @@ namespace DataProvider_Server_voucher
                             break;
                             //return;
                         }
-                        Thread.Sleep(20);
+                        Thread.Sleep(server_threadDelay);
                     }
                 }
                 //else
@@ -298,7 +298,7 @@ namespace DataProvider_Server_voucher
         {
             //try
             //{
-            Console.WriteLine("MSG: "+ msgList);
+          //  Console.WriteLine("MSG: "+ msgList);
             string parsedMessage = "";
             string receiver = "";
             string sendStringData = "";
@@ -355,11 +355,11 @@ namespace DataProvider_Server_voucher
 
                     case "#2":
                         //#2,DeviceData Recived(Start)
-                        sendStringData = "#2;";
-                        sendByteData = new byte[sendStringData.Length];
-                        sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                         try
                         {
+                            sendStringData = "#2;";
+                            sendByteData = new byte[sendStringData.Length];
+                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             int value = 0;
                             deviceConnection.TryGetValue(int.Parse(sender), out value);
                             int connectDeviceNumber_local = value;
@@ -367,7 +367,11 @@ namespace DataProvider_Server_voucher
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("RESEND ERROR");
+                            sendStringData = "#5;";
+                            sendByteData = new byte[sendStringData.Length];
+                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                            int connectDeviceNumber_local = int.Parse(sender);
+                            ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                             return;
                         }
                         break;
@@ -444,11 +448,11 @@ namespace DataProvider_Server_voucher
                                 {
                                     timeOffset = DateTimeOffset.Now;
                                     preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                                    if (splitedMsg[3].Contains(";"))
-                                    {
-                                        splitedMsg[3] = splitedMsg[3].TrimEnd(splitedMsg[3][splitedMsg[3].Length - 1]);
-                                        Console.WriteLine(splitedMsg[3]);
-                                    }
+                                    //if (splitedMsg[3].Contains(";"))
+                                    //{
+                                    //    splitedMsg[3] = splitedMsg[3].TrimEnd(splitedMsg[3][splitedMsg[3].Length - 1]);
+                                    //    Console.WriteLine(splitedMsg[3]);
+                                    //}
                                     sendStringData = $"{splitedMsg[0]},{splitedMsg[1]},{splitedMsg[2]},{splitedMsg[3]},{preUnixMilliseconds};";
                                     sendByteData = new byte[sendStringData.Length];
                                     sendByteData = Encoding.UTF8.GetBytes(sendStringData);
