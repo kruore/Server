@@ -171,11 +171,11 @@ namespace VoucherApplication
                 stopwatch.Start();
                 if (stream != null)
                 {
-                    if (server_send == true)
-                    {
-
-                        DataUpdate();
-                    }
+                    DataUpdate();
+                    //if (server_send == true)
+                    //{
+                    //    DataUpdate();
+                    //}
                 }
                 stopwatch.Stop();
                 //if (stopwatch.ElapsedMilliseconds < 40)
@@ -354,7 +354,6 @@ namespace VoucherApplication
                 ReceiveThread.Start();
                 MessageBox.Show("서버에 접속됨");
             }
-
             catch
             {
                 //   MessageBox.Show("서버연결에 실패하였습니다.", "Server Error");
@@ -404,7 +403,8 @@ namespace VoucherApplication
                                 }
                                 else if (splited_Data[0].Equals("#2"))
                                 {
-                                    server_send = true;
+                             //       server_send = true;
+                                //    DataUpdate();
                                     Console.WriteLine("DADADADADAD");
                                 }
                             }
@@ -421,39 +421,6 @@ namespace VoucherApplication
                     Console.WriteLine(e);
                 }
             }
-
-            //    while (true)
-            //    {
-            //        try
-            //        {
-            //            byte[] receiveByte = new byte[client.ReceiveBufferSize];
-            //            client.GetStream().ReadAsync(receiveByte, 0, (int)client.ReceiveBufferSize);
-            //            receiveMessage = Encoding.UTF8.GetString(receiveByte);
-
-            //            Console.WriteLine(receiveMessage);
-            //            string[] receiveMessageArray = receiveMessage.Split('>');
-            //            foreach (var item in receiveMessageArray)
-            //            {
-            //                if (!item.Contains('<'))
-            //                    continue;
-            //                if (item.Contains("관리자<TEST"))
-            //                    continue;
-
-            //                receiveMessageList.Add(item);
-            //            }
-
-            //       //     ParsingReceiveMessage(receiveMessageList);
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            //MessageBox.Show("서버와의 연결이 끊어졌습니다.", "Server Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //            //MessageBox.Show(e.Message);
-            //            //MessageBox.Show(e.StackTrace);
-            //            //Environment.Exit(1);
-            //        }
-            //       //Thread.Sleep(500);
-            //    }
-            //}
 
         }
 

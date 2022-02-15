@@ -135,7 +135,6 @@ namespace DataProvider_Server_voucher
                 //        Thread.Sleep(10);
                 //    }
                 //}
-                Console.WriteLine("END");
                 conntectCheckThread = new Task(ConnectCheckLoop);
                 conntectCheckThread.Start();
                 return;
@@ -189,13 +188,27 @@ namespace DataProvider_Server_voucher
             clientDelays.Add(sender, CD);
             totalDelay.Add(sender, SCD);
             //확인용
+            Console.WriteLine("END");
             foreach (var item in ClientManager.clientDic)
             {
+
                 Console.WriteLine("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
                 Console.WriteLine("USERNUMBER" + item.Value.clientNumber);
                 Console.WriteLine("DELAY:" + totalDelay[item.Value.clientNumber.ToString()]);
                 Console.WriteLine("SERVERDELAY:" + serverDelays[item.Value.clientNumber.ToString()]);
                 Console.WriteLine("CLIENTDELAY:" + clientDelays[item.Value.clientNumber.ToString()]);
+                listBox4.BeginInvoke((Action)(() =>
+                {
+                    ObservableCollection<string> list = new ObservableCollection<string>();
+                    if (listBox4.Items.Contains("PTP " + item.Value.clientName))
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        listBox4.Items.Add("PTP " + item.Value.clientName);
+                    }
+                }));
             }
         }
 
@@ -228,6 +241,10 @@ namespace DataProvider_Server_voucher
             try
             {
                 ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
+                listBox4.BeginInvoke((Action)(() =>
+                {
+                  listBox4.Items.Add("PTP:" + targetClient.clientName+"-Leave");
+                }));
             }
             catch (Exception e)
             {
@@ -290,15 +307,12 @@ namespace DataProvider_Server_voucher
                 }
             }
         }
-
-
-
         // MESSAGE PARSSED
         private void SendMsgToClient(string msgList, string sender)
         {
             //try
             //{
-          //  Console.WriteLine("MSG: "+ msgList);
+            //  Console.WriteLine("MSG: "+ msgList);
             string parsedMessage = "";
             string receiver = "";
             string sendStringData = "";
@@ -646,7 +660,6 @@ namespace DataProvider_Server_voucher
                     }
                 }
             }
-
             else
             {
                 if (protocool == StaticDefine.ADD_USER)
@@ -772,7 +785,7 @@ namespace DataProvider_Server_voucher
             }
             else if (SaveConfig.Contains("IOS"))
             {
-                Console.WriteLine("IOS");
+                // Console.WriteLine("IOS");
                 if (AirpodData[sender.ToString()].Count > 1)
                 {
 
@@ -841,6 +854,21 @@ namespace DataProvider_Server_voucher
         }
 
         private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void listBox4_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
