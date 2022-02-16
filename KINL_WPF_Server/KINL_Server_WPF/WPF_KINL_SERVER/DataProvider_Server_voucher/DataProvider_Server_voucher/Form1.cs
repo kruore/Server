@@ -316,6 +316,7 @@ namespace DataProvider_Server_voucher
             listBox3.BeginInvoke((Action)(() =>
             {
                 listBox5.Items.Add(msgList);
+                listBox5.SelectedIndex = listBox5.Items.Count - 1;
             }));
             string parsedMessage = "";
             string receiver = "";
