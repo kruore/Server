@@ -128,25 +128,24 @@ namespace VoucherApplication
             {
                 Console.WriteLine(port[i]);
             }
-            Console.WriteLine(port.Length);
             if (port.Length > 0)
             {
-                if (stream != null)
-                {
-                    return;
-                }
-                stream = new SerialPort(port[0], 115200);
-                stream.Open();
-                char[] buffer = new char[1];
-                buffer[0] = '0';
-                stream.Write(buffer, 0, 1);
-                //stream.Write("0");
-                Console.WriteLine("Open");
-                timeOffset = DateTimeOffset.Now;
-                recorddata = false;
-                rTh1 = new Thread(FIxedUpdate);
-                rTh1.IsBackground = false;
-                rTh1.Start();
+                //if (stream != null)
+                //{
+                //    return;
+                //}
+                //stream = new SerialPort(port[0], 115200);
+                //stream.Open();
+                //char[] buffer = new char[1];
+                //buffer[0] = '0';
+                //stream.Write(buffer, 0, 1);
+                ////stream.Write("0");
+                //Console.WriteLine("Open");
+                //timeOffset = DateTimeOffset.Now;
+                //recorddata = false;
+                //rTh1 = new Thread(FIxedUpdate);
+                //rTh1.IsBackground = false;
+                //rTh1.Start();
             }
             else
             {
@@ -171,11 +170,11 @@ namespace VoucherApplication
                 stopwatch.Start();
                 if (stream != null)
                 {
-                    DataUpdate();
-                    //if (server_send == true)
-                    //{
-                    //    DataUpdate();
-                    //}
+                    //DataUpdate();
+                    if (server_send == true)
+                    {
+                        DataUpdate();
+                    }
                 }
                 stopwatch.Stop();
                 //if (stopwatch.ElapsedMilliseconds < 40)
@@ -230,6 +229,7 @@ namespace VoucherApplication
                         //Debug.Log(receivedstring);
                         UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
                         byte[] buf = Encoding.Default.GetBytes($"DEVICE,{UnixMilliseconds.ToString() + "," + receivedstring};");
+                        Console.WriteLine(buf);
                         client.GetStream().Write(buf, 0, buf.Length);
                         DataRecorder.instance.Queue_ex_01.Enqueue(UnixMilliseconds.ToString() + "," + receivedstring);
                         string data = preUnixMilliseconds + "delay:" + (UnixMilliseconds - preUnixMilliseconds).ToString() + "count:" + DataRecorder.instance.Queue_ex_01.Count.ToString() + ",time" + DateTime.Now.ToString("HHmmss.fff") + ",data:" + receivedstring;
@@ -403,9 +403,70 @@ namespace VoucherApplication
                                 }
                                 else if (splited_Data[0].Equals("#2"))
                                 {
-                             //       server_send = true;
-                                //    DataUpdate();
+                                    recorddata = true;
+                                    server_send = true;
+                                    string[] port = SerialPort.GetPortNames();
+                                    for (int j = 0; j < port.Length; j++)
+                                    {
+                                        Console.WriteLine(port[j]);
+                                    }
+                                    Console.WriteLine(port.Length);
+                                    if (port.Length > 0)
+                                    {
+                                        if (stream != null)
+                                        {
+                                            return;
+                                        }
+                                        stream = new SerialPort(port[0], 115200);
+                                        stream.Open();
+                                        char[] buffers = new char[1];
+                                        buffers[0] = '0';
+                                        stream.Write(buffers, 0, 1);
+                                        //stream.Write("0");
+                                        Console.WriteLine("Open");
+                                        timeOffset = DateTimeOffset.Now;
+                                        rTh1 = new Thread(FIxedUpdate);
+                                        rTh1.IsBackground = false;
+                                        rTh1.Start();
+                                    }
+                                    else
+                                    {
+                                        SetDataText("Null Port");
+                                    }
                                     Console.WriteLine("DADADADADAD");
+                                }
+                                else if (splited_Data[0].Equals("#3"))
+                                {
+                                    Console.WriteLine("DDDDDDDDDDDDDDDDDDDDDDDDDDD");
+                                    if (recorddata)
+                                    {
+                                        recorddata = false;
+                                        server_send = false;
+                                        if (rTh.ThreadState == System.Threading.ThreadState.Unstarted)
+                                        {
+                                            rTh.Start();
+                                        }
+                                        else if (rTh.ThreadState == System.Threading.ThreadState.Suspended)
+                                        {
+                                            rTh.Resume();
+                                       //     SetDataText("Resume");
+                                        }
+                                        else if (rTh.ThreadState == System.Threading.ThreadState.Running)
+                                        {
+                                            while (rTh.ThreadState != System.Threading.ThreadState.Suspended)
+                                            {
+                                                Thread.Sleep(1);
+                                            }
+                                            rTh.Resume();
+                                       //     SetDataText("RunningAndSuspended");
+                                        }
+                                    }
+                                    if (stream != null)
+                                    {
+                                        stream.Close();
+                                        stream = null;
+                                    }
+                                    DataTextBox.BeginInvoke(new Action(() => DataTextBox.Clear()));
                                 }
                             }
                         }
