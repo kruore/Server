@@ -37,6 +37,8 @@
             this.button1 = new System.Windows.Forms.Button();
             this.listBox4 = new System.Windows.Forms.ListBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.listBox5 = new System.Windows.Forms.ListBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -127,11 +129,31 @@
             this.label4.Text = "PTP Checker";
             this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
+            // listBox5
+            // 
+            this.listBox5.FormattingEnabled = true;
+            this.listBox5.ItemHeight = 12;
+            this.listBox5.Location = new System.Drawing.Point(566, 47);
+            this.listBox5.Name = "listBox5";
+            this.listBox5.Size = new System.Drawing.Size(222, 136);
+            this.listBox5.TabIndex = 12;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(564, 13);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(46, 12);
+            this.label5.TabIndex = 13;
+            this.label5.Text = "DEBUG";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.listBox5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.listBox4);
             this.Controls.Add(this.button1);
@@ -158,6 +180,8 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ListBox listBox4;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ListBox listBox5;
+        private System.Windows.Forms.Label label5;
     }
 }
 

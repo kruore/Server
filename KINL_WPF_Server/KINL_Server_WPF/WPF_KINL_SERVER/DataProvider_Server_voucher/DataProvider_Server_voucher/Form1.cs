@@ -313,6 +313,10 @@ namespace DataProvider_Server_voucher
             //try
             //{
             Console.WriteLine("MSG: "+ msgList);
+            listBox3.BeginInvoke((Action)(() =>
+            {
+                listBox5.Items.Add(msgList);
+            }));
             string parsedMessage = "";
             string receiver = "";
             string sendStringData = "";

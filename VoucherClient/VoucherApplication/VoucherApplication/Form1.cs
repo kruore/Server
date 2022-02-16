@@ -205,7 +205,10 @@ namespace VoucherApplication
         {
             try
             {
-                receivedstring = stream.ReadLine();
+                if (stream != null)
+                {
+                    receivedstring = stream.ReadLine();
+                }
                 if (easurement_timing_budget_check)
                 {
                     //receivedstring = DateTime.Now.ToString("yyyyMMddHHmmss.fff") + ",wow";
@@ -449,7 +452,7 @@ namespace VoucherApplication
                                         else if (rTh.ThreadState == System.Threading.ThreadState.Suspended)
                                         {
                                             rTh.Resume();
-                                       //     SetDataText("Resume");
+                                            //     SetDataText("Resume");
                                         }
                                         else if (rTh.ThreadState == System.Threading.ThreadState.Running)
                                         {
@@ -458,7 +461,7 @@ namespace VoucherApplication
                                                 Thread.Sleep(1);
                                             }
                                             rTh.Resume();
-                                       //     SetDataText("RunningAndSuspended");
+                                            //     SetDataText("RunningAndSuspended");
                                         }
                                     }
                                     if (stream != null)
