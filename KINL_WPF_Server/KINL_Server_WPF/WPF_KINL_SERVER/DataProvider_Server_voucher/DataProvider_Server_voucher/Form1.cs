@@ -787,8 +787,11 @@ namespace DataProvider_Server_voucher
 
         private void SaveFile(int sender)
         {
-            string SaveConfig = GetClinetName(sender.ToString());
-            if (SaveConfig.Contains("DEVICE"))
+            int clientPort;
+            deviceConnection.TryGetValue(sender, out clientPort);
+            string SaveIOS = GetClinetName(sender.ToString());
+            string SaveDevice = GetClinetName(clientPort.ToString());
+            if (SaveDevice.Contains("DEVICE"))
             {
                 for (int i = 0; i < DeviceData[sender.ToString()].Count; i++)
                 {
@@ -806,7 +809,7 @@ namespace DataProvider_Server_voucher
                     DeviceData[sender.ToString()].Clear();
                 }
             }
-            else if (SaveConfig.Contains("IOS"))
+            else if (SaveIOS.Contains("IOS"))
             {
                 // Console.WriteLine("IOS");
                 if (AirpodData[sender.ToString()].Count > 1)
@@ -849,6 +852,7 @@ namespace DataProvider_Server_voucher
                     AirpodData[sender.ToString()].Clear();
                 }
             }
+            deviceConnection.Remove(sender);
         }
 
 
