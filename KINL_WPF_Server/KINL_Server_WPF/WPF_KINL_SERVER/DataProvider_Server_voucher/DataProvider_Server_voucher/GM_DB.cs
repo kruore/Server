@@ -83,9 +83,8 @@ namespace DataProvider_Server_voucher
             CreateTable(_idx, "DataPath");
             Addcolumn(_idx, "DataPath", "filename", "varchar(30)");
             CreateTable(_idx, "tableDataSet");
-            Addcolumn(_idx, "", "weight", "int");
-            Addcolumn(_idx, "", "count", "int");
-
+            Addcolumn(_idx, "tableDataSet", "weight", "int");
+            Addcolumn(_idx, "tableDataSet", "count", "int");
         }
         /// <summary>
         /// 테이블 생성

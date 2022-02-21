@@ -432,7 +432,6 @@ namespace DataProvider_Server_voucher
                         int value=0;
                         deviceConnection.TryGetValue(int.Parse(sender), out value);
                         SaveFile(int.Parse(sender));
-                        SaveFile(value);
                         break;
 
                     case "#5":
@@ -793,17 +792,17 @@ namespace DataProvider_Server_voucher
             string SaveDevice = GetClinetName(clientPort.ToString());
             if (SaveDevice.Contains("DEVICE"))
             {
-                for (int i = 0; i < DeviceData[sender.ToString()].Count; i++)
+                for (int i = 0; i < DeviceData[clientPort.ToString()].Count; i++)
                 {
-                    GM_DataRecorder.instance.Enqueue_Data(sender.ToString(), DeviceData[sender.ToString()][i].ToString());
+                    GM_DataRecorder.instance.Enqueue_Data(clientPort.ToString(), DeviceData[clientPort.ToString()][i].ToString());
                 }
                 if (DeviceData[sender.ToString()].Count > 0)
                 {
                     foreach (var clientNames in ClientManager.clientDic.Values)
                     {
-                        if (clientNames.clientNumber == sender)
+                        if (clientNames.clientNumber == clientPort)
                         {
-                            GM_DataRecorder.instance.WriteSteamingData_Batch_Device(sender.ToString(), clientNames.clientName);
+                            GM_DataRecorder.instance.WriteSteamingData_Batch_Device(clientPort.ToString(), clientNames.clientName);
                         }
                     }
                     DeviceData[sender.ToString()].Clear();
