@@ -16,7 +16,8 @@ namespace DataProvider_Server_voucher
         public static GM_DB inst;
         public MySqlConnection ConnectionDB()
         {
-            MySqlConnection connection = new MySqlConnection("Server=localhost;Port=3306;Database=coding32;UiD=root;Pwd=cogsci2017;");
+            MySqlConnection connection = new MySqlConnection("Server=localhost;Port=3306;Database=voucher;UiD=root;Pwd=cogsci2017;");
+            Console.WriteLine("Connect DB");
             return connection;
         }
         public void init()
@@ -24,6 +25,7 @@ namespace DataProvider_Server_voucher
             if (inst != null)
             {
                 inst = this;
+                Console.WriteLine("This");
             }
         }
         public bool CheckID(string _idx)
@@ -81,12 +83,9 @@ namespace DataProvider_Server_voucher
             CreateTable(_idx, "DataPath");
             Addcolumn(_idx, "DataPath", "filename", "varchar(30)");
             CreateTable(_idx, "tableDataSet");
-            Addcolumn(_idx, "tableDataSet", "weight", "int");
-            Addcolumn(_idx, "tableDataSet", "count", "int");
-            Addcolumn(_idx, "tableDataSet", "time", "float");
-            Addcolumn(_idx, "tableDataSet", "machineindex", "int");
-            Addcolumn(_idx, "tableDataSet", "exerciseclass", "int");
-            Addcolumn(_idx, "tableDataSet", "muscleclass", "int");
+            Addcolumn(_idx, "", "weight", "int");
+            Addcolumn(_idx, "", "count", "int");
+
         }
         /// <summary>
         /// 테이블 생성

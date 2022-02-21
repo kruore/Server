@@ -16,7 +16,7 @@ namespace DataProvider_Server_voucher
         public static event Action<string, string> messageParsingAction = null;
         public static event Action<string, int, string,string> ChangeListViewAction = null;
         public static event Action<string> PTP_Synchronized = null;
-
+        public GM_DB gm_DB = new GM_DB();
         public void AddClient(TcpClient newClient)
         {
             ClientData currentClient = new ClientData(newClient);
@@ -66,6 +66,10 @@ namespace DataProvider_Server_voucher
                             {
                                 Form1.clientNames = client.clientName;
                                 Console.WriteLine("DDD"+Form1.clientNames);
+                            }
+                            else if (client.clientName.Contains("IOS"))
+                            {
+                                gm_DB.CheckID(client.clientName.ToString());
                             }
                             return;
                         }

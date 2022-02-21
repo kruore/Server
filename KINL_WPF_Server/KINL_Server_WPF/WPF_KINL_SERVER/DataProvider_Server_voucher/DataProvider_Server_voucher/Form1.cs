@@ -260,7 +260,7 @@ namespace DataProvider_Server_voucher
 
         private void MessageParsing(string sender, string message)
         {
-            Console.WriteLine(message);
+           // Console.WriteLine(message);
             testContain += message;
             lock (lockObj)
             {
@@ -312,7 +312,7 @@ namespace DataProvider_Server_voucher
         {
             //try
             //{
-            Console.WriteLine("MSG: "+ msgList);
+          // Console.WriteLine("MSG: "+ msgList);
             listBox3.BeginInvoke((Action)(() =>
             {
                 listBox5.Items.Add(msgList);

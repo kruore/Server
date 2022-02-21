@@ -13,7 +13,7 @@ namespace DataProvider_Server_voucher
     internal class MainServer
     {
         ClientManager _clientManager = new ClientManager();
-
+        GM_DB gm_db = new GM_DB();
         public MainServer()
         {
             Task serverStart = Task.Run(() =>
