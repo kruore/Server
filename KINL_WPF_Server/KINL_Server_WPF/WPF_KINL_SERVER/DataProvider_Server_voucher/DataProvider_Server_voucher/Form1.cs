@@ -12,9 +12,6 @@ namespace DataProvider_Server_voucher
 {
     public partial class Form1 : Form
     {
-        string testContain;
-
-
         object lockObj = new object();
         object _ptpLock = new object();
 
@@ -50,14 +47,10 @@ namespace DataProvider_Server_voucher
         public static string clientNames;
 
         Task conntectCheckThread = null;
-        Task conntectPTPThread = null;
-        Task fileCheck = null;
 
         private Dictionary<string, bool> DeviceSend = new Dictionary<string, bool>();
         private Dictionary<string, bool> Watch_DeviceSend = new Dictionary<string, bool>();
         private Dictionary<string, bool> Airpod_DeviceSend = new Dictionary<string, bool>();
-
-        private bool PTP_Checker = true;
 
         public Form1()
         {
@@ -67,6 +60,20 @@ namespace DataProvider_Server_voucher
             ClientManager.ChangeListViewAction += ChangeListView;
             ClientManager.PTP_Synchronized += CheckPTP;
 
+        }
+
+        private void PTPEndChecker(string sender)
+        {
+            string sendStringData = "END";
+            byte[] sendByteData = new byte[sendStringData.Length];
+            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+            foreach (var item in ClientManager.clientDic)
+            {
+                if (item.Value.clientNumber == int.Parse(sender))
+                {
+                    item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                }
+            }
         }
         //GET CLIENT NUMBER AND CHECKED PTP
         private void CheckPTP(string a)
@@ -107,34 +114,7 @@ namespace DataProvider_Server_voucher
                         Thread.Sleep(server_threadDelay);
                     }
                 }
-                //else
-                //{
-                //    while (PTPlist[a.ToString()].Count < 10)
-                //    {
-                //        try
-                //        {
-                //            timeOffset = DateTimeOffset.Now;
-                //            preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                //            string sendStringData = $"<PTP>,{a.ToString()},{preUnixMilliseconds}";
-                //            byte[] sendByteData = new byte[sendStringData.Length];
-                //            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                //            //foreach (var att in ClientManager.clientDic)
-                //            //{
-                //            //    if (att.Value.clientNumber == a)
-                //            //    {
-                //            //        att.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                //            //    }
-                //            //}
-                //        }
-                //        catch (Exception e)
-                //        {
-                //            Console.WriteLine("ERROR");
-                //            break;
-                //            //return;
-                //        }
-                //        Thread.Sleep(10);
-                //    }
-                //}
+                PTPEndChecker(a);
                 conntectCheckThread = new Task(ConnectCheckLoop);
                 conntectCheckThread.Start();
                 return;
@@ -227,7 +207,6 @@ namespace DataProvider_Server_voucher
                     }
                     catch (Exception e)
                     {
-                        SaveFile(item.Value.clientNumber);
                         RemoveClient(item.Value);
                     }
                 }
@@ -243,7 +222,7 @@ namespace DataProvider_Server_voucher
                 ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
                 listBox4.BeginInvoke((Action)(() =>
                 {
-                  listBox4.Items.Add("PTP:" + targetClient.clientName+"-Leave");
+                    listBox4.Items.Add("PTP:" + targetClient.clientName + "-Leave");
                 }));
             }
             catch (Exception e)
@@ -256,12 +235,20 @@ namespace DataProvider_Server_voucher
             totalDelay.Remove(targetClient.clientNumber.ToString());
             clientDelays.Remove(targetClient.clientNumber.ToString());
             serverDelays.Remove(targetClient.clientNumber.ToString());
+            if (ClientManager.clientDic.Count < 1)
+            {
+                conntectCheckThread.Dispose();
+            }
+            else
+            {
+                conntectCheckThread.Start();
+            }
         }
 
         private void MessageParsing(string sender, string message)
         {
-           // Console.WriteLine(message);
-            testContain += message;
+            //// Console.WriteLine(message);
+            //testContain += message;
             lock (lockObj)
             {
                 if (!msgDic.ContainsKey(sender))
@@ -312,7 +299,7 @@ namespace DataProvider_Server_voucher
         {
             //try
             //{
-          // Console.WriteLine("MSG: "+ msgList);
+            // Console.WriteLine("MSG: "+ msgList);
             listBox3.BeginInvoke((Action)(() =>
             {
                 listBox5.Items.Add(msgList);
@@ -330,7 +317,7 @@ namespace DataProvider_Server_voucher
             //}
 
             //    if (msgList.Substring(0, 1) == "#")
-            if (msgList.IndexOf("#")==0)
+            if (msgList.IndexOf("#") == 0)
             {
                 string[] splitedMsgs = msgList.Split(',');
                 //#1,iosName,DeviceName
@@ -417,6 +404,9 @@ namespace DataProvider_Server_voucher
                             deviceConnection.TryGetValue(int.Parse(sender), out values);
                             int connectDeviceNumber_local = values;
                             ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                            Console.WriteLine("DATA SAVE");
+                            deviceConnection.TryGetValue(int.Parse(sender), out values);
+                            SaveFile(int.Parse(sender));
                         }
                         catch (Exception e)
                         {
@@ -428,10 +418,7 @@ namespace DataProvider_Server_voucher
                     // Save
                     // #4 , IOS, DEVICE
                     case "#4":
-                        Console.WriteLine("DATA SAVE");
-                        int value=0;
-                        deviceConnection.TryGetValue(int.Parse(sender), out value);
-                        SaveFile(int.Parse(sender));
+
                         break;
 
                     case "#5":
@@ -701,7 +688,7 @@ namespace DataProvider_Server_voucher
                         string sendStringData = "<TEST>";
                         byte[] sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                        
+
                         listBox3.Items.Add("IOS:" + clientNumber + "Disconnect");
 
                     }));
@@ -783,7 +770,6 @@ namespace DataProvider_Server_voucher
 
 
         //FILE SAVED
-
         private void SaveFile(int sender)
         {
             int clientPort;
@@ -795,20 +781,24 @@ namespace DataProvider_Server_voucher
                 for (int i = 0; i < DeviceData[clientPort.ToString()].Count; i++)
                 {
                     GM_DataRecorder.instance.Enqueue_Data(clientPort.ToString(), DeviceData[clientPort.ToString()][i].ToString());
+                    if (i == DeviceData.Count - 1)
+                    {
+
+                    }
                 }
-                if (DeviceData[sender.ToString()].Count > 0)
+                if (DeviceData[clientPort.ToString()].Count > 0)
                 {
                     foreach (var clientNames in ClientManager.clientDic.Values)
                     {
                         if (clientNames.clientNumber == clientPort)
                         {
-                            GM_DataRecorder.instance.WriteSteamingData_Batch_Device(clientPort.ToString(), clientNames.clientName);
+                            GM_DataRecorder.instance.WriteSteamingData_Batch_Device(clientPort.ToString(), SaveIOS);
                         }
                     }
-                    DeviceData[sender.ToString()].Clear();
+                    DeviceData[clientPort.ToString()].Clear();
                 }
             }
-            else if (SaveIOS.Contains("IOS"))
+            if (SaveIOS.Contains("IOS"))
             {
                 // Console.WriteLine("IOS");
                 if (AirpodData[sender.ToString()].Count > 1)
@@ -876,7 +866,6 @@ namespace DataProvider_Server_voucher
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //SaveFile();
         }
 
         private void label2_Click(object sender, EventArgs e)

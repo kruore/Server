@@ -81,10 +81,19 @@ namespace DataProvider_Server_voucher
         {
             CreateDataBase(_idx);
             CreateTable(_idx, "DataPath");
-            Addcolumn(_idx, "DataPath", "filename", "varchar(30)");
-            CreateTable(_idx, "tableDataSet");
-            Addcolumn(_idx, "tableDataSet", "weight", "int");
-            Addcolumn(_idx, "tableDataSet", "count", "int");
+            Addcolumn(_idx, "DataPath", "fileDate", "varchar(30)");
+            Addcolumn(_idx, "DataPath", "filePath", "varchar(30)");
+            CreateTable(_idx, "Data");
+            Addcolumn(_idx, "Data", "fileDate", "varchar(30)");
+            Addcolumn(_idx, "Data", "machine", "varchar(30)");
+            Addcolumn(_idx, "Data", "weight", "int");
+            Addcolumn(_idx, "Data", "count", "int");
+            CreateTable(_idx, "Machine");
+            Addcolumn(_idx, "Machine", "fileDate", "varchar(30)");
+            Addcolumn(_idx, "Machine", "Allout(Guess)", "varchar(30)");
+            Addcolumn(_idx, "Machine", "weight", "int");
+            Addcolumn(_idx, "Machine", "count", "int");
+            Addcolumn(_idx, "Machine", "1RM", "int");
         }
         /// <summary>
         /// 테이블 생성
@@ -233,7 +242,6 @@ namespace DataProvider_Server_voucher
                 Log(insertQuery);
                 try
                 {
-
                     connection.Open();
                     MySqlCommand command = new MySqlCommand(insertQuery, connection);
                     MySqlDataReader rdr = command.ExecuteReader();

@@ -103,54 +103,54 @@ namespace VoucherApplication
         private void metroButton1_Click(object sender, EventArgs e)
         {
 
-            initialis = DatainitialisText.Text;
-            index = EquipIndexText.Text;
-            weight = WeightText.Text;
-            if (DatainitialisText.Text.Equals(String.Empty) || EquipIndexText.Text.Equals(String.Empty) || WeightText.Text.Equals(String.Empty))
-            {
-                DataTextBox.AppendText("Error:Null!");
-                return;
-            }
-            else
-            {
-                DataTextBox.AppendText("initialis:" + initialis + "Index:" + index + "weight:" + weight);
+            //initialis = DatainitialisText.Text;
+            //index = EquipIndexText.Text;
+            //weight = WeightText.Text;
+            //if (DatainitialisText.Text.Equals(String.Empty) || EquipIndexText.Text.Equals(String.Empty) || WeightText.Text.Equals(String.Empty))
+            //{
+            //    DataTextBox.AppendText("Error:Null!");
+            //    return;
+            //}
+            //else
+            //{
+            //    DataTextBox.AppendText("initialis:" + initialis + "Index:" + index + "weight:" + weight);
 
-            }
-            if (dataqueue != null)
-            {
-                dataqueue.Clear();
-            }
-            string temp = initialis + "_" + index + "_" + weight;
-            Login(temp);
+            //}
+            //if (dataqueue != null)
+            //{
+            //    dataqueue.Clear();
+            //}
+            //string temp = initialis + "_" + index + "_" + weight;
+            Login();
 
-            string[] port = SerialPort.GetPortNames();
-            for (int i = 0; i < port.Length; i++)
-            {
-                Console.WriteLine(port[i]);
-            }
-            if (port.Length > 0)
-            {
-                //if (stream != null)
-                //{
-                //    return;
-                //}
-                //stream = new SerialPort(port[0], 115200);
-                //stream.Open();
-                //char[] buffer = new char[1];
-                //buffer[0] = '0';
-                //stream.Write(buffer, 0, 1);
-                ////stream.Write("0");
-                //Console.WriteLine("Open");
-                //timeOffset = DateTimeOffset.Now;
-                //recorddata = false;
-                //rTh1 = new Thread(FIxedUpdate);
-                //rTh1.IsBackground = false;
-                //rTh1.Start();
-            }
-            else
-            {
-                SetDataText("Null Port");
-            }
+            //string[] port = SerialPort.GetPortNames();
+            //for (int i = 0; i < port.Length; i++)
+            //{
+            //    Console.WriteLine(port[i]);
+            //}
+            //if (port.Length > 0)
+            //{
+            //    if (stream != null)
+            //    {
+            //        return;
+            //    }
+            //    stream = new SerialPort(port[0], 115200);
+            //    stream.Open();
+            //    char[] buffer = new char[1];
+            //    buffer[0] = '0';
+            //    stream.Write(buffer, 0, 1);
+            //    //stream.Write("0");
+            //    Console.WriteLine("Open");
+            //    timeOffset = DateTimeOffset.Now;
+            //    recorddata = false;
+            //    rTh1 = new Thread(FIxedUpdate);
+            //    rTh1.IsBackground = false;
+            //    rTh1.Start();
+            //}
+            //else
+            //{
+            //    SetDataText("Null Port");
+            //}
         }
         void EnqueueData()
         {
@@ -337,7 +337,7 @@ namespace VoucherApplication
             base.OnFormClosing(e);
         }
 
-        private void Login(string a)
+        private void Login()
         {
             try
             {
