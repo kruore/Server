@@ -81,7 +81,7 @@ namespace DataProvider_Server_voucher
         {
             CreateDataBase(_idx);
             CreateTable(_idx, "DataPath");
-            Addcolumn(_idx, "DataPath", "fileDate", "varchar(30)");
+            Addcolumn(_idx, "DataPath", "fileDate", "varchar(255)");
             Addcolumn(_idx, "DataPath", "filePath", "varchar(30)");
             CreateTable(_idx, "Data");
             Addcolumn(_idx, "Data", "fileDate", "varchar(30)");
@@ -198,7 +198,6 @@ namespace DataProvider_Server_voucher
                 Log(insertQuery.ToString());
                 try
                 {
-
                     connection.Open();
                     MySqlCommand command = new MySqlCommand(insertQuery, connection);
                     if (command.ExecuteNonQuery() == -1)
@@ -209,7 +208,6 @@ namespace DataProvider_Server_voucher
                     {
                         Log("테이블 생성 성공");
                     }
-
                     connection.Close();
                 }
                 catch (Exception e)
@@ -238,7 +236,7 @@ namespace DataProvider_Server_voucher
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format("use {0}; SELECT COUNT(*) FROM DataPath WHERE filename= \"{1}\" and datedata = \"{2}\";", _idx, _filename, _dateData);
+                string insertQuery = string.Format("use {0}; SELECT COUNT(*) FROM DataPath WHERE filePath= \"{1}\" and datedata = \"{2}\";", _idx, _filename, _dateData);
                 Log(insertQuery);
                 try
                 {

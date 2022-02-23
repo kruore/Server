@@ -81,8 +81,8 @@ namespace DataProvider_Server_voucher
             {
                 isCategoryPrinted_DV = false;
                 string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_DEVICE.txt";
-                gM_DB.UpdateDataPath(clientName, DateTime.Now.ToString("yyyyMMddHHmmss"), tempFileName);
                 string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
+                gM_DB.UpdateDataPath(clientName, tempFileName, file_Location);
                 string m_str_DataCategory = string.Empty;
 
                 int totalCountoftheQueue = Queue_Device.Count;

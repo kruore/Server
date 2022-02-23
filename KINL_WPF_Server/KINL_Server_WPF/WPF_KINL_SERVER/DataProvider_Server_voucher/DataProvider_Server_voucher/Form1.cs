@@ -75,7 +75,10 @@ namespace DataProvider_Server_voucher
                 }
             }
         }
-        //GET CLIENT NUMBER AND CHECKED PTP
+        /// <summary>
+        /// GET CLIENT NUMBER AND CHECKED PTP
+        /// </summary>
+        /// <param name="a">ptp 를 진행할 때 필요한 client number</param>
         private void CheckPTP(string a)
         {
             lock (_ptpLock)
@@ -97,13 +100,6 @@ namespace DataProvider_Server_voucher
                             {
                                 ClientManager.clientDic[int.Parse(a)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                             }
-                            //foreach (var att in ClientManager.clientDic)
-                            //{
-                            //    if (att.Value.clientNumber == GetClinetNumber(a))
-                            //    {
-                            //        att.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                            //    }
-                            //}
                         }
                         catch (Exception e)
                         {
@@ -121,6 +117,10 @@ namespace DataProvider_Server_voucher
             }
 
         }
+        /// <summary>
+        /// PTP 10개의 데이터를 받아 가장 짧은 딜레이 기준 최적화
+        /// </summary>
+        /// <param name="sender">client port Number</param>
         private void CalculatePTP(string sender)
         {
             string UserNum = "";
@@ -167,7 +167,7 @@ namespace DataProvider_Server_voucher
             serverDelays.Add(sender, SD);
             clientDelays.Add(sender, CD);
             totalDelay.Add(sender, SCD);
-            //확인용
+            //확인용 DebugLine
             Console.WriteLine("END");
             foreach (var item in ClientManager.clientDic)
             {
@@ -191,7 +191,9 @@ namespace DataProvider_Server_voucher
                 }));
             }
         }
-
+        /// <summary>
+        /// ECHO(HeartBit) 스레드, 서버의 접속을 확인하고 비접속시 디스커넥트 시킴
+        /// </summary>
         private void ConnectCheckLoop()
         {
             while (true)
@@ -213,7 +215,10 @@ namespace DataProvider_Server_voucher
                 Thread.Sleep(2000);
             }
         }
-
+        /// <summary>
+        /// 클라이언트 제거
+        /// </summary>
+        /// <param name="targetClient">해당 클라이언트 데이터 제거</param>
         private void RemoveClient(ClientData targetClient)
         {
             ClientData result = null;
@@ -244,7 +249,11 @@ namespace DataProvider_Server_voucher
                 conntectCheckThread.Start();
             }
         }
-
+        /// <summary>
+        /// 메세지 파싱
+        /// </summary>
+        /// <param name="sender">보내는 클라이언트 port number</param>
+        /// <param name="message">전송 된 데이터</param>
         private void MessageParsing(string sender, string message)
         {
             //// Console.WriteLine(message);
@@ -275,7 +284,6 @@ namespace DataProvider_Server_voucher
                     }
                     msgDic[sender] = temparray[temparray.Length - 1];
                 }
-                //Console.WriteLine("msgDic" + msgDic[GetClinetNumber(sender).ToString()]);
                 foreach (var item in msgArray)
                 {
                     if (string.IsNullOrEmpty(item))
@@ -289,11 +297,14 @@ namespace DataProvider_Server_voucher
                         msgList.Add(item);
                     }
                     SendMsgToClient(item, sender);
-
-                    // Console.WriteLine(item.ToString());
                 }
             }
         }
+        /// <summary>
+        /// 파싱 된 메세지 해독 및 전달
+        /// </summary>
+        /// <param name="msgList"></param>
+        /// <param name="sender"></param>
         // MESSAGE PARSSED
         private void SendMsgToClient(string msgList, string sender)
         {
@@ -310,24 +321,70 @@ namespace DataProvider_Server_voucher
             string sendStringData = "";
             byte[] sendByteData = new byte[sendStringData.Length];
             msgList = msgList.Replace("^", ",");
-            //Console.WriteLine(msgList);
-            //if (msgList.Contains("<PTP>"))
-            //{
-            //    Console.WriteLine(msgList);
-            //}
 
-            //    if (msgList.Substring(0, 1) == "#")
-            if (msgList.IndexOf("#") == 0)
+            if (msgList.IndexOf("<") == 0)
+            {
+                string[] splitedMsg = msgList.Split(',');
+                receiver = splitedMsg[0];
+                parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
+
+                switch (receiver)
+                {
+                    case "<PTP>":
+                        if (totalDelay.ContainsKey(sender))
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            for (int i = 1; i < splitedMsg.Length; i++)
+                            {
+                                long a;
+                                if (!long.TryParse(splitedMsg[i], out a))
+                                {
+                                    Console.WriteLine(splitedMsg + "\n" + msgList);
+                                    return;
+                                }
+                            }
+                            if (splitedMsg.Length < 6)
+                            {
+                                //    Console.WriteLine(splitedMsg);
+                                if (splitedMsg.Equals(""))
+                                {
+
+                                }
+                                else
+                                {
+                                    timeOffset = DateTimeOffset.Now;
+                                    preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
+                                    sendStringData = $"{splitedMsg[0]},{splitedMsg[1]},{splitedMsg[2]},{splitedMsg[3]},{preUnixMilliseconds};";
+                                    sendByteData = new byte[sendStringData.Length];
+                                    sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                                    ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                }
+                            }
+                            else if (splitedMsg.Length >= 6 && splitedMsg.Length < 7)
+                            {
+                                if (splitedMsg[2].Contains("<PTP>") || splitedMsg[3].Contains("<PTP>"))
+                                {
+                                    return;
+                                }
+                                PTPlist[sender].Add(msgList);
+                                if (PTPlist[sender].Count == 10)
+                                {
+                                    CalculatePTP(sender);
+                                }
+                                return;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            else if (msgList.IndexOf("#") == 0)
             {
                 string[] splitedMsgs = msgList.Split(',');
-                //#1,iosName,DeviceName
-                // 동기화
-                //#1,1(ios),2(device)= true
-                //#2,DeviceData Recived(Start)
-                //#3
-                //#4 Save= IOS send , server Recive
-                //#5,DeviceName - Discnnect = IOS
-                //server = ios,device disconnect
+
                 switch (msgList.Substring(0, 2))
                 {
 
@@ -340,34 +397,13 @@ namespace DataProvider_Server_voucher
                         string connectDevice = splitedMsgs[2];
                         int connectDeviceNumber = GetClinetNumber(splitedMsgs[2]);
 
+
+                        // 두 디바이스 커넥트
                         deviceConnection.Add(connectIosNumber, connectDeviceNumber);
-                        //sendStringData = "#2;";
-                        //sendByteData = new byte[sendStringData.Length];
-                        //sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-
-                        //try
-                        //{
-                        //    //Console.WriteLine("Device Connected");
-                        //    string connectIos = splitedMsgs[1];
-                        //    int connectIosNumber = GetClinetNumber(splitedMsgs[1]);
-
-                        //    string connectDevice = splitedMsgs[2];
-                        //    int connectDeviceNumber = GetClinetNumber(splitedMsgs[2]);
-
-                        //  //  deviceConnection.Add(connectIosNumber, connectDeviceNumber);
-
-                        //    ClientManager.clientDic[connectIosNumber].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                        //    ClientManager.clientDic[connectDeviceNumber].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                        //}
-                        //catch (Exception e)
-                        //{
-                        //    Console.WriteLine("Connection Error");
-                        //    return;
-                        //}
                         break;
 
+                    //Data Send
                     case "#2":
-                        //#2,DeviceData Recived(Start)
                         try
                         {
                             sendStringData = "#2;";
@@ -411,14 +447,18 @@ namespace DataProvider_Server_voucher
                         catch (Exception e)
                         {
                             Console.WriteLine("Stop Send Data Error");
+                            ClientData tempSender;
+                            ClientManager.clientDic.TryGetValue(int.Parse(sender), out tempSender);
+                            if (tempSender != null)
+                            {
+                                RemoveClient(tempSender);
+                            }
                             return;
                         }
                         break;
-
                     // Save
                     // #4 , IOS, DEVICE
                     case "#4":
-
                         break;
 
                     case "#5":
@@ -433,65 +473,14 @@ namespace DataProvider_Server_voucher
             }
             else
             {
+
+                //#으로 포함된 프로토콜이 아닐 경우
                 string[] splitedMsg = msgList.Split(',');
 
                 receiver = splitedMsg[0];
                 parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
                 switch (receiver)
                 {
-                    case "<PTP>":
-                        if (totalDelay.ContainsKey(sender))
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            for (int i = 1; i < splitedMsg.Length; i++)
-                            {
-                                long a;
-                                if (!long.TryParse(splitedMsg[i], out a))
-                                {
-                                    Console.WriteLine(splitedMsg + "\n" + msgList);
-                                    return;
-                                }
-                            }
-                            if (splitedMsg.Length < 6)
-                            {
-                                //    Console.WriteLine(splitedMsg);
-                                if (splitedMsg.Equals(""))
-                                {
-
-                                }
-                                else
-                                {
-                                    timeOffset = DateTimeOffset.Now;
-                                    preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                                    //if (splitedMsg[3].Contains(";"))
-                                    //{
-                                    //    splitedMsg[3] = splitedMsg[3].TrimEnd(splitedMsg[3][splitedMsg[3].Length - 1]);
-                                    //    Console.WriteLine(splitedMsg[3]);
-                                    //}
-                                    sendStringData = $"{splitedMsg[0]},{splitedMsg[1]},{splitedMsg[2]},{splitedMsg[3]},{preUnixMilliseconds};";
-                                    sendByteData = new byte[sendStringData.Length];
-                                    sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                                    ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                                }
-                            }
-                            else if (splitedMsg.Length >= 6 && splitedMsg.Length < 7)
-                            {
-                                if (splitedMsg[2].Contains("<PTP>") || splitedMsg[3].Contains("<PTP>"))
-                                {
-                                    return;
-                                }
-                                PTPlist[sender].Add(msgList);
-                                if (PTPlist[sender].Count == 10)
-                                {
-                                    CalculatePTP(sender);
-                                }
-                                return;
-                            }
-                        }
-                        break;
                     case "DEVICE":
                         if (!totalDelay.ContainsKey(sender))
                         {
@@ -517,8 +506,6 @@ namespace DataProvider_Server_voucher
                         }
                         try
                         {
-                            //if (splitedMsg.Length == 11)
-                            //{
                             long tempTime1 = Convert.ToInt64(splitedMsg[1]);
                             long PTPTime1 = totalDelay[sender];
                             tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[sender] / 2);
@@ -594,8 +581,6 @@ namespace DataProvider_Server_voucher
                 }
             }
         }
-
-        // UTILL
         private int GetClinetNumber(string targetClientName)
         {
             foreach (var item in ClientManager.clientDic)
@@ -884,6 +869,11 @@ namespace DataProvider_Server_voucher
         }
 
         private void listBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
         {
 
         }
