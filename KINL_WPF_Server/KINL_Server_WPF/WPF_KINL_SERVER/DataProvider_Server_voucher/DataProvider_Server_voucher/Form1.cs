@@ -52,6 +52,8 @@ namespace DataProvider_Server_voucher
         private Dictionary<string, bool> Watch_DeviceSend = new Dictionary<string, bool>();
         private Dictionary<string, bool> Airpod_DeviceSend = new Dictionary<string, bool>();
 
+        GM_DB gm_dm = new GM_DB();
+
         public Form1()
         {
             InitializeComponent();
@@ -397,7 +399,6 @@ namespace DataProvider_Server_voucher
                         string connectDevice = splitedMsgs[2];
                         int connectDeviceNumber = GetClinetNumber(splitedMsgs[2]);
 
-
                         // 두 디바이스 커넥트
                         deviceConnection.Add(connectIosNumber, connectDeviceNumber);
                         break;
@@ -412,6 +413,7 @@ namespace DataProvider_Server_voucher
                             int values = 0;
                             deviceConnection.TryGetValue(int.Parse(sender), out values);
                             int connectDeviceNumber_local = values;
+                            Console.WriteLine("접속한 클라이언트의 수: "+ClientManager.clientDic.Count);
                             ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                         }
                         catch (Exception e)
@@ -447,12 +449,12 @@ namespace DataProvider_Server_voucher
                         catch (Exception e)
                         {
                             Console.WriteLine("Stop Send Data Error");
-                            ClientData tempSender;
-                            ClientManager.clientDic.TryGetValue(int.Parse(sender), out tempSender);
-                            if (tempSender != null)
-                            {
-                                RemoveClient(tempSender);
-                            }
+                            //ClientData tempSender;
+                            //ClientManager.clientDic.TryGetValue(int.Parse(sender), out tempSender);
+                            //if (tempSender != null)
+                            //{
+                            //    RemoveClient(tempSender);
+                            //}
                             return;
                         }
                         break;
@@ -766,10 +768,6 @@ namespace DataProvider_Server_voucher
                 for (int i = 0; i < DeviceData[clientPort.ToString()].Count; i++)
                 {
                     GM_DataRecorder.instance.Enqueue_Data(clientPort.ToString(), DeviceData[clientPort.ToString()][i].ToString());
-                    if (i == DeviceData.Count - 1)
-                    {
-
-                    }
                 }
                 if (DeviceData[clientPort.ToString()].Count > 0)
                 {
