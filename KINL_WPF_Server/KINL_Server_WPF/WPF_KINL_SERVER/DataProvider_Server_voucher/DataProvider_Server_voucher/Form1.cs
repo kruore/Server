@@ -52,7 +52,7 @@ namespace DataProvider_Server_voucher
         private Dictionary<string, bool> Watch_DeviceSend = new Dictionary<string, bool>();
         private Dictionary<string, bool> Airpod_DeviceSend = new Dictionary<string, bool>();
 
-        GM_DB gm_dm = new GM_DB();
+        GM_DB gm_db = new GM_DB();
 
         public Form1()
         {
@@ -204,7 +204,7 @@ namespace DataProvider_Server_voucher
                 {
                     try
                     {
-                        string sendStringData = "<TEST>";
+                        string sendStringData = "<TEST>;";
                         byte[] sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                         item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
@@ -826,9 +826,6 @@ namespace DataProvider_Server_voucher
             }
             deviceConnection.Remove(sender);
         }
-
-
-
 
         //INIT
         private void MainServerStart()

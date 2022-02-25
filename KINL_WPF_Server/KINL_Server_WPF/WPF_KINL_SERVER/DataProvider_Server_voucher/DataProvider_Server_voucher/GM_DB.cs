@@ -78,16 +78,17 @@ namespace DataProvider_Server_voucher
             }
         }
         public void InitSchema(string _idx)
+            //public void InitSchema(string _idx, string _machineName)
         {
             CreateDataBase(_idx);
             CreateTable(_idx, "DataPath");
-            Addcolumn(_idx, "DataPath", "fileDate", "varchar(255)");
-            Addcolumn(_idx, "DataPath", "filePath", "varchar(30)");
+            Addcolumn(_idx, "DataPath", "filePath", "varchar(255)");
+            Addcolumn(_idx, "DataPath", "fileName", "varchar(255)");
             CreateTable(_idx, "Data");
             Addcolumn(_idx, "Data", "fileDate", "varchar(30)");
-            Addcolumn(_idx, "Data", "machine", "varchar(30)");
             Addcolumn(_idx, "Data", "weight", "int");
             Addcolumn(_idx, "Data", "count", "int");
+            Addcolumn(_idx, "Data", "machineindex", "varchar(30)");
             CreateTable(_idx, "Machine");
             Addcolumn(_idx, "Machine", "fileDate", "varchar(30)");
             Addcolumn(_idx, "Machine", "Allout(Guess)", "varchar(30)");
@@ -103,7 +104,7 @@ namespace DataProvider_Server_voucher
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format("use {0};Create Table {1}(DateData varchar(30));", _idx, _tablename);
+                string insertQuery = string.Format("use {0};Create Table {1}(DateData varchar(30));;", _idx, _tablename);
                 Log(insertQuery);
                 try
                 {
@@ -232,11 +233,11 @@ namespace DataProvider_Server_voucher
         /// <param name="_dateData">찾으려 하는 datedata</param>
         /// <param name="_filename">찾으려 하는 filename</param>
         /// <returns>찾았는지에 대한 여부</returns>
-        public bool CheckDataPathData(string _idx, string _dateData, string _filename)
+        public bool CheckDataPathData(string _idx, string _dateData, string _filePath, string _filename)
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format("use {0}; SELECT COUNT(*) FROM DataPath WHERE filePath= \"{1}\" and datedata = \"{2}\";", _idx, _filename, _dateData);
+                string insertQuery = string.Format($"use {_idx}; SELECT COUNT(*) FROM datapath WHERE filePath= '{_filePath}' and Datedata ='{_dateData}' and fileName = '{_filename}';");
                 Log(insertQuery);
                 try
                 {
@@ -278,11 +279,11 @@ namespace DataProvider_Server_voucher
         /// <param name="_idx">schema명</param>
         /// <param name="_dateData">넣으려 하는 datedata</param>
         /// <param name="_filename">넣으려 하는 filename</param>
-        public void UpdateDataPath(string _idx, string _dateData, string _filename)
+        public void UpdateDataPath(string _idx, string _dateData, string _filePath, string _filename)
         {
-            if (!CheckDataPathData(_idx, _filename, _dateData))
+            if (!CheckDataPathData(_idx,_dateData,_filePath, _filename))
             {
-                InsertDataPath(_idx, _dateData, _filename);
+                InsertDataPath(_idx, _dateData,_filePath, _filename);
             }
             else
             {
@@ -295,11 +296,11 @@ namespace DataProvider_Server_voucher
         /// <param name="_idx">schema명</param>
         /// <param name="_dateData">넣으려 하는 datedata</param>
         /// <param name="_filename">넣으려 하는 filename</param>
-        public void InsertDataPath(string _idx, string _dateData, string _filename)
+        public void InsertDataPath(string _idx, string _dateData,string _filePath, string _filename)
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format("use {0};insert into datapath(Datedata,filename) value ({1},{2});", _idx, _dateData, _filename);
+                string insertQuery = string.Format($"use {_idx};insert into datapath(Datedata,filePath,fileName) value ('{_dateData}','{_filePath}','{_filename}');");
                 Log(insertQuery.ToString());
                 try
                 {
@@ -324,6 +325,48 @@ namespace DataProvider_Server_voucher
                 }
             }
         }
+/// <summary>
+/// Insert Machine Data
+/// </summary>
+/// <param name="_idx"></param>
+/// <param name="_dateData"></param>
+/// <param name="_filePath"></param>
+/// <param name="_filename"></param>
+        public void InsertMachineData(string _idx, string _dateData, string _filePath, string _filename)
+        {
+            using (MySqlConnection connection = ConnectionDB())
+            {
+                string insertQuery = string.Format($"use {_idx};insert into datapath(Datedata,filePath,fileName) value ('{_dateData}','{_filePath}','{_filename}');");
+                Log(insertQuery.ToString());
+                try
+                {
+
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(insertQuery, connection);
+                    if (command.ExecuteNonQuery() == -1)
+                    {
+                        Log("테이블 생성 실패");
+                    }
+                    else
+                    {
+                        Log("테이블 생성 성공");
+                    }
+
+                    connection.Close();
+                }
+                catch (Exception e)
+                {
+                    Log("실패");
+                    Log(e.ToString());
+                }
+            }
+        }
+
+
+
+
+
+
         /// <summary>
         /// Dataset테이블에서 datedata와 weight, macineindex가 일치하는 값이 있는지 확인.
         /// </summary>
@@ -336,7 +379,7 @@ namespace DataProvider_Server_voucher
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format("use {0}; SELECT Count(*) FROM tableDataset WHERE datedata= \"{1}\" and weight = {2} and machineindex = {3};", _idx, _datedata, _weight, _machineindex);
+                string insertQuery = string.Format("use {0}; SELECT Count(*) FROM data WHERE Data= \"{1}\" and weight = {2} and machineindex = {3};", _idx, _datedata, _weight, _machineindex);
                 Log(insertQuery);
                 try
                 {
@@ -379,19 +422,16 @@ namespace DataProvider_Server_voucher
         /// <param name="_datedata">날짜</param>
         /// <param name="_weight">무게</param>
         /// <param name="_count">횟수</param>
-        /// <param name="_time">운동시간</param>
         /// <param name="_machineindex">머신의 index</param>
-        /// <param name="_exerciseclass">운동종류</param>
-        /// <param name="_mucleclass">운동에 쓰이는 근육</param>
-        public void insertDataset(string _idx, string _datedata, int _weight, int _count, int _time, int _machineindex, int _exerciseclass, int _mucleclass)
+        public void insertDataset(string _idx, string _datedata, int _weight, int _count, int _machineindex)
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format("use {0};insert into tabledataset(Datedata,weight,count, time, machineindex, exerciseclass, muscleclass) value ({1},{2},{3},{4},{5},{6},{7});", "kks", "\"0000\"", _weight, _count, _time, _machineindex, _exerciseclass, _mucleclass);
+               // insert into data(DateData, fileDate, weight, count, machineindex) values(1, 2, 3, 4, 5);
+                string insertQuery = string.Format($"use {_idx};insert into data(Datedata,fileDate,weight,count, machineindex) value ({DateTime.Now.ToString("yyyyMMddHHmmss")},{_datedata},{_weight},{_count},{_machineindex});");
                 Log(insertQuery.ToString());
                 try
                 {
-
                     connection.Open();
                     MySqlCommand command = new MySqlCommand(insertQuery, connection);
                     if (command.ExecuteNonQuery() == -1)
@@ -421,15 +461,13 @@ namespace DataProvider_Server_voucher
         /// <param name="_count">횟수</param>
         /// <param name="_time">운동시간</param>
         /// <param name="_machineindex">머신의 index</param>
-        /// <param name="_exerciseclass">운동종류</param>
-        /// <param name="_mucleclass">운동에 쓰이는 근육</param>
-        public void UpdateDataset(string _idx, string _datedata, int _weight, int _count, int _time, int _machineindex, int _exerciseclass, int _mucleclass)
+        public void UpdateDataset(string _idx, string _datedata, int _weight, int _count, int _machineindex)
         {
             if (CheckDataset(_idx, _datedata, _weight, _machineindex))
             {
                 using (MySqlConnection connection = ConnectionDB())
                 {
-                    string insertQuery = string.Format("use {0};Update tabledataset set count = count+{1} where datedata = \"{2}\"and weight ={3} and machineindex = {4};", _idx, _count, _datedata, _weight, _machineindex);
+                    string insertQuery = string.Format("use {0};Update data set count = count+{1} where datedata = \"{2}\"and weight ={3} and machineindex = {4};", _idx, _count, _datedata, _weight, _machineindex);
                     Log(insertQuery.ToString());
                     try
                     {
@@ -456,7 +494,7 @@ namespace DataProvider_Server_voucher
             }
             else
             {
-                insertDataset(_idx, _datedata, _weight, _count, _time, _machineindex, _exerciseclass, _mucleclass);
+                insertDataset(_idx, _datedata, _weight, _count, _machineindex);
             }
         }
         /// <summary>
@@ -470,7 +508,7 @@ namespace DataProvider_Server_voucher
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format("use {0}; SELECT * FROM tableDataset WHERE datedata= \"{1}\" and machineindex = {2};", _idx, _datedata, _machineindex);
+                string insertQuery = string.Format("use {0}; SELECT * FROM data WHERE datedata= \"{1}\" and machineindex = {2};", _idx, _datedata, _machineindex);
                 Log(insertQuery);
                 try
                 {

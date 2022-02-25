@@ -82,7 +82,7 @@ namespace DataProvider_Server_voucher
                 isCategoryPrinted_DV = false;
                 string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_DEVICE.txt";
                 string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
-                gM_DB.UpdateDataPath(clientName, tempFileName, file_Location);
+                gM_DB.UpdateDataPath(clientName,DateTime.Now.ToString("yyyyMMddHHmmss"),tempFileName, file_Location);
                 string m_str_DataCategory = string.Empty;
 
                 int totalCountoftheQueue = Queue_Device.Count;
@@ -94,6 +94,20 @@ namespace DataProvider_Server_voucher
                     while (Queue_Device[clientNumber].Count != 0)
                     {
                         string stringData = Queue_Device[clientNumber].Dequeue();
+                        if (Queue_Device[clientNumber].Count == 0)
+                        {
+                            string[] splitData=stringData.Split(',');
+                            /// <param name="_idx">schema 명</param>
+                            /// <param name="_datedata">날짜</param>
+                            /// <param name="_weight">무게</param>
+                            /// <param name="_count">횟수</param>
+                            /// <param name="_time">운동시간</param>
+                            /// <param name="_machineindex">머신의 index</param>
+                            /// <param name="_exerciseclass">운동종류</param>
+                            /// <param name="_mucleclass">운동에 쓰이는 근육</param>
+                            
+                            gM_DB.UpdateDataset(clientName, splitData[1], int.Parse(splitData[7]), int.Parse(splitData[8]), 6);
+                        }
 
                         if (stringData.Length > 0)
                         {
@@ -119,6 +133,8 @@ namespace DataProvider_Server_voucher
 
                         }
                     }
+
+                  
                 }
                 tempb = true;
                 isCategoryPrinted_DV = false;
@@ -262,7 +278,6 @@ namespace DataProvider_Server_voucher
                 fileReader = null;
             }
         }
-
         //폴더 생성
         public string MakeFolder(string _WantedfolderName)
         {
