@@ -71,6 +71,11 @@ namespace DataProvider_Server_voucher
                             {
                                 gm_DB.CheckID(client.clientName.ToString());
                             }
+                            else if(client.clientName.Contains("AI"))
+                            {
+                                //AI Client
+                                Console.WriteLine("DDD" + client.clientName);
+                            }
                             return;
                         }
                     }

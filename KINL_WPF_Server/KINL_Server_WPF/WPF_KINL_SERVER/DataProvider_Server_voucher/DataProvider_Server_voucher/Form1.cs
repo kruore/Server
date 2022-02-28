@@ -66,7 +66,7 @@ namespace DataProvider_Server_voucher
 
         private void PTPEndChecker(string sender)
         {
-            string sendStringData = "END";
+            string sendStringData = "END;";
             byte[] sendByteData = new byte[sendStringData.Length];
             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
             foreach (var item in ClientManager.clientDic)
@@ -171,26 +171,25 @@ namespace DataProvider_Server_voucher
             totalDelay.Add(sender, SCD);
             //확인용 DebugLine
             Console.WriteLine("END");
+            listBox4.BeginInvoke((Action)(() =>
+            {
+                ObservableCollection<string> list = new ObservableCollection<string>();
+                if (listBox4.Items.Contains("PTP " + sender))
+                {
+                    return;
+                }
+                else
+                {
+                    listBox4.Items.Add("PTP " + sender);
+                }
+            }));
             foreach (var item in ClientManager.clientDic)
             {
-
                 Console.WriteLine("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
                 Console.WriteLine("USERNUMBER" + item.Value.clientNumber);
                 Console.WriteLine("DELAY:" + totalDelay[item.Value.clientNumber.ToString()]);
                 Console.WriteLine("SERVERDELAY:" + serverDelays[item.Value.clientNumber.ToString()]);
                 Console.WriteLine("CLIENTDELAY:" + clientDelays[item.Value.clientNumber.ToString()]);
-                listBox4.BeginInvoke((Action)(() =>
-                {
-                    ObservableCollection<string> list = new ObservableCollection<string>();
-                    if (listBox4.Items.Contains("PTP " + item.Value.clientName))
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        listBox4.Items.Add("PTP " + item.Value.clientName);
-                    }
-                }));
             }
         }
         /// <summary>
@@ -458,8 +457,8 @@ namespace DataProvider_Server_voucher
                             return;
                         }
                         break;
-                    // Save
-                    // #4 , IOS, DEVICE
+                    // AI Server Send
+                    // #4
                     case "#4":
                         break;
 
@@ -483,6 +482,12 @@ namespace DataProvider_Server_voucher
                 parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
                 switch (receiver)
                 {
+                    case "AI":
+                        if (!totalDelay.ContainsKey(sender))
+                        {
+                            return;
+                        }
+                        break;
                     case "DEVICE":
                         if (!totalDelay.ContainsKey(sender))
                         {
