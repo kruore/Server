@@ -35,7 +35,7 @@ namespace VoucherApplication
         public static extern uint TimeEndPeriod(uint uMilliseconds);
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 IParam);
-
+        bool server_send = false;
         private const int WM_SETREDRAW = 11;
         bool recorddata = false;
         public static Form1 inst;
@@ -128,25 +128,24 @@ namespace VoucherApplication
             {
                 Console.WriteLine(port[i]);
             }
-            Console.WriteLine(port.Length);
             if (port.Length > 0)
             {
-                if (stream != null)
-                {
-                    return;
-                }
-                stream = new SerialPort(port[0], 115200);
-                stream.Open();
-                char[] buffer = new char[1];
-                buffer[0] = '0';
-                stream.Write(buffer, 0, 1);
-                //stream.Write("0");
-                Console.WriteLine("Open");
-                timeOffset = DateTimeOffset.Now;
-                recorddata = true;
-                rTh1 = new Thread(FIxedUpdate);
-                rTh1.IsBackground = false;
-                rTh1.Start();
+                //if (stream != null)
+                //{
+                //    return;
+                //}
+                //stream = new SerialPort(port[0], 115200);
+                //stream.Open();
+                //char[] buffer = new char[1];
+                //buffer[0] = '0';
+                //stream.Write(buffer, 0, 1);
+                ////stream.Write("0");
+                //Console.WriteLine("Open");
+                //timeOffset = DateTimeOffset.Now;
+                //recorddata = false;
+                //rTh1 = new Thread(FIxedUpdate);
+                //rTh1.IsBackground = false;
+                //rTh1.Start();
             }
             else
             {
@@ -171,7 +170,11 @@ namespace VoucherApplication
                 stopwatch.Start();
                 if (stream != null)
                 {
-                    DataUpdate();
+                    //DataUpdate();
+                    if (server_send == true)
+                    {
+                        DataUpdate();
+                    }
                 }
                 stopwatch.Stop();
                 //if (stopwatch.ElapsedMilliseconds < 40)
@@ -202,7 +205,10 @@ namespace VoucherApplication
         {
             try
             {
-                receivedstring = stream.ReadLine();
+                if (stream != null)
+                {
+                    receivedstring = stream.ReadLine();
+                }
                 if (easurement_timing_budget_check)
                 {
                     //receivedstring = DateTime.Now.ToString("yyyyMMddHHmmss.fff") + ",wow";
@@ -226,6 +232,7 @@ namespace VoucherApplication
                         //Debug.Log(receivedstring);
                         UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
                         byte[] buf = Encoding.Default.GetBytes($"DEVICE,{UnixMilliseconds.ToString() + "," + receivedstring};");
+                        Console.WriteLine(buf);
                         client.GetStream().Write(buf, 0, buf.Length);
                         DataRecorder.instance.Queue_ex_01.Enqueue(UnixMilliseconds.ToString() + "," + receivedstring);
                         string data = preUnixMilliseconds + "delay:" + (UnixMilliseconds - preUnixMilliseconds).ToString() + "count:" + DataRecorder.instance.Queue_ex_01.Count.ToString() + ",time" + DateTime.Now.ToString("HHmmss.fff") + ",data:" + receivedstring;
@@ -336,12 +343,13 @@ namespace VoucherApplication
             {
                 string parsedName = "%^&";
                 //parsedName += a;
-                parsedName += "DEVICE";
+                parsedName += "6_DEVICE";
 
                 clientNAME = parsedName;
 
                 client = new TcpClient();
                 client.Connect("210.94.216.195", 4545);
+                //  client.Connect("210.94.167.45", 4545);
                 byte[] byteData = new byte[parsedName.Length];
                 byteData = Encoding.UTF8.GetBytes(parsedName);
                 client.GetStream().Write(byteData, 0, byteData.Length);
@@ -349,7 +357,6 @@ namespace VoucherApplication
                 ReceiveThread.Start();
                 MessageBox.Show("서버에 접속됨");
             }
-
             catch
             {
                 //   MessageBox.Show("서버연결에 실패하였습니다.", "Server Error");
@@ -362,7 +369,6 @@ namespace VoucherApplication
             {
                 try
                 {
-
                     netStream = client.GetStream();
 
                     int BUFFERSIZE = client.ReceiveBufferSize;
@@ -400,59 +406,85 @@ namespace VoucherApplication
                                 }
                                 else if (splited_Data[0].Equals("#2"))
                                 {
-                                    //DATA SEND!!!
-                                    Console.WriteLine("DATA SEND");
+                                    recorddata = true;
+                                    server_send = true;
+                                    string[] port = SerialPort.GetPortNames();
+                                    for (int j = 0; j < port.Length; j++)
+                                    {
+                                        Console.WriteLine(port[j]);
+                                    }
+                                    Console.WriteLine(port.Length);
+                                    if (port.Length > 0)
+                                    {
+                                        if (stream != null)
+                                        {
+                                            return;
+                                        }
+                                        stream = new SerialPort(port[0], 115200);
+                                        stream.Open();
+                                        char[] buffers = new char[1];
+                                        buffers[0] = '0';
+                                        stream.Write(buffers, 0, 1);
+                                        //stream.Write("0");
+                                        Console.WriteLine("Open");
+                                        timeOffset = DateTimeOffset.Now;
+                                        rTh1 = new Thread(FIxedUpdate);
+                                        rTh1.IsBackground = false;
+                                        rTh1.Start();
+                                    }
+                                    else
+                                    {
+                                        SetDataText("Null Port");
+                                    }
+                                    Console.WriteLine("DADADADADAD");
                                 }
                                 else if (splited_Data[0].Equals("#3"))
                                 {
-                                    Console.WriteLine("DATA SEND STOP");
+                                    Console.WriteLine("DDDDDDDDDDDDDDDDDDDDDDDDDDD");
+                                    if (recorddata)
+                                    {
+                                        recorddata = false;
+                                        server_send = false;
+                                        if (rTh.ThreadState == System.Threading.ThreadState.Unstarted)
+                                        {
+                                            rTh.Start();
+                                        }
+                                        else if (rTh.ThreadState == System.Threading.ThreadState.Suspended)
+                                        {
+                                            rTh.Resume();
+                                            //     SetDataText("Resume");
+                                        }
+                                        else if (rTh.ThreadState == System.Threading.ThreadState.Running)
+                                        {
+                                            while (rTh.ThreadState != System.Threading.ThreadState.Suspended)
+                                            {
+                                                Thread.Sleep(1);
+                                            }
+                                            rTh.Resume();
+                                            //     SetDataText("RunningAndSuspended");
+                                        }
+                                    }
+                                    if (stream != null)
+                                    {
+                                        stream.Close();
+                                        stream = null;
+                                    }
+                                    DataTextBox.BeginInvoke(new Action(() => DataTextBox.Clear()));
                                 }
                             }
                         }
 
                     }
-
-
-
                 }
                 catch (Exception e)
                 {
+                    MessageBox.Show("서버와의 연결이 끊어졌습니다.", "Server Error");
+                    MessageBox.Show(e.Message);
+                    MessageBox.Show(e.StackTrace);
+                    Environment.Exit(1);
                     Console.WriteLine(e);
                 }
             }
-
-            //    while (true)
-            //    {
-            //        try
-            //        {
-            //            byte[] receiveByte = new byte[client.ReceiveBufferSize];
-            //            client.GetStream().ReadAsync(receiveByte, 0, (int)client.ReceiveBufferSize);
-            //            receiveMessage = Encoding.UTF8.GetString(receiveByte);
-
-            //            Console.WriteLine(receiveMessage);
-            //            string[] receiveMessageArray = receiveMessage.Split('>');
-            //            foreach (var item in receiveMessageArray)
-            //            {
-            //                if (!item.Contains('<'))
-            //                    continue;
-            //                if (item.Contains("관리자<TEST"))
-            //                    continue;
-
-            //                receiveMessageList.Add(item);
-            //            }
-
-            //       //     ParsingReceiveMessage(receiveMessageList);
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            //MessageBox.Show("서버와의 연결이 끊어졌습니다.", "Server Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //            //MessageBox.Show(e.Message);
-            //            //MessageBox.Show(e.StackTrace);
-            //            //Environment.Exit(1);
-            //        }
-            //       //Thread.Sleep(500);
-            //    }
-            //}
 
         }
 
