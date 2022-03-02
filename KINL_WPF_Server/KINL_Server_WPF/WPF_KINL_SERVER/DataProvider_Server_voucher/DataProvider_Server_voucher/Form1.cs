@@ -61,7 +61,6 @@ namespace DataProvider_Server_voucher
             ClientManager.messageParsingAction += MessageParsing;
             ClientManager.ChangeListViewAction += ChangeListView;
             ClientManager.PTP_Synchronized += CheckPTP;
-
         }
 
         private void PTPEndChecker(string sender)
@@ -417,7 +416,7 @@ namespace DataProvider_Server_voucher
                         }
                         catch (Exception e)
                         {
-                            sendStringData = "#5;";
+                            sendStringData = "#0;";
                             sendByteData = new byte[sendStringData.Length];
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             int connectDeviceNumber_local = int.Parse(sender);
@@ -442,7 +441,7 @@ namespace DataProvider_Server_voucher
                             int connectDeviceNumber_local = values;
                             ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                             Console.WriteLine("DATA SAVE");
-                            deviceConnection.TryGetValue(int.Parse(sender), out values);
+                            //deviceConnection.TryGetValue(int.Parse(sender), out values);
                             SaveFile(int.Parse(sender));
                         }
                         catch (Exception e)
@@ -463,7 +462,22 @@ namespace DataProvider_Server_voucher
                         break;
 
                     case "#5":
-                        // ERROR = disconnected device or ios callback
+                        // IOS request DB data
+                        string data = gm_db.Search_DataPath_Table("kks_ios");
+                        string[] sendByteDatas=data.Split(';');
+
+                        for (int i=0; i<sendByteDatas.Length-1; i++)
+                        {
+                            sendStringData = sendByteDatas[i]+';';
+                            sendByteData = new byte[sendStringData.Length];
+                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                            ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        }
+                        sendStringData = "<DBEND>;";
+                        sendByteData = new byte[sendStringData.Length];
+                        sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                        ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        Console.WriteLine("DB Search");
                         break;
 
                     //Close Socket;
@@ -487,6 +501,7 @@ namespace DataProvider_Server_voucher
                         {
                             return;
                         }
+                        Console.WriteLine("AI COMMM");
                         break;
                     case "DEVICE":
                         if (!totalDelay.ContainsKey(sender))
@@ -655,7 +670,24 @@ namespace DataProvider_Server_voucher
                         DeviceSend[clientNumber] = true;
                     }
                 }
+            }else if (clientName.Contains("AI"))
+            {
+                if (protocool == StaticDefine.ADD_USER)
+                {
+                    listBox3.BeginInvoke((Action)(() =>
+                    {
+                        listBox3.Items.Add("AI: " + clientNumber + "Connect");
+                    }));
+                }
+                else if (protocool == StaticDefine.REMOVE_USER_LIST)
+                {
+                    listBox3.BeginInvoke((Action)(() =>
+                    {
+                        listBox3.Items.Add("AI : " + clientNumber + "Disconnect");
+                    }));
+                }
             }
+            
             else
             {
                 if (protocool == StaticDefine.ADD_USER)

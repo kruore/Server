@@ -45,6 +45,54 @@ namespace DataProvider_Server_voucher
             }
             return true;
         }
+
+
+        /// <summary>
+        /// Serch Table from DB -> Send to server -> Client
+        /// </summary>
+        /// <param name="_idx">해당 유저 아이디</param>
+        public string Search_DataPath_Table(string _idx)
+        {
+            using (MySqlConnection connection = ConnectionDB())
+            {
+                string searchQuery = string.Format($"use {_idx}; SELECT * FROM dataPath");
+                Log(searchQuery);
+                try
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(searchQuery, connection);
+                    MySqlDataReader rdr = command.ExecuteReader();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while (rdr.Read())
+                    {
+                        for(int i=0;i<rdr.FieldCount;i++)
+                        {
+                            stringBuilder.Append(rdr.GetString(i));
+                            stringBuilder.Append(",");
+                        }
+                        stringBuilder.Append(rdr.GetString(rdr.FieldCount-1));
+                        stringBuilder.Append(";");
+                    }
+                    Log(stringBuilder.ToString());
+
+                    rdr.Close();
+
+                    connection.Close();
+                    return stringBuilder.ToString();
+                }
+                catch (Exception e)
+                {
+                    Log("실패");
+                    Log(e.ToString());
+                    return null;
+                }
+            }
+            return null;
+        }
+
+
+
+
         /// <summary>
         /// 새로운 id값이 들어오면 새로운 데이터베이스(schema)를 생성
         /// </summary>
@@ -78,7 +126,7 @@ namespace DataProvider_Server_voucher
             }
         }
         public void InitSchema(string _idx)
-            //public void InitSchema(string _idx, string _machineName)
+        //public void InitSchema(string _idx, string _machineName)
         {
             CreateDataBase(_idx);
             CreateTable(_idx, "DataPath");
@@ -96,6 +144,7 @@ namespace DataProvider_Server_voucher
             Addcolumn(_idx, "Machine", "count", "int");
             Addcolumn(_idx, "Machine", "1RM", "int");
         }
+
         /// <summary>
         /// 테이블 생성
         /// </summary>
@@ -281,9 +330,9 @@ namespace DataProvider_Server_voucher
         /// <param name="_filename">넣으려 하는 filename</param>
         public void UpdateDataPath(string _idx, string _dateData, string _filePath, string _filename)
         {
-            if (!CheckDataPathData(_idx,_dateData,_filePath, _filename))
+            if (!CheckDataPathData(_idx, _dateData, _filePath, _filename))
             {
-                InsertDataPath(_idx, _dateData,_filePath, _filename);
+                InsertDataPath(_idx, _dateData, _filePath, _filename);
             }
             else
             {
@@ -296,7 +345,7 @@ namespace DataProvider_Server_voucher
         /// <param name="_idx">schema명</param>
         /// <param name="_dateData">넣으려 하는 datedata</param>
         /// <param name="_filename">넣으려 하는 filename</param>
-        public void InsertDataPath(string _idx, string _dateData,string _filePath, string _filename)
+        public void InsertDataPath(string _idx, string _dateData, string _filePath, string _filename)
         {
             using (MySqlConnection connection = ConnectionDB())
             {
@@ -325,13 +374,13 @@ namespace DataProvider_Server_voucher
                 }
             }
         }
-/// <summary>
-/// Insert Machine Data
-/// </summary>
-/// <param name="_idx"></param>
-/// <param name="_dateData"></param>
-/// <param name="_filePath"></param>
-/// <param name="_filename"></param>
+        /// <summary>
+        /// Insert Machine Data
+        /// </summary>
+        /// <param name="_idx"></param>
+        /// <param name="_dateData"></param>
+        /// <param name="_filePath"></param>
+        /// <param name="_filename"></param>
         public void InsertMachineData(string _idx, string _dateData, string _filePath, string _filename)
         {
             using (MySqlConnection connection = ConnectionDB())
@@ -427,7 +476,7 @@ namespace DataProvider_Server_voucher
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-               // insert into data(DateData, fileDate, weight, count, machineindex) values(1, 2, 3, 4, 5);
+                // insert into data(DateData, fileDate, weight, count, machineindex) values(1, 2, 3, 4, 5);
                 string insertQuery = string.Format($"use {_idx};insert into data(Datedata,fileDate,weight,count, machineindex) value ({DateTime.Now.ToString("yyyyMMddHHmmss")},{_datedata},{_weight},{_count},{_machineindex});");
                 Log(insertQuery.ToString());
                 try
