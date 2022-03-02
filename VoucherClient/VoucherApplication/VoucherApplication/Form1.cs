@@ -47,6 +47,8 @@ namespace VoucherApplication
         Thread ReceiveThread = null;
         NetworkStream netStream = null;
 
+        bool bLogin;
+
         public Form1()
         {
             if (inst == null)
@@ -58,7 +60,6 @@ namespace VoucherApplication
             datainstance.Awake();
             stopwatch = new Stopwatch();
             Start();
-
         }
         public void Start()
         {
@@ -70,14 +71,6 @@ namespace VoucherApplication
             {
                 Console.WriteLine(port[i]);
             }
-            //Console.WriteLine(port.Length);
-            //if (stream != null)
-            //{
-            //    stream.Close();
-            //}
-            //stream = new SerialPort(port[0], 115200);
-            //stream.Open();
-            //Console.WriteLine("Open");
             timeOffset = DateTimeOffset.Now;
             rTh = new Thread(EnqueueData);
             rTh.IsBackground = false;
@@ -92,7 +85,6 @@ namespace VoucherApplication
         DateTimeOffset timeOffset;
         public Thread rTh;
         public Thread rTh1;
-        public Thread rTh2;
         bool easurement_timing_budget_check = false;
         private static AutoResetEvent are = new AutoResetEvent(false);
         /// <summary>
@@ -100,29 +92,9 @@ namespace VoucherApplication
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void metroButton1_Click(object sender, EventArgs e)
+        /// 
+        private void streamOn()
         {
-
-            initialis = DatainitialisText.Text;
-            index = EquipIndexText.Text;
-            weight = WeightText.Text;
-            if (DatainitialisText.Text.Equals(String.Empty) || EquipIndexText.Text.Equals(String.Empty) || WeightText.Text.Equals(String.Empty))
-            {
-                DataTextBox.AppendText("Error:Null!");
-                return;
-            }
-            else
-            {
-                DataTextBox.AppendText("initialis:" + initialis + "Index:" + index + "weight:" + weight);
-
-            }
-            if (dataqueue != null)
-            {
-                dataqueue.Clear();
-            }
-            string temp = initialis + "_" + index + "_" + weight;
-            Login(temp);
-
             string[] port = SerialPort.GetPortNames();
             for (int i = 0; i < port.Length; i++)
             {
@@ -130,27 +102,31 @@ namespace VoucherApplication
             }
             if (port.Length > 0)
             {
-                //if (stream != null)
-                //{
-                //    return;
-                //}
-                //stream = new SerialPort(port[0], 115200);
-                //stream.Open();
-                //char[] buffer = new char[1];
-                //buffer[0] = '0';
-                //stream.Write(buffer, 0, 1);
-                ////stream.Write("0");
-                //Console.WriteLine("Open");
-                //timeOffset = DateTimeOffset.Now;
-                //recorddata = false;
-                //rTh1 = new Thread(FIxedUpdate);
-                //rTh1.IsBackground = false;
-                //rTh1.Start();
+                if (stream != null)
+                {
+                    return;
+                }
+                stream = new SerialPort(port[0], 115200);
+                stream.Open();
+                char[] buffer = new char[1];
+                buffer[0] = '0';
+                stream.Write(buffer, 0, 1);
+                //stream.Write("0");
+                Console.WriteLine("Open");
+                timeOffset = DateTimeOffset.Now;
+                rTh1 = new Thread(FIxedUpdate);
+                rTh1.IsBackground = false;
+                rTh1.Start();
             }
             else
             {
                 SetDataText("Null Port");
             }
+        }
+        private void metroButton1_Click(object sender, EventArgs e)
+        {
+            //streamOn();
+            Login();
         }
         void EnqueueData()
         {
@@ -163,6 +139,7 @@ namespace VoucherApplication
         }
         public void FIxedUpdate()
         {
+            Console.WriteLine("DATASEND!!!!");
             while (recorddata)
             {
                 TimeBeginPeriod(1);
@@ -170,7 +147,6 @@ namespace VoucherApplication
                 stopwatch.Start();
                 if (stream != null)
                 {
-                    //DataUpdate();
                     if (server_send == true)
                     {
                         DataUpdate();
@@ -226,19 +202,14 @@ namespace VoucherApplication
                         }
                         receivedstring = receivedstring.Replace("\r", "");
                         receivedstring = receivedstring.Remove(0, 1);
-                        //receivedstring=receivedstring.Substring(receivedstring.Length - 1);
-                        //receivedstring += "\n";
                         timeOffset = DateTimeOffset.Now;
-                        //Debug.Log(receivedstring);
                         UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                        byte[] buf = Encoding.Default.GetBytes($"DEVICE,{UnixMilliseconds.ToString() + "," + receivedstring};");
-                        Console.WriteLine(buf);
+                        byte[] buf = Encoding.Default.GetBytes($"DEVICE,{UnixMilliseconds.ToString()},4,{UnixMilliseconds.ToString()},{receivedstring};");
+                      //  Console.WriteLine(buf);
                         client.GetStream().Write(buf, 0, buf.Length);
                         DataRecorder.instance.Queue_ex_01.Enqueue(UnixMilliseconds.ToString() + "," + receivedstring);
                         string data = preUnixMilliseconds + "delay:" + (UnixMilliseconds - preUnixMilliseconds).ToString() + "count:" + DataRecorder.instance.Queue_ex_01.Count.ToString() + ",time" + DateTime.Now.ToString("HHmmss.fff") + ",data:" + receivedstring;
                         DataTextBox.Invoke(new Action(() => SetDataText(data)));
-                        //if(DataTextBox.TextLength)
-                        //Console.Write((UnixMilliseconds - preUnixMilliseconds).ToString() + "\n");
                         preUnixMilliseconds = UnixMilliseconds;
                         stream.BaseStream.Flush();
                     }
@@ -256,7 +227,6 @@ namespace VoucherApplication
                         {
                             rTh.Resume();
                         }
-                        //EnqueueData();
                     }
                 }
                 else
@@ -275,27 +245,13 @@ namespace VoucherApplication
         }
         private void metroButton2_Click(object sender, EventArgs e)
         {
+            bLogin = false;
+            client.Close();
+            client=null;
+
             if (recorddata)
             {
                 recorddata = false;
-                if (rTh.ThreadState == System.Threading.ThreadState.Unstarted)
-                {
-                    rTh.Start();
-                }
-                else if (rTh.ThreadState == System.Threading.ThreadState.Suspended)
-                {
-                    rTh.Resume();
-                    SetDataText("Resume");
-                }
-                else if (rTh.ThreadState == System.Threading.ThreadState.Running)
-                {
-                    while (rTh.ThreadState != System.Threading.ThreadState.Suspended)
-                    {
-                        Thread.Sleep(1);
-                    }
-                    rTh.Resume();
-                    SetDataText("RunningAndSuspended");
-                }
             }
             if (stream != null)
             {
@@ -307,21 +263,6 @@ namespace VoucherApplication
         public void SetDataText(string _data)
         {
             DataTextBox.AppendText(_data + "\n");
-            //if (DataTextBox.Lines.Length > linenumber)
-            //{
-            //    LinkedList<string> tempLines = new LinkedList<string>(DataTextBox.Lines);
-
-            //    while ((tempLines.Count - linenumber) > 0)
-            //    {
-            //        tempLines.RemoveFirst();
-            //    }
-
-            //    DataTextBox.Lines = tempLines.ToArray();
-            //}
-            //SendMessage(this.Handle, WM_SETREDRAW, true, 0);
-
-            ////DataTextBox.SelectionStart = DataTextBox.Text.Length;
-            ////DataTextBox.ScrollToCaret();
         }
         private void DataTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -337,30 +278,37 @@ namespace VoucherApplication
             base.OnFormClosing(e);
         }
 
-        private void Login(string a)
+        private void Login()
         {
             try
             {
-                string parsedName = "%^&";
-                //parsedName += a;
-                parsedName += "6_DEVICE";
+                if(!bLogin)
+                {
+                    string parsedName = "%^&";
+                    parsedName += "6_DEVICE";
 
-                clientNAME = parsedName;
+                    clientNAME = parsedName;
 
-                client = new TcpClient();
-                client.Connect("210.94.216.195", 4545);
-                //  client.Connect("210.94.167.45", 4545);
-                byte[] byteData = new byte[parsedName.Length];
-                byteData = Encoding.UTF8.GetBytes(parsedName);
-                client.GetStream().Write(byteData, 0, byteData.Length);
-                ReceiveThread = new Thread(RecieveMessage);
-                ReceiveThread.Start();
-                MessageBox.Show("서버에 접속됨");
+                    client = new TcpClient();
+
+                    //동국대학교 계산관 IP
+                    client.Connect("210.94.216.195", 4545);
+                    // 서버 컴퓨터 IP
+                    //  client.Connect("210.94.167.45", 4545);
+                    byte[] byteData = new byte[parsedName.Length];
+                    byteData = Encoding.UTF8.GetBytes(parsedName);
+                    client.GetStream().Write(byteData, 0, byteData.Length);
+                    ReceiveThread = new Thread(RecieveMessage);
+                    ReceiveThread.Start();
+                    MessageBox.Show("서버에 접속됨");
+                    bLogin = true;
+                }
             }
             catch
             {
-                //   MessageBox.Show("서버연결에 실패하였습니다.", "Server Error");
+                MessageBox.Show("서버연결에 실패하였습니다.\n서버를 기동해주세요", "Server Error");
                 client = null;
+                bLogin = false;
             }
         }
         private void RecieveMessage()
@@ -378,7 +326,7 @@ namespace VoucherApplication
                     string message = Encoding.UTF8.GetString(buffer, 0, bytes);
 
                     string[] splited = message.Split(';');
-                    Console.WriteLine(message);
+                 //   Console.WriteLine(message);
                     for (int i = 0; i < splited.Length; i++)
                     {
                         if (splited[i].Equals(""))
@@ -391,7 +339,6 @@ namespace VoucherApplication
                             //   Console.WriteLine(splited.Count);
                             if (splited_Data.Length > 0)
                             {
-
                                 if (splited_Data[0].Equals("<PTP>"))
                                 {
                                     byte[] sendbuffer = new byte[1024];
@@ -402,39 +349,22 @@ namespace VoucherApplication
                                     byte[] byteData = new byte[sendData.Length];
                                     byteData = Encoding.UTF8.GetBytes(sendData);
                                     client.GetStream().Write(byteData, 0, byteData.Length);
-                                    Console.WriteLine(sendString);
+                                //    Console.WriteLine(sendString);
                                 }
                                 else if (splited_Data[0].Equals("#2"))
                                 {
-                                    recorddata = true;
+                                    Console.WriteLine("DATASEND");
                                     server_send = true;
-                                    string[] port = SerialPort.GetPortNames();
-                                    for (int j = 0; j < port.Length; j++)
+                                    recorddata = true;
+                                    streamOn();
+                                    if (stream != null)
                                     {
-                                        Console.WriteLine(port[j]);
-                                    }
-                                    Console.WriteLine(port.Length);
-                                    if (port.Length > 0)
-                                    {
-                                        if (stream != null)
-                                        {
-                                            return;
-                                        }
-                                        stream = new SerialPort(port[0], 115200);
-                                        stream.Open();
-                                        char[] buffers = new char[1];
-                                        buffers[0] = '0';
-                                        stream.Write(buffers, 0, 1);
-                                        //stream.Write("0");
-                                        Console.WriteLine("Open");
-                                        timeOffset = DateTimeOffset.Now;
-                                        rTh1 = new Thread(FIxedUpdate);
-                                        rTh1.IsBackground = false;
-                                        rTh1.Start();
+                                        Console.WriteLine("STREAM SEND");
                                     }
                                     else
                                     {
-                                        SetDataText("Null Port");
+                                        MessageBox.Show("기기 스트림이 불안정합니다.\n다시 연결해주세요.");
+                                        Console.WriteLine("STREAM END");
                                     }
                                     Console.WriteLine("DADADADADAD");
                                 }
@@ -479,10 +409,11 @@ namespace VoucherApplication
                 catch (Exception e)
                 {
                     MessageBox.Show("서버와의 연결이 끊어졌습니다.", "Server Error");
-                    MessageBox.Show(e.Message);
-                    MessageBox.Show(e.StackTrace);
-                    Environment.Exit(1);
-                    Console.WriteLine(e);
+                    //client.Close();
+                    ReceiveThread.Abort();
+                    //MessageBox.Show(e.Message);
+                    //MessageBox.Show(e.StackTrace);
+                    //Environment.Exit(1);
                 }
             }
 

@@ -12,9 +12,6 @@ namespace DataProvider_Server_voucher
 {
     public partial class Form1 : Form
     {
-        string testContain;
-
-
         object lockObj = new object();
         object _ptpLock = new object();
 
@@ -50,14 +47,12 @@ namespace DataProvider_Server_voucher
         public static string clientNames;
 
         Task conntectCheckThread = null;
-        Task conntectPTPThread = null;
-        Task fileCheck = null;
 
         private Dictionary<string, bool> DeviceSend = new Dictionary<string, bool>();
         private Dictionary<string, bool> Watch_DeviceSend = new Dictionary<string, bool>();
         private Dictionary<string, bool> Airpod_DeviceSend = new Dictionary<string, bool>();
 
-        private bool PTP_Checker = true;
+        GM_DB gm_db = new GM_DB();
 
         public Form1()
         {
@@ -68,7 +63,24 @@ namespace DataProvider_Server_voucher
             ClientManager.PTP_Synchronized += CheckPTP;
 
         }
-        //GET CLIENT NUMBER AND CHECKED PTP
+
+        private void PTPEndChecker(string sender)
+        {
+            string sendStringData = "END;";
+            byte[] sendByteData = new byte[sendStringData.Length];
+            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+            foreach (var item in ClientManager.clientDic)
+            {
+                if (item.Value.clientNumber == int.Parse(sender))
+                {
+                    item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                }
+            }
+        }
+        /// <summary>
+        /// GET CLIENT NUMBER AND CHECKED PTP
+        /// </summary>
+        /// <param name="a">ptp 를 진행할 때 필요한 client number</param>
         private void CheckPTP(string a)
         {
             lock (_ptpLock)
@@ -90,13 +102,6 @@ namespace DataProvider_Server_voucher
                             {
                                 ClientManager.clientDic[int.Parse(a)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                             }
-                            //foreach (var att in ClientManager.clientDic)
-                            //{
-                            //    if (att.Value.clientNumber == GetClinetNumber(a))
-                            //    {
-                            //        att.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                            //    }
-                            //}
                         }
                         catch (Exception e)
                         {
@@ -107,40 +112,17 @@ namespace DataProvider_Server_voucher
                         Thread.Sleep(server_threadDelay);
                     }
                 }
-                //else
-                //{
-                //    while (PTPlist[a.ToString()].Count < 10)
-                //    {
-                //        try
-                //        {
-                //            timeOffset = DateTimeOffset.Now;
-                //            preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                //            string sendStringData = $"<PTP>,{a.ToString()},{preUnixMilliseconds}";
-                //            byte[] sendByteData = new byte[sendStringData.Length];
-                //            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                //            //foreach (var att in ClientManager.clientDic)
-                //            //{
-                //            //    if (att.Value.clientNumber == a)
-                //            //    {
-                //            //        att.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                //            //    }
-                //            //}
-                //        }
-                //        catch (Exception e)
-                //        {
-                //            Console.WriteLine("ERROR");
-                //            break;
-                //            //return;
-                //        }
-                //        Thread.Sleep(10);
-                //    }
-                //}
+                PTPEndChecker(a);
                 conntectCheckThread = new Task(ConnectCheckLoop);
                 conntectCheckThread.Start();
                 return;
             }
 
         }
+        /// <summary>
+        /// PTP 10개의 데이터를 받아 가장 짧은 딜레이 기준 최적화
+        /// </summary>
+        /// <param name="sender">client port Number</param>
         private void CalculatePTP(string sender)
         {
             string UserNum = "";
@@ -187,31 +169,32 @@ namespace DataProvider_Server_voucher
             serverDelays.Add(sender, SD);
             clientDelays.Add(sender, CD);
             totalDelay.Add(sender, SCD);
-            //확인용
+            //확인용 DebugLine
             Console.WriteLine("END");
+            listBox4.BeginInvoke((Action)(() =>
+            {
+                ObservableCollection<string> list = new ObservableCollection<string>();
+                if (listBox4.Items.Contains("PTP " + sender))
+                {
+                    return;
+                }
+                else
+                {
+                    listBox4.Items.Add("PTP " + sender);
+                }
+            }));
             foreach (var item in ClientManager.clientDic)
             {
-
                 Console.WriteLine("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
                 Console.WriteLine("USERNUMBER" + item.Value.clientNumber);
                 Console.WriteLine("DELAY:" + totalDelay[item.Value.clientNumber.ToString()]);
                 Console.WriteLine("SERVERDELAY:" + serverDelays[item.Value.clientNumber.ToString()]);
                 Console.WriteLine("CLIENTDELAY:" + clientDelays[item.Value.clientNumber.ToString()]);
-                listBox4.BeginInvoke((Action)(() =>
-                {
-                    ObservableCollection<string> list = new ObservableCollection<string>();
-                    if (listBox4.Items.Contains("PTP " + item.Value.clientName))
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        listBox4.Items.Add("PTP " + item.Value.clientName);
-                    }
-                }));
             }
         }
-
+        /// <summary>
+        /// ECHO(HeartBit) 스레드, 서버의 접속을 확인하고 비접속시 디스커넥트 시킴
+        /// </summary>
         private void ConnectCheckLoop()
         {
             while (true)
@@ -220,21 +203,23 @@ namespace DataProvider_Server_voucher
                 {
                     try
                     {
-                        string sendStringData = "<TEST>";
+                        string sendStringData = "<TEST>;";
                         byte[] sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                         item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                     }
                     catch (Exception e)
                     {
-                        SaveFile(item.Value.clientNumber);
                         RemoveClient(item.Value);
                     }
                 }
                 Thread.Sleep(2000);
             }
         }
-
+        /// <summary>
+        /// 클라이언트 제거
+        /// </summary>
+        /// <param name="targetClient">해당 클라이언트 데이터 제거</param>
         private void RemoveClient(ClientData targetClient)
         {
             ClientData result = null;
@@ -243,7 +228,7 @@ namespace DataProvider_Server_voucher
                 ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
                 listBox4.BeginInvoke((Action)(() =>
                 {
-                  listBox4.Items.Add("PTP:" + targetClient.clientName+"-Leave");
+                    listBox4.Items.Add("PTP:" + targetClient.clientName + "-Leave");
                 }));
             }
             catch (Exception e)
@@ -256,12 +241,24 @@ namespace DataProvider_Server_voucher
             totalDelay.Remove(targetClient.clientNumber.ToString());
             clientDelays.Remove(targetClient.clientNumber.ToString());
             serverDelays.Remove(targetClient.clientNumber.ToString());
+            if (ClientManager.clientDic.Count < 1)
+            {
+                conntectCheckThread.Dispose();
+            }
+            else
+            {
+                conntectCheckThread.Start();
+            }
         }
-
+        /// <summary>
+        /// 메세지 파싱
+        /// </summary>
+        /// <param name="sender">보내는 클라이언트 port number</param>
+        /// <param name="message">전송 된 데이터</param>
         private void MessageParsing(string sender, string message)
         {
-            Console.WriteLine(message);
-            testContain += message;
+            //// Console.WriteLine(message);
+            //testContain += message;
             lock (lockObj)
             {
                 if (!msgDic.ContainsKey(sender))
@@ -288,7 +285,6 @@ namespace DataProvider_Server_voucher
                     }
                     msgDic[sender] = temparray[temparray.Length - 1];
                 }
-                //Console.WriteLine("msgDic" + msgDic[GetClinetNumber(sender).ToString()]);
                 foreach (var item in msgArray)
                 {
                     if (string.IsNullOrEmpty(item))
@@ -302,17 +298,20 @@ namespace DataProvider_Server_voucher
                         msgList.Add(item);
                     }
                     SendMsgToClient(item, sender);
-
-                    // Console.WriteLine(item.ToString());
                 }
             }
         }
+        /// <summary>
+        /// 파싱 된 메세지 해독 및 전달
+        /// </summary>
+        /// <param name="msgList"></param>
+        /// <param name="sender"></param>
         // MESSAGE PARSSED
         private void SendMsgToClient(string msgList, string sender)
         {
             //try
             //{
-            Console.WriteLine("MSG: "+ msgList);
+            // Console.WriteLine("MSG: "+ msgList);
             listBox3.BeginInvoke((Action)(() =>
             {
                 listBox5.Items.Add(msgList);
@@ -323,134 +322,13 @@ namespace DataProvider_Server_voucher
             string sendStringData = "";
             byte[] sendByteData = new byte[sendStringData.Length];
             msgList = msgList.Replace("^", ",");
-            //Console.WriteLine(msgList);
-            //if (msgList.Contains("<PTP>"))
-            //{
-            //    Console.WriteLine(msgList);
-            //}
 
-            //    if (msgList.Substring(0, 1) == "#")
-            if (msgList.IndexOf("#")==0)
-            {
-                string[] splitedMsgs = msgList.Split(',');
-                //#1,iosName,DeviceName
-                // 동기화
-                //#1,1(ios),2(device)= true
-                //#2,DeviceData Recived(Start)
-                //#3
-                //#4 Save= IOS send , server Recive
-                //#5,DeviceName - Discnnect = IOS
-                //server = ios,device disconnect
-                switch (msgList.Substring(0, 2))
-                {
-
-                    //Connect
-                    // #1 , IOS, DEVICE
-                    case "#1":
-                        string connectIos = splitedMsgs[1];
-                        int connectIosNumber = GetClinetNumber(splitedMsgs[1]);
-
-                        string connectDevice = splitedMsgs[2];
-                        int connectDeviceNumber = GetClinetNumber(splitedMsgs[2]);
-
-                        deviceConnection.Add(connectIosNumber, connectDeviceNumber);
-                        //sendStringData = "#2;";
-                        //sendByteData = new byte[sendStringData.Length];
-                        //sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-
-                        //try
-                        //{
-                        //    //Console.WriteLine("Device Connected");
-                        //    string connectIos = splitedMsgs[1];
-                        //    int connectIosNumber = GetClinetNumber(splitedMsgs[1]);
-
-                        //    string connectDevice = splitedMsgs[2];
-                        //    int connectDeviceNumber = GetClinetNumber(splitedMsgs[2]);
-
-                        //  //  deviceConnection.Add(connectIosNumber, connectDeviceNumber);
-
-                        //    ClientManager.clientDic[connectIosNumber].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                        //    ClientManager.clientDic[connectDeviceNumber].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                        //}
-                        //catch (Exception e)
-                        //{
-                        //    Console.WriteLine("Connection Error");
-                        //    return;
-                        //}
-                        break;
-
-                    case "#2":
-                        //#2,DeviceData Recived(Start)
-                        try
-                        {
-                            sendStringData = "#2;";
-                            sendByteData = new byte[sendStringData.Length];
-                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                            int values = 0;
-                            deviceConnection.TryGetValue(int.Parse(sender), out values);
-                            int connectDeviceNumber_local = values;
-                            ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                        }
-                        catch (Exception e)
-                        {
-                            sendStringData = "#5;";
-                            sendByteData = new byte[sendStringData.Length];
-                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                            int connectDeviceNumber_local = int.Parse(sender);
-                            ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                            return;
-                        }
-                        break;
-
-                    //#3 = Data End
-                    case "#3":
-
-                        sendStringData = "#3;";
-                        sendByteData = new byte[sendStringData.Length];
-                        sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                        try
-                        {
-                            sendStringData = "#3;";
-                            sendByteData = new byte[sendStringData.Length];
-                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                            int values = 0;
-                            deviceConnection.TryGetValue(int.Parse(sender), out values);
-                            int connectDeviceNumber_local = values;
-                            ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("Stop Send Data Error");
-                            return;
-                        }
-                        break;
-
-                    // Save
-                    // #4 , IOS, DEVICE
-                    case "#4":
-                        Console.WriteLine("DATA SAVE");
-                        int value=0;
-                        deviceConnection.TryGetValue(int.Parse(sender), out value);
-                        SaveFile(int.Parse(sender));
-                        SaveFile(value);
-                        break;
-
-                    case "#5":
-                        // ERROR = disconnected device or ios callback
-                        break;
-
-                    //Close Socket;
-                    case "#9":
-                        RemoveClient(ClientManager.clientDic[int.Parse(sender)]);
-                        break;
-                }
-            }
-            else
+            if (msgList.IndexOf("<") == 0)
             {
                 string[] splitedMsg = msgList.Split(',');
-
                 receiver = splitedMsg[0];
                 parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
+
                 switch (receiver)
                 {
                     case "<PTP>":
@@ -480,11 +358,6 @@ namespace DataProvider_Server_voucher
                                 {
                                     timeOffset = DateTimeOffset.Now;
                                     preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                                    //if (splitedMsg[3].Contains(";"))
-                                    //{
-                                    //    splitedMsg[3] = splitedMsg[3].TrimEnd(splitedMsg[3][splitedMsg[3].Length - 1]);
-                                    //    Console.WriteLine(splitedMsg[3]);
-                                    //}
                                     sendStringData = $"{splitedMsg[0]},{splitedMsg[1]},{splitedMsg[2]},{splitedMsg[3]},{preUnixMilliseconds};";
                                     sendByteData = new byte[sendStringData.Length];
                                     sendByteData = Encoding.UTF8.GetBytes(sendStringData);
@@ -504,6 +377,115 @@ namespace DataProvider_Server_voucher
                                 }
                                 return;
                             }
+                        }
+                        break;
+                }
+            }
+
+            else if (msgList.IndexOf("#") == 0)
+            {
+                string[] splitedMsgs = msgList.Split(',');
+
+                switch (msgList.Substring(0, 2))
+                {
+
+                    //Connect
+                    // #1 , IOS, DEVICE
+                    case "#1":
+                        string connectIos = splitedMsgs[1];
+                        int connectIosNumber = GetClinetNumber(splitedMsgs[1]);
+
+                        string connectDevice = splitedMsgs[2];
+                        int connectDeviceNumber = GetClinetNumber(splitedMsgs[2]);
+
+                        // 두 디바이스 커넥트
+                        deviceConnection.Add(connectIosNumber, connectDeviceNumber);
+                        break;
+
+                    //Data Send
+                    case "#2":
+                        try
+                        {
+                            sendStringData = "#2;";
+                            sendByteData = new byte[sendStringData.Length];
+                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                            int values = 0;
+                            deviceConnection.TryGetValue(int.Parse(sender), out values);
+                            int connectDeviceNumber_local = values;
+                            Console.WriteLine("접속한 클라이언트의 수: "+ClientManager.clientDic.Count);
+                            ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        }
+                        catch (Exception e)
+                        {
+                            sendStringData = "#5;";
+                            sendByteData = new byte[sendStringData.Length];
+                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                            int connectDeviceNumber_local = int.Parse(sender);
+                            ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                            return;
+                        }
+                        break;
+
+                    //#3 = Data End
+                    case "#3":
+
+                        sendStringData = "#3;";
+                        sendByteData = new byte[sendStringData.Length];
+                        sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                        try
+                        {
+                            sendStringData = "#3;";
+                            sendByteData = new byte[sendStringData.Length];
+                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                            int values = 0;
+                            deviceConnection.TryGetValue(int.Parse(sender), out values);
+                            int connectDeviceNumber_local = values;
+                            ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                            Console.WriteLine("DATA SAVE");
+                            deviceConnection.TryGetValue(int.Parse(sender), out values);
+                            SaveFile(int.Parse(sender));
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Stop Send Data Error");
+                            //ClientData tempSender;
+                            //ClientManager.clientDic.TryGetValue(int.Parse(sender), out tempSender);
+                            //if (tempSender != null)
+                            //{
+                            //    RemoveClient(tempSender);
+                            //}
+                            return;
+                        }
+                        break;
+                    // AI Server Send
+                    // #4
+                    case "#4":
+                        break;
+
+                    case "#5":
+                        // ERROR = disconnected device or ios callback
+                        break;
+
+                    //Close Socket;
+                    case "#9":
+                        RemoveClient(ClientManager.clientDic[int.Parse(sender)]);
+                        break;
+                }
+            }
+            else
+            {
+
+                //#으로 포함된 프로토콜이 아닐 경우
+                string[] splitedMsg = msgList.Split(',');
+
+                receiver = splitedMsg[0];
+                parsedMessage = string.Format("{0}<{1}>", sender, splitedMsg[1]);
+                switch (receiver)
+                {
+                    case "AI":
+                        if (!totalDelay.ContainsKey(sender))
+                        {
+                            return;
                         }
                         break;
                     case "DEVICE":
@@ -531,8 +513,6 @@ namespace DataProvider_Server_voucher
                         }
                         try
                         {
-                            //if (splitedMsg.Length == 11)
-                            //{
                             long tempTime1 = Convert.ToInt64(splitedMsg[1]);
                             long PTPTime1 = totalDelay[sender];
                             tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[sender] / 2);
@@ -608,8 +588,6 @@ namespace DataProvider_Server_voucher
                 }
             }
         }
-
-        // UTILL
         private int GetClinetNumber(string targetClientName)
         {
             foreach (var item in ClientManager.clientDic)
@@ -702,7 +680,7 @@ namespace DataProvider_Server_voucher
                         string sendStringData = "<TEST>";
                         byte[] sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                        
+
                         listBox3.Items.Add("IOS:" + clientNumber + "Disconnect");
 
                     }));
@@ -784,7 +762,6 @@ namespace DataProvider_Server_voucher
 
 
         //FILE SAVED
-
         private void SaveFile(int sender)
         {
             int clientPort;
@@ -793,23 +770,23 @@ namespace DataProvider_Server_voucher
             string SaveDevice = GetClinetName(clientPort.ToString());
             if (SaveDevice.Contains("DEVICE"))
             {
-                for (int i = 0; i < DeviceData[sender.ToString()].Count; i++)
+                for (int i = 0; i < DeviceData[clientPort.ToString()].Count; i++)
                 {
-                    GM_DataRecorder.instance.Enqueue_Data(sender.ToString(), DeviceData[sender.ToString()][i].ToString());
+                    GM_DataRecorder.instance.Enqueue_Data(clientPort.ToString(), DeviceData[clientPort.ToString()][i].ToString());
                 }
-                if (DeviceData[sender.ToString()].Count > 0)
+                if (DeviceData[clientPort.ToString()].Count > 0)
                 {
                     foreach (var clientNames in ClientManager.clientDic.Values)
                     {
-                        if (clientNames.clientNumber == sender)
+                        if (clientNames.clientNumber == clientPort)
                         {
-                            GM_DataRecorder.instance.WriteSteamingData_Batch_Device(sender.ToString(), clientNames.clientName);
+                            GM_DataRecorder.instance.WriteSteamingData_Batch_Device(clientPort.ToString(), SaveIOS);
                         }
                     }
-                    DeviceData[sender.ToString()].Clear();
+                    DeviceData[clientPort.ToString()].Clear();
                 }
             }
-            else if (SaveIOS.Contains("IOS"))
+            if (SaveIOS.Contains("IOS"))
             {
                 // Console.WriteLine("IOS");
                 if (AirpodData[sender.ToString()].Count > 1)
@@ -855,9 +832,6 @@ namespace DataProvider_Server_voucher
             deviceConnection.Remove(sender);
         }
 
-
-
-
         //INIT
         private void MainServerStart()
         {
@@ -877,7 +851,6 @@ namespace DataProvider_Server_voucher
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //SaveFile();
         }
 
         private void label2_Click(object sender, EventArgs e)
@@ -896,6 +869,11 @@ namespace DataProvider_Server_voucher
         }
 
         private void listBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
         {
 
         }

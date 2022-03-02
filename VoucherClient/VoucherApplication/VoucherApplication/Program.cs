@@ -25,6 +25,5 @@ namespace VoucherApplication
             Application.Run(new Form1());
         }
 
-
     }
 }
