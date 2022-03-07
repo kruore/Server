@@ -90,9 +90,6 @@ namespace DataProvider_Server_voucher
             return null;
         }
 
-
-
-
         /// <summary>
         /// 새로운 id값이 들어오면 새로운 데이터베이스(schema)를 생성
         /// </summary>
@@ -137,12 +134,56 @@ namespace DataProvider_Server_voucher
             Addcolumn(_idx, "Data", "weight", "int");
             Addcolumn(_idx, "Data", "count", "int");
             Addcolumn(_idx, "Data", "machineindex", "varchar(30)");
-            CreateTable(_idx, "Machine");
-            Addcolumn(_idx, "Machine", "fileDate", "varchar(30)");
-            Addcolumn(_idx, "Machine", "Allout(Guess)", "varchar(30)");
-            Addcolumn(_idx, "Machine", "weight", "int");
-            Addcolumn(_idx, "Machine", "count", "int");
-            Addcolumn(_idx, "Machine", "1RM", "int");
+         
+        }
+
+        public void initTable(string _idx, string _machine_name)
+        {
+            CreateTable(_idx, _machine_name);
+            Addcolumn(_idx, _machine_name, "fileDate", "varchar(30)");
+            Addcolumn(_idx, _machine_name, "Allout(Guess)", "varchar(30)");
+            Addcolumn(_idx, _machine_name, "weight", "int");
+            Addcolumn(_idx, _machine_name, "count", "int");
+            Addcolumn(_idx, _machine_name, "1RM", "int");
+        }
+
+        public int CheckSchema_FromExercise(string _idx, string _exercise)
+        {
+            using (MySqlConnection connection = ConnectionDB())
+            {
+                string insertQuery = string.Format("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = {1};", _idx,_exercise);
+                Log(insertQuery);
+                try
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(insertQuery, connection);
+                    MySqlDataReader rdr = command.ExecuteReader();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while (rdr.Read())
+                    {
+                        stringBuilder.Append(rdr.GetString(0));
+                    }
+                    rdr.Close();
+                    connection.Close();
+                    Log(stringBuilder.ToString());
+                    int count;
+                    if (int.TryParse(stringBuilder.ToString(), out count))
+                    {
+                        if (count <= 0)
+                        {
+                            initTable(_idx,_exercise);
+                        }
+                    }
+                    return count;
+                }
+                catch (Exception e)
+                {
+                    Log("실패");
+                    Log(e.ToString());
+                    return 0;
+                }
+            }
+            return 0;
         }
 
         /// <summary>

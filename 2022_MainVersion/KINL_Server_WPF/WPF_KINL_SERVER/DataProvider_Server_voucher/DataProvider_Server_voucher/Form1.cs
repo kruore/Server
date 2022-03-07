@@ -221,17 +221,28 @@ namespace DataProvider_Server_voucher
         /// <param name="targetClient">해당 클라이언트 데이터 제거</param>
         private void RemoveClient(ClientData targetClient)
         {
+
+            int disconnectDevice;
+            deviceConnection.TryGetValue(targetClient.clientNumber, out disconnectDevice);
             ClientData result = null;
             try
             {
-                ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
-                listBox4.BeginInvoke((Action)(() =>
+                if (ClientManager.clientDic[disconnectDevice].isSend == false)
                 {
-                    listBox4.Items.Add("PTP:" + targetClient.clientName + "-Leave");
-                }));
+                    string sendStringDatas = $"#3;";
+                    byte[] sendByteDatas = new byte[sendStringDatas.Length];
+                    sendByteDatas = Encoding.UTF8.GetBytes(sendStringDatas);
+                    ClientManager.clientDic[disconnectDevice].tcpClient.GetStream().Write(sendByteDatas, 0, sendByteDatas.Length);
+                }
+                ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
             }
             catch (Exception e)
             {
+                if(disconnectDevice==-1)
+                {
+                    Console.WriteLine("?????????");
+                }
+
                 //Console.WriteLine(e);
                 Console.WriteLine("EEEEEEEEEEEEEEEEEEEEEEE");
             }
@@ -240,6 +251,11 @@ namespace DataProvider_Server_voucher
             totalDelay.Remove(targetClient.clientNumber.ToString());
             clientDelays.Remove(targetClient.clientNumber.ToString());
             serverDelays.Remove(targetClient.clientNumber.ToString());
+            deviceConnection.Remove(targetClient.clientNumber);
+            listBox4.BeginInvoke((Action)(() =>
+            {
+                listBox4.Items.Add("PTP:" + targetClient.clientName + "-Leave");
+            }));
             if (ClientManager.clientDic.Count < 1)
             {
                 conntectCheckThread.Dispose();
@@ -397,6 +413,10 @@ namespace DataProvider_Server_voucher
                         string connectDevice = splitedMsgs[2];
                         int connectDeviceNumber = GetClinetNumber(splitedMsgs[2]);
 
+                        //string connectDevice_exerciseName = splitedMsgs[3];
+                        //gm_db.CheckSchema_FromExercise(GetClinetName(splitedMsgs[2]), splitedMsgs[3]);
+                        //// TODO : 이 친구를 운동으로 사용 할 예정
+
                         // 두 디바이스 커넥트
                         deviceConnection.Add(connectIosNumber, connectDeviceNumber);
                         break;
@@ -411,7 +431,7 @@ namespace DataProvider_Server_voucher
                             int values = 0;
                             deviceConnection.TryGetValue(int.Parse(sender), out values);
                             int connectDeviceNumber_local = values;
-                            Console.WriteLine("접속한 클라이언트의 수: "+ClientManager.clientDic.Count);
+                            Console.WriteLine("접속한 클라이언트의 수: " + ClientManager.clientDic.Count);
                             ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                         }
                         catch (Exception e)
@@ -421,13 +441,13 @@ namespace DataProvider_Server_voucher
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             int connectDeviceNumber_local = int.Parse(sender);
                             ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+
                             return;
                         }
                         break;
 
                     //#3 = Data End
                     case "#3":
-
                         sendStringData = "#3;";
                         sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
@@ -439,6 +459,7 @@ namespace DataProvider_Server_voucher
                             int values = 0;
                             deviceConnection.TryGetValue(int.Parse(sender), out values);
                             int connectDeviceNumber_local = values;
+                            ClientManager.clientDic[connectDeviceNumber_local].isSend = true;
                             ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                             Console.WriteLine("DATA SAVE");
                             //deviceConnection.TryGetValue(int.Parse(sender), out values);
@@ -462,13 +483,23 @@ namespace DataProvider_Server_voucher
                         break;
 
                     case "#5":
+
+                        try
+                        {
+
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
+
                         // IOS request DB data
                         string data = gm_db.Search_DataPath_Table("kks_ios");
-                        string[] sendByteDatas=data.Split(';');
+                        string[] sendByteDatas = data.Split(';');
 
-                        for (int i=0; i<sendByteDatas.Length-1; i++)
+                        for (int i = 0; i < sendByteDatas.Length - 1; i++)
                         {
-                            sendStringData = sendByteDatas[i]+';';
+                            sendStringData = sendByteDatas[i] + ';';
                             sendByteData = new byte[sendStringData.Length];
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
@@ -670,7 +701,8 @@ namespace DataProvider_Server_voucher
                         DeviceSend[clientNumber] = true;
                     }
                 }
-            }else if (clientName.Contains("AI"))
+            }
+            else if (clientName.Contains("AI"))
             {
                 if (protocool == StaticDefine.ADD_USER)
                 {
@@ -687,7 +719,7 @@ namespace DataProvider_Server_voucher
                     }));
                 }
             }
-            
+
             else
             {
                 if (protocool == StaticDefine.ADD_USER)
@@ -861,7 +893,6 @@ namespace DataProvider_Server_voucher
                     AirpodData[sender.ToString()].Clear();
                 }
             }
-            deviceConnection.Remove(sender);
         }
 
         //INIT

@@ -19,6 +19,7 @@ namespace DataProvider_Server_voucher
         public int clientNumber { get; set; }
         public enum ClientType { User, Device, IPhone, Watch};
         public ClientType clientType { get; set; }
+        public bool isSend { get; set; }
 
         //IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
 
@@ -29,7 +30,7 @@ namespace DataProvider_Server_voucher
         {
             currentMsg = new StringBuilder();
             readBuffer = new byte[1024];
-
+            this.isSend = false;
             this.tcpClient = tcpClient;
 
             char[] splitDivision = new char[2];
