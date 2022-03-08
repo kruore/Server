@@ -415,6 +415,7 @@ namespace DataProvider_Server_voucher
                         //string connectDevice_exerciseName = splitedMsgs[3];
                         if (connectDeviceNumber == -1)
                         {
+
                         }
                         else
                         {
@@ -446,7 +447,6 @@ namespace DataProvider_Server_voucher
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             int connectDeviceNumber_local = int.Parse(sender);
                             ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-
                             return;
                         }
                         break;
@@ -494,32 +494,70 @@ namespace DataProvider_Server_voucher
                         // 5개씩만 받고 , + 표시를 누르면 추가 요청을 하는 방식.
                         try
                         {
-                            if (splitedMsgs[2] == "all")
+                            if (splitedMsgs[1] == "all")
                             {
+                                string data = gm_db.Search_All_Table(GetClinetName(sender));
+                                string[] sendByteDatas = data.Split(';');
+                                for (int i = 0; i < sendByteDatas.Length - 1; i++)
+                                {
+                                    sendStringData = "#5" + sendByteDatas[i] + ';';
+                                    sendByteData = new byte[sendStringData.Length];
+                                    sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                                    ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                }
+                            }
+                            else if(splitedMsgs[1]=="DataPath")
+                            {
+                                string data = gm_db.Search_DataPath_Table(GetClinetName(sender));
+                                string[] sendByteDatas = data.Split(';');
 
+                                for (int i = 0; i < sendByteDatas.Length - 1; i++)
+                                {
+                                    sendStringData = "#5" + sendByteDatas[i] + ';';
+                                    sendByteData = new byte[sendStringData.Length];
+                                    sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                                    ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                }
+                              
+                            }
+                            else if (splitedMsgs[1] == "Data")
+                            {
+                                string data = gm_db.Search_DataPath_Table(GetClinetName(sender));
+                                string[] sendByteDatas = data.Split(';');
+
+                                for (int i = 0; i < sendByteDatas.Length - 1; i++)
+                                {
+                                    sendStringData = "#5" + sendByteDatas[i] + ';';
+                                    sendByteData = new byte[sendStringData.Length];
+                                    sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                                    ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                }
+
+                            }
+                            else
+                            {
+                                string data = gm_db.Search_DataPath_Table(GetClinetName(sender));
+                                string[] sendByteDatas = data.Split(';');
+
+                                for (int i = 0; i < sendByteDatas.Length - 1; i++)
+                                {
+                                    sendStringData = "#5" + sendByteDatas[i] + ';';
+                                    sendByteData = new byte[sendStringData.Length];
+                                    sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                                    ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                }
                             }
                         }
                         catch (Exception e)
                         {
 
                         }
-
-                        // IOS request DB data
-                        string data = gm_db.Search_DataPath_Table("kks_ios");
-                        string[] sendByteDatas = data.Split(';');
-
-                        for (int i = 0; i < sendByteDatas.Length - 1; i++)
-                        {
-                            sendStringData = "#5" + sendByteDatas[i] + ';';
-                            sendByteData = new byte[sendStringData.Length];
-                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                            ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                        }
                         sendStringData = "<#6>;";
                         sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                         ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                         Console.WriteLine("DB Search");
+                        // IOS request DB data
                         break;
 
                     //Close Socket;
@@ -530,7 +568,6 @@ namespace DataProvider_Server_voucher
             }
             else
             {
-
                 //#으로 포함된 프로토콜이 아닐 경우
                 string[] splitedMsg = msgList.Split(',');
 

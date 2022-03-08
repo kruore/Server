@@ -46,6 +46,94 @@ namespace DataProvider_Server_voucher
             return true;
         }
 
+        public string Search_Data_Table(string _idx)
+        {
+            using (MySqlConnection connection = ConnectionDB())
+            {
+                string searchQuery = string.Format($"use {_idx}; SELECT * FROM data;");
+                Log(searchQuery);
+                try
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(searchQuery, connection);
+                    MySqlDataReader rdr = command.ExecuteReader();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while (rdr.Read())
+                    {
+                        for (int i = 0; i < rdr.FieldCount - 1; i++)
+                        {
+                            stringBuilder.Append(rdr.GetString(i));
+                            stringBuilder.Append(",");
+                            stringBuilder.Append(";");
+                        }
+                        stringBuilder.Append(rdr.GetString(rdr.FieldCount));
+                        stringBuilder.Append(";");
+                    }
+                    Log(stringBuilder.ToString());
+
+                    rdr.Close();
+
+                    connection.Close();
+                    return stringBuilder.ToString();
+                }
+                catch (Exception e)
+                {
+                    Log("실패");
+                    Log(e.ToString());
+                    return null;
+                }
+            }
+            return null;
+        }
+
+
+
+
+        /// <summary>
+        /// All table Search
+        /// </summary>
+        /// <param name="_idx"></param>
+        /// <returns></returns>
+        public string Search_All_Table(string _idx)
+        {
+            using (MySqlConnection connection = ConnectionDB())
+            {
+                string searchQuery = string.Format($"use {_idx};  SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{_idx}';");
+                Log(searchQuery);
+                try
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(searchQuery, connection);
+                    MySqlDataReader rdr = command.ExecuteReader();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while (rdr.Read())
+                    {
+                        for (int i = 0; i < rdr.FieldCount - 1; i++)
+                        {
+                            stringBuilder.Append(rdr.GetString(i));
+                            stringBuilder.Append(",");
+                            stringBuilder.Append(";");
+                        }
+                        stringBuilder.Append(rdr.GetString(rdr.FieldCount));
+                        stringBuilder.Append(";");
+                    }
+                    Log(stringBuilder.ToString());
+
+                    rdr.Close();
+
+                    connection.Close();
+                    return stringBuilder.ToString();
+                }
+                catch (Exception e)
+                {
+                    Log("실패");
+                    Log(e.ToString());
+                    return null;
+                }
+            }
+            return null;
+        }
+
 
         /// <summary>
         /// Serch Table from DB -> Send to server -> Client
