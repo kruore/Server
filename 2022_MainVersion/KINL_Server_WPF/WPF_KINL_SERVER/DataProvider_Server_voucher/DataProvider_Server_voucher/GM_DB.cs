@@ -55,7 +55,7 @@ namespace DataProvider_Server_voucher
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string searchQuery = string.Format($"use {_idx}; SELECT * FROM dataPath");
+                string searchQuery = string.Format($"use {_idx}; SELECT * FROM dataPath;");
                 Log(searchQuery);
                 try
                 {
@@ -65,12 +65,13 @@ namespace DataProvider_Server_voucher
                     StringBuilder stringBuilder = new StringBuilder();
                     while (rdr.Read())
                     {
-                        for(int i=0;i<rdr.FieldCount;i++)
+                        for(int i=0;i<rdr.FieldCount-1;i++)
                         {
                             stringBuilder.Append(rdr.GetString(i));
                             stringBuilder.Append(",");
+                            stringBuilder.Append(";");
                         }
-                        stringBuilder.Append(rdr.GetString(rdr.FieldCount-1));
+                        stringBuilder.Append(rdr.GetString(rdr.FieldCount));
                         stringBuilder.Append(";");
                     }
                     Log(stringBuilder.ToString());
@@ -89,7 +90,6 @@ namespace DataProvider_Server_voucher
             }
             return null;
         }
-
         /// <summary>
         /// 새로운 id값이 들어오면 새로운 데이터베이스(schema)를 생성
         /// </summary>
@@ -452,11 +452,6 @@ namespace DataProvider_Server_voucher
             }
         }
 
-
-
-
-
-
         /// <summary>
         /// Dataset테이블에서 datedata와 weight, macineindex가 일치하는 값이 있는지 확인.
         /// </summary>
@@ -561,7 +556,6 @@ namespace DataProvider_Server_voucher
                     Log(insertQuery.ToString());
                     try
                     {
-
                         connection.Open();
                         MySqlCommand command = new MySqlCommand(insertQuery, connection);
                         if (command.ExecuteNonQuery() == 1)
@@ -572,7 +566,6 @@ namespace DataProvider_Server_voucher
                         {
                             Log("데이터 업데이트 실패");
                         }
-
                         connection.Close();
                     }
                     catch (Exception e)

@@ -238,7 +238,7 @@ namespace DataProvider_Server_voucher
             }
             catch (Exception e)
             {
-                if(disconnectDevice==-1)
+                if (disconnectDevice == -1)
                 {
                     Console.WriteLine("?????????");
                 }
@@ -403,7 +403,6 @@ namespace DataProvider_Server_voucher
 
                 switch (msgList.Substring(0, 2))
                 {
-
                     //Connect
                     // #1 , IOS, DEVICE
                     case "#1":
@@ -414,8 +413,14 @@ namespace DataProvider_Server_voucher
                         int connectDeviceNumber = GetClinetNumber(splitedMsgs[2]);
 
                         //string connectDevice_exerciseName = splitedMsgs[3];
-                        //gm_db.CheckSchema_FromExercise(GetClinetName(splitedMsgs[2]), splitedMsgs[3]);
-                        //// TODO : 이 친구를 운동으로 사용 할 예정
+                        if (connectDeviceNumber == -1)
+                        {
+                        }
+                        else
+                        {
+                            gm_db.CheckSchema_FromExercise(GetClinetName(splitedMsgs[2]), splitedMsgs[3]);
+                        }
+                        //TODO : 이 친구를 운동으로 사용 할 예정
 
                         // 두 디바이스 커넥트
                         deviceConnection.Add(connectIosNumber, connectDeviceNumber);
@@ -484,9 +489,15 @@ namespace DataProvider_Server_voucher
 
                     case "#5":
 
+                        // #5 , all =  테이블 명
+                        // #5 , exercise = 해당 테이블의 SELECT * FROM table_name;
+                        // 5개씩만 받고 , + 표시를 누르면 추가 요청을 하는 방식.
                         try
                         {
+                            if (splitedMsgs[2] == "all")
+                            {
 
+                            }
                         }
                         catch (Exception e)
                         {
@@ -499,12 +510,12 @@ namespace DataProvider_Server_voucher
 
                         for (int i = 0; i < sendByteDatas.Length - 1; i++)
                         {
-                            sendStringData = sendByteDatas[i] + ';';
+                            sendStringData = "#5" + sendByteDatas[i] + ';';
                             sendByteData = new byte[sendStringData.Length];
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                         }
-                        sendStringData = "<DBEND>;";
+                        sendStringData = "<#6>;";
                         sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                         ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);

@@ -133,9 +133,9 @@
             // 
             this.listBox5.FormattingEnabled = true;
             this.listBox5.ItemHeight = 12;
-            this.listBox5.Location = new System.Drawing.Point(566, 47);
+            this.listBox5.Location = new System.Drawing.Point(521, 47);
             this.listBox5.Name = "listBox5";
-            this.listBox5.Size = new System.Drawing.Size(222, 136);
+            this.listBox5.Size = new System.Drawing.Size(267, 304);
             this.listBox5.TabIndex = 12;
             // 
             // label5
