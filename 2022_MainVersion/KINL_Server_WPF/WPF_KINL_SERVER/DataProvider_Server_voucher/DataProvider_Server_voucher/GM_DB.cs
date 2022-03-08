@@ -94,6 +94,7 @@ namespace DataProvider_Server_voucher
         /// </summary>
         /// <param name="_idx"></param>
         /// <returns></returns>
+        /// 
         public string Search_All_Table(string _idx)
         {
             using (MySqlConnection connection = ConnectionDB())
@@ -108,13 +109,13 @@ namespace DataProvider_Server_voucher
                     StringBuilder stringBuilder = new StringBuilder();
                     while (rdr.Read())
                     {
-                        for (int i = 0; i < rdr.FieldCount - 1; i++)
+                        Console.WriteLine(rdr.FieldCount);
+                        for (int i = 0; i < rdr.FieldCount - 2; i++)
                         {
                             stringBuilder.Append(rdr.GetString(i));
                             stringBuilder.Append(",");
-                            stringBuilder.Append(";");
                         }
-                        stringBuilder.Append(rdr.GetString(rdr.FieldCount));
+                        stringBuilder.Append(rdr.GetString(rdr.FieldCount-1));
                         stringBuilder.Append(";");
                     }
                     Log(stringBuilder.ToString());
@@ -135,6 +136,9 @@ namespace DataProvider_Server_voucher
         }
 
 
+
+
+
         /// <summary>
         /// Serch Table from DB -> Send to server -> Client
         /// </summary>
@@ -153,7 +157,7 @@ namespace DataProvider_Server_voucher
                     StringBuilder stringBuilder = new StringBuilder();
                     while (rdr.Read())
                     {
-                        for(int i=0;i<rdr.FieldCount-1;i++)
+                        for (int i = 0; i < rdr.FieldCount - 1; i++)
                         {
                             stringBuilder.Append(rdr.GetString(i));
                             stringBuilder.Append(",");
@@ -222,7 +226,7 @@ namespace DataProvider_Server_voucher
             Addcolumn(_idx, "Data", "weight", "int");
             Addcolumn(_idx, "Data", "count", "int");
             Addcolumn(_idx, "Data", "machineindex", "varchar(30)");
-         
+
         }
 
         public void initTable(string _idx, string _machine_name)
@@ -239,7 +243,7 @@ namespace DataProvider_Server_voucher
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = {1};", _idx,_exercise);
+                string insertQuery = string.Format("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = {1};", _idx, _exercise);
                 Log(insertQuery);
                 try
                 {
@@ -259,7 +263,7 @@ namespace DataProvider_Server_voucher
                     {
                         if (count <= 0)
                         {
-                            initTable(_idx,_exercise);
+                            initTable(_idx, _exercise);
                         }
                     }
                     return count;

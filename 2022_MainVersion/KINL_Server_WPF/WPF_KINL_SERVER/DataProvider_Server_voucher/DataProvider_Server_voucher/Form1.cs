@@ -494,13 +494,13 @@ namespace DataProvider_Server_voucher
                         // 5개씩만 받고 , + 표시를 누르면 추가 요청을 하는 방식.
                         try
                         {
-                            if (splitedMsgs[1] == "all")
+                            if (splitedMsgs[1] == "All")
                             {
                                 string data = gm_db.Search_All_Table(GetClinetName(sender));
                                 string[] sendByteDatas = data.Split(';');
                                 for (int i = 0; i < sendByteDatas.Length - 1; i++)
                                 {
-                                    sendStringData = "#5" + sendByteDatas[i] + ';';
+                                    sendStringData = "<#5>" + sendByteDatas[i] + ';';
                                     sendByteData = new byte[sendStringData.Length];
                                     sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                     ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
