@@ -239,7 +239,7 @@ namespace DataProvider_Server_voucher
                                     + "GyroZ,"
                                     + "AccX,"
                                     + "AccY,"
-                                    + "AccZ,"
+                                    + "AccZ"
                                     ;
                                 streamWriter.WriteLine(str_DataCategory);
                                 isCategoryPrinted_A = true;

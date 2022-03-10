@@ -45,7 +45,47 @@ namespace DataProvider_Server_voucher
             }
             return true;
         }
+        
 
+        public int CheckTable(string _idx,string _tableName)
+        {
+            using (MySqlConnection connection = ConnectionDB())
+            {
+                string insertQuery = string.Format($"SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{0}'AND table_name = '{1}';", _idx,_tableName);
+                //SELECT * FROM INFORMATION_SCHEMA.TABLES. WHERE TABLE_SCHEMA='database_name';
+                Log(insertQuery);
+                try
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(insertQuery, connection);
+                    MySqlDataReader rdr = command.ExecuteReader();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while (rdr.Read())
+                    {
+                        stringBuilder.Append(rdr.GetString(0));
+                    }
+                    rdr.Close();
+                    connection.Close();
+                    Log(stringBuilder.ToString());
+                    int count;
+                    if (int.TryParse(stringBuilder.ToString(), out count))
+                    {
+                        if (count <= 0)
+                        {
+                            initTable(_idx, _tableName);
+                        }
+                    }
+                    return count;
+                }
+                catch (Exception e)
+                {
+                    Log("실패");
+                    Log(e.ToString());
+                    return 0;
+                }
+            }
+            return 0;
+        }
         public string Search_Data_Table(string _idx)
         {
             using (MySqlConnection connection = ConnectionDB())
@@ -85,9 +125,6 @@ namespace DataProvider_Server_voucher
             }
             return null;
         }
-
-
-
 
         /// <summary>
         /// All table Search
@@ -135,19 +172,15 @@ namespace DataProvider_Server_voucher
             return null;
         }
 
-
-
-
-
         /// <summary>
         /// Serch Table from DB -> Send to server -> Client
         /// </summary>
         /// <param name="_idx">해당 유저 아이디</param>
-        public string Search_DataPath_Table(string _idx)
+        public string Search_Table(string _idx,string _tableName)
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string searchQuery = string.Format($"use {_idx}; SELECT * FROM dataPath;");
+                string searchQuery = string.Format($"use {_idx}; SELECT * FROM {_tableName};");
                 Log(searchQuery);
                 try
                 {
