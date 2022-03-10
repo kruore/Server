@@ -220,7 +220,7 @@ public class GM_DataRecorder
                                 + "GyroZ,"
                                 + "AccX,"
                                 + "AccY,"
-                                + "AccZ,"
+                                + "AccZ"
                                 ;
                             streamWriter.WriteLine(str_DataCategory);
                             isCategoryPrinted_A = true;

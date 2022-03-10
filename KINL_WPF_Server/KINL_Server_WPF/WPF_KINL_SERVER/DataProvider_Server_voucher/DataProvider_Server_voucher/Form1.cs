@@ -343,7 +343,7 @@ namespace DataProvider_Server_voucher
 
                             timeOffset = DateTimeOffset.Now;
                             preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                            
+
                             if (splitedMsg[3].Contains(";"))
                             {
                                 splitedMsg[3] = splitedMsg[3].TrimEnd(splitedMsg[3][splitedMsg[3].Length - 1]);
@@ -395,22 +395,27 @@ namespace DataProvider_Server_voucher
                     }
                     try
                     {
-                        //if (splitedMsg.Length == 11)
-                        //{
-                        long tempTime1 = Convert.ToInt64(splitedMsg[1]);
-                        long PTPTime1 = totalDelay[sender];
-                        tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[sender] / 2);
-                        StringBuilder aaaa1 = new StringBuilder();
-                        aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
-                        aaaa1.Append(tempTime1);
-                        for (int i = 1; i < splitedMsg.Length; i++)
+                        if (splitedMsg.Length == 10)
                         {
-                            aaaa1.Append("," + splitedMsg[i]);
+                            
+                            long tempTime1 = Convert.ToInt64(splitedMsg[1]);
+                            long PTPTime1 = totalDelay[sender];
+                            tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[sender] / 2);
+                            StringBuilder aaaa1 = new StringBuilder();
+                            aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
+                            aaaa1.Append(tempTime1);
+                            for (int i = 1; i < splitedMsg.Length; i++)
+                            {
+                                if(splitedMsg[i].Contains("<")&&splitedMsg[i].Contains("W"))
+                                {
+                                    return;
+                                }
+                                aaaa1.Append("," + splitedMsg[i]);
+                            }
+                            string groupLogMessage2 = aaaa1.ToString();
+                            //   Console.WriteLine(aaaa1);
+                            ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage2, "AIRPOT");
                         }
-                        string groupLogMessage2 = aaaa1.ToString();
-                        //   Console.WriteLine(aaaa1);
-                        ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage2, "AIRPOT");
-                        //}
                     }
                     catch (Exception ex)
                     {
@@ -443,6 +448,10 @@ namespace DataProvider_Server_voucher
                             aaaa2.Append(tempTime2);
                             for (int i = 1; i < splitedMsg.Length; i++)
                             {
+                                if (splitedMsg[i].Contains("<") && splitedMsg[i].Contains("A"))
+                                {
+                                    return;
+                                }
                                 aaaa2.Append("," + splitedMsg[i]);
                             }
                             //    Console.WriteLine(aaaa2);
@@ -647,67 +656,75 @@ namespace DataProvider_Server_voucher
         private void SaveFile(int sender)
         {
             string SaveConfig = GetClinetName(sender.ToString());
-            if (SaveConfig.Contains("DEVICE"))
+            try
             {
-                for (int i = 0; i < DeviceData[sender.ToString()].Count; i++)
+                if (SaveConfig.Contains("DEVICE"))
                 {
-                    GM_DataRecorder.instance.Enqueue_Data(sender.ToString(), DeviceData[sender.ToString()][i].ToString());
-                }
-                if (DeviceData[sender.ToString()].Count > 0)
-                {
-                    foreach (var clientNames in ClientManager.clientDic.Values)
+                    for (int i = 0; i < DeviceData[sender.ToString()].Count; i++)
                     {
-                        if (clientNames.clientNumber == sender)
+                        GM_DataRecorder.instance.Enqueue_Data(sender.ToString(), DeviceData[sender.ToString()][i].ToString());
+                    }
+                    if (DeviceData[sender.ToString()].Count > 0)
+                    {
+                        foreach (var clientNames in ClientManager.clientDic.Values)
                         {
-                            GM_DataRecorder.instance.WriteSteamingData_Batch_Device(sender.ToString(), clientNames.clientName);
+                            if (clientNames.clientNumber == sender)
+                            {
+                                GM_DataRecorder.instance.WriteSteamingData_Batch_Device(sender.ToString(), clientNames.clientName);
+                            }
+                        }
+                        DeviceData[sender.ToString()].Clear();
+                    }
+                    DeviceNameDefault = GetClinetName(sender.ToString());
+                }
+                else
+                {
+                    Console.WriteLine("IOS");
+                    if (AirPotData[sender.ToString()].Count > 1)
+                    {
+
+                        for (int i = 0; i < AirPotData[sender.ToString()].Count; i++)
+                        {
+                            GM_DataRecorder.instance.Enqueue_Data_A(sender.ToString(), AirPotData[sender.ToString()][i].ToString());
                         }
                     }
-                    DeviceData[sender.ToString()].Clear();
+                    if (WatchData[sender.ToString()].Count > 1)
+                    {
+                        for (int i = 0; i < WatchData[sender.ToString()].Count; i++)
+                        {
+                            GM_DataRecorder.instance.Enqueue_Data_W(sender.ToString(), WatchData[sender.ToString()][i].ToString());
+                        }
+                    }
+
+                    if (WatchData[sender.ToString()].Count > 0)
+                    {
+                        foreach (var clientNames in ClientManager.clientDic.Values)
+                        {
+                            if (clientNames.clientNumber == sender)
+                            {
+                                GM_DataRecorder.instance.WriteSteamingData_Batch_Watch(sender.ToString(), DeviceNameDefault);
+                            }
+                        }
+
+                        WatchData[sender.ToString()].Clear();
+                    }
+                    if (AirPotData[sender.ToString()].Count > 0)
+                    {
+                        foreach (var clientNames in ClientManager.clientDic.Values)
+                        {
+                            if (clientNames.clientNumber == sender)
+                            {
+                                GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot(sender.ToString(), DeviceNameDefault);
+                            }
+                        }
+                        AirPotData[sender.ToString()].Clear();
+                    }
                 }
-                DeviceNameDefault = GetClinetName(sender.ToString());
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("IOS");
-                if (AirPotData[sender.ToString()].Count > 1)
-                {
-
-                    for (int i = 0; i < AirPotData[sender.ToString()].Count; i++)
-                    {
-                        GM_DataRecorder.instance.Enqueue_Data_A(sender.ToString(), AirPotData[sender.ToString()][i].ToString());
-                    }
-                }
-                if (WatchData[sender.ToString()].Count > 1)
-                {
-                    for (int i = 0; i < WatchData[sender.ToString()].Count; i++)
-                    {
-                        GM_DataRecorder.instance.Enqueue_Data_W(sender.ToString(), WatchData[sender.ToString()][i].ToString());
-                    }
-                }
-
-                if (WatchData[sender.ToString()].Count > 0)
-                {
-                    foreach (var clientNames in ClientManager.clientDic.Values)
-                    {
-                        if (clientNames.clientNumber == sender)
-                        {
-                            GM_DataRecorder.instance.WriteSteamingData_Batch_Watch(sender.ToString(), DeviceNameDefault);
-                        }
-                    }
-
-                    WatchData[sender.ToString()].Clear();
-                }
-                if (AirPotData[sender.ToString()].Count > 0)
-                {
-                    foreach (var clientNames in ClientManager.clientDic.Values)
-                    {
-                        if (clientNames.clientNumber == sender)
-                        {
-                            GM_DataRecorder.instance.WriteSteamingData_Batch_AirPot(sender.ToString(), DeviceNameDefault);
-                        }
-                    }
-                    AirPotData[sender.ToString()].Clear();
-                }
+                Console.WriteLine("ERROR:" + sender);
+                return;
             }
         }
 
