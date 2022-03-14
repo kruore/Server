@@ -42,7 +42,7 @@ namespace DataProvider_Server_voucher
             {
                 //Console.WriteLine(client.tcpClient.Client.LocalEndPoint.ToString());
                 int byteLength = client.tcpClient.GetStream().EndRead(ar);
-                string strData = Encoding.Default.GetString(client.readBuffer, 0, byteLength);
+                string strData = Encoding.UTF8.GetString(client.readBuffer, 0, byteLength);
                 client.tcpClient.GetStream().BeginRead(client.readBuffer, 0, client.readBuffer.Length, new AsyncCallback(DataReceived), client);
 
                 if (string.IsNullOrEmpty(client.clientName))

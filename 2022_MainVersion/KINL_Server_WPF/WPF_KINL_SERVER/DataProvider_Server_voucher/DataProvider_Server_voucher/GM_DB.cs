@@ -259,9 +259,7 @@ namespace DataProvider_Server_voucher
             Addcolumn(_idx, "Data", "weight", "int");
             Addcolumn(_idx, "Data", "count", "int");
             Addcolumn(_idx, "Data", "machineindex", "varchar(30)");
-
         }
-
         public void initTable(string _idx, string _machine_name)
         {
             CreateTable(_idx, _machine_name);
@@ -271,7 +269,6 @@ namespace DataProvider_Server_voucher
             Addcolumn(_idx, _machine_name, "count", "int");
             Addcolumn(_idx, _machine_name, "1RM", "int");
         }
-
         public int CheckSchema_FromExercise(string _idx, string _exercise)
         {
             using (MySqlConnection connection = ConnectionDB())
@@ -310,7 +307,6 @@ namespace DataProvider_Server_voucher
             }
             return 0;
         }
-
         /// <summary>
         /// 테이블 생성
         /// </summary>
@@ -327,13 +323,13 @@ namespace DataProvider_Server_voucher
                     MySqlCommand command = new MySqlCommand(insertQuery, connection);
                     int debugtext = command.ExecuteNonQuery();
                     Log(debugtext.ToString());
-                    if (debugtext == 1)
+                    if (debugtext == -1)
                     {
-                        Log("테이블 생성 성공");
+                        Log("테이블 생성 실패");
                     }
                     else
                     {
-                        Log("테이블 생성 실패");
+                        Log("테이블 생성 성공");
                     }
                     connection.Close();
                 }

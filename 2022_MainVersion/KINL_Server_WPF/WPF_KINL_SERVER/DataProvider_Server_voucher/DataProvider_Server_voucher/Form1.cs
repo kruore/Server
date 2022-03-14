@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace DataProvider_Server_voucher
 {
@@ -61,11 +62,12 @@ namespace DataProvider_Server_voucher
             ClientManager.messageParsingAction += MessageParsing;
             ClientManager.ChangeListViewAction += ChangeListView;
             ClientManager.PTP_Synchronized += CheckPTP;
+
         }
 
         private void PTPEndChecker(string sender)
         {
-            string sendStringData = "END;";
+            string sendStringData = "<PTPEND>;";
             byte[] sendByteData = new byte[sendStringData.Length];
             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
             foreach (var item in ClientManager.clientDic)
@@ -95,6 +97,7 @@ namespace DataProvider_Server_voucher
                             timeOffset = DateTimeOffset.Now;
                             preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
                             string sendStringData = $"<PTP>,{a.ToString()},{preUnixMilliseconds};";
+
                             byte[] sendByteData = new byte[sendStringData.Length];
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             if (ClientManager.clientDic.ContainsKey(int.Parse(a)))
@@ -225,27 +228,29 @@ namespace DataProvider_Server_voucher
             int disconnectDevice;
             deviceConnection.TryGetValue(targetClient.clientNumber, out disconnectDevice);
             ClientData result = null;
+            ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
             try
             {
-                if (ClientManager.clientDic[disconnectDevice].isSend == false)
+                if (ClientManager.clientDic[disconnectDevice].isSend == true)
                 {
                     string sendStringDatas = "#3;";
                     byte[] sendByteDatas = new byte[sendStringDatas.Length];
                     sendByteDatas = Encoding.UTF8.GetBytes(sendStringDatas);
+                    ClientManager.clientDic[disconnectDevice].isSend = false;
                     ClientManager.clientDic[disconnectDevice].tcpClient.GetStream().Write(sendByteDatas, 0, sendByteDatas.Length);
                 }
-                ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
             }
             catch (Exception e)
             {
-                if (disconnectDevice == -1)
+                if (disconnectDevice == -1 && disconnectDevice == 0)
                 {
-                    Console.WriteLine("?????????");
+                    Console.WriteLine("디바이스를 찾지 못했음");
                 }
 
                 //Console.WriteLine(e);
                 Console.WriteLine("EEEEEEEEEEEEEEEEEEEEEEE");
             }
+            ClientManager.clientDic[disconnectDevice].isSend = false;
             ClientManager.clientDic.TryRemove(targetClient.clientNumber, out result);
             PTPlist.Remove(targetClient.clientNumber.ToString());
             totalDelay.Remove(targetClient.clientNumber.ToString());
@@ -375,6 +380,7 @@ namespace DataProvider_Server_voucher
                                     preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
                                     sendStringData = $"{splitedMsg[0]},{splitedMsg[1]},{splitedMsg[2]},{splitedMsg[3]},{preUnixMilliseconds};";
                                     sendByteData = new byte[sendStringData.Length];
+                                    Console.WriteLine(sendByteData);
                                     sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                     ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                                 }
@@ -419,7 +425,7 @@ namespace DataProvider_Server_voucher
                         }
                         else
                         {
-                            gm_db.CheckSchema_FromExercise(GetClinetName(splitedMsgs[2]), splitedMsgs[3]);
+                            // gm_db.CheckSchema_FromExercise(GetClinetName(splitedMsgs[2]), splitedMsgs[3]);
                         }
                         //TODO : 이 친구를 운동으로 사용 할 예정
 
@@ -438,7 +444,12 @@ namespace DataProvider_Server_voucher
                             deviceConnection.TryGetValue(int.Parse(sender), out values);
                             int connectDeviceNumber_local = values;
                             Console.WriteLine("접속한 클라이언트의 수: " + ClientManager.clientDic.Count);
-                            ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                            if (ClientManager.clientDic[connectDeviceNumber_local].isSend == false)
+                            {
+                                ClientManager.clientDic[connectDeviceNumber_local].isSend = true;
+                                ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                Console.WriteLine(ClientManager.clientDic[connectDeviceNumber_local].clientName);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -464,9 +475,12 @@ namespace DataProvider_Server_voucher
                             int values = 0;
                             deviceConnection.TryGetValue(int.Parse(sender), out values);
                             int connectDeviceNumber_local = values;
-                            ClientManager.clientDic[connectDeviceNumber_local].isSend = true;
-                            ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                            Console.WriteLine("DATA SAVE");
+                            if (ClientManager.clientDic[connectDeviceNumber_local].isSend == true)
+                            {
+                                ClientManager.clientDic[connectDeviceNumber_local].isSend = false;
+                                ClientManager.clientDic[connectDeviceNumber_local].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                Console.WriteLine("DATA SAVE");
+                            }
                             //deviceConnection.TryGetValue(int.Parse(sender), out values);
                             SaveFile(int.Parse(sender));
                         }
@@ -494,13 +508,14 @@ namespace DataProvider_Server_voucher
                         // 5개씩만 받고 , + 표시를 누르면 추가 요청을 하는 방식.
                         try
                         {
+                            Thread.Sleep(1000);
                             if (splitedMsgs[1] == "All")
                             {
                                 string data = gm_db.Search_All_Table(GetClinetName(sender));
                                 string[] sendByteDatas = data.Split(';');
                                 for (int i = 0; i < sendByteDatas.Length - 1; i++)
                                 {
-                                    sendStringData = "<#5>" + sendByteDatas[i] + ';';
+                                    sendStringData = "<#5>," + sendByteDatas[i] + ';';
                                     sendByteData = new byte[sendStringData.Length];
                                     sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                     ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
@@ -509,11 +524,11 @@ namespace DataProvider_Server_voucher
                             else if (splitedMsgs[1] == "DataPath")
                             {
                                 string data = gm_db.Search_Table(GetClinetName(sender), "DataPath");
-                                string[] sendByteDatas = data.Split(';');
+                                string[] sendByteDatas = data.Split(',');
 
                                 for (int i = 0; i < sendByteDatas.Length - 1; i++)
                                 {
-                                    sendStringData = "<#5>" + sendByteDatas[i] + ';';
+                                    sendStringData = "<#5>," + sendByteDatas[i] + ';';
                                     sendByteData = new byte[sendStringData.Length];
                                     sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                     ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
@@ -523,28 +538,27 @@ namespace DataProvider_Server_voucher
                             else if (splitedMsgs[1] == "Data")
                             {
                                 string data = gm_db.Search_Table(GetClinetName(sender), "Data");
-                                string[] sendByteDatas = data.Split(';');
+                                string[] sendByteDatas = data.Split(',');
 
                                 for (int i = 0; i < sendByteDatas.Length - 1; i++)
                                 {
-                                    sendStringData = "<#5>" + sendByteDatas[i] + ';';
+                                    sendStringData = "<#5>," + sendByteDatas[i] + ';';
                                     sendByteData = new byte[sendStringData.Length];
                                     sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                     ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                                 }
-
                             }
                             else
                             {
                                 int count = gm_db.CheckTable(GetClinetName(sender), splitedMsgs[1]);
                                 string data = null;
                                 data = gm_db.Search_Table(GetClinetName(sender), splitedMsgs[1]);
-                                string[] sendByteDatas = data.Split(';');
                                 if (data != null)
                                 {
+                                    string[] sendByteDatas = data.Split(',');
                                     for (int i = 0; i < sendByteDatas.Length - 1; i++)
                                     {
-                                        sendStringData = "<#5>,"+ splitedMsgs[1]+ sendByteDatas[i] + ';';
+                                        sendStringData = "<#5>," + splitedMsgs[1] + sendByteDatas[i] + ';';
                                         sendByteData = new byte[sendStringData.Length];
                                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                         ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
@@ -613,16 +627,22 @@ namespace DataProvider_Server_voucher
                         {
                             if (splitedMsg.Length == 10)
                             {
+                                for (int i = 1; i < splitedMsg.Length; i++)
+                                {
+                                    if (splitedMsg[i].Contains("<") && splitedMsg[i].Contains("W"))
+                                    {
+                                        return;
+                                    }
+                                }
                                 long tempTime1 = Convert.ToInt64(splitedMsg[1]);
                                 long PTPTime1 = totalDelay[sender];
                                 tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[sender] / 2);
                                 StringBuilder aaaa1 = new StringBuilder();
                                 aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
                                 aaaa1.Append(tempTime1);
-                                for (int i = 1; i < splitedMsg.Length; i++)
+                                for (int j = 1; j < splitedMsg.Length; j++)
                                 {
-                                    if (splitedMsg[i].Contains("<") && splitedMsg[i].Contains("W"))
-                                        aaaa1.Append("," + splitedMsg[i]);
+                                    aaaa1.Append("," + splitedMsg[j]);
                                 }
                                 string groupLogMessage2 = aaaa1.ToString();
                                 //   Console.WriteLine(aaaa1);
@@ -642,12 +662,19 @@ namespace DataProvider_Server_voucher
                         }
                         try
                         {
-                            if (splitedMsg.Length == 10)
+                            if (splitedMsg.Length == 11)
                             {
                                 long tempTime2 = Convert.ToInt64(splitedMsg[1]);
                                 long PTPTime2 = totalDelay[sender];
                                 long aaa = 0;
 
+                                for (int i = 0; i < splitedMsg.Length; i++)
+                                {
+                                    if (splitedMsg[i].Contains("<") && splitedMsg[i].Contains("AI"))
+                                    {
+                                        return;
+                                    }
+                                }
                                 if (!totalDelay.TryGetValue(sender, out aaa))
                                 {
                                     foreach (var name in totalDelay)
@@ -655,14 +682,14 @@ namespace DataProvider_Server_voucher
                                         Console.WriteLine($"{GetClinetNumber(name.Key)},{name.Value},{sender}");
                                     }
                                 }
+
                                 tempTime2 = (tempTime2 + PTPTime2) - (serverDelays[sender] / 2);
                                 StringBuilder aaaa2 = new StringBuilder();
                                 aaaa2 = aaaa2.Append(splitedMsg[0] + ",");
                                 aaaa2.Append(tempTime2);
-                                for (int i = 1; i < splitedMsg.Length; i++)
+                                for (int j = 1; j < splitedMsg.Length; j++)
                                 {
-                                    if (splitedMsg[i].Contains("<") && splitedMsg[i].Contains("AI"))
-                                        aaaa2.Append("," + splitedMsg[i]);
+                                    aaaa2.Append("," + splitedMsg[j]);
                                 }
                                 //    Console.WriteLine(aaaa2);
                                 string groupLogMessage3 = aaaa2.ToString();

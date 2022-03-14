@@ -204,7 +204,7 @@ namespace VoucherApplication
                         receivedstring = receivedstring.Remove(0, 1);
                         timeOffset = DateTimeOffset.Now;
                         UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
-                        byte[] buf = Encoding.Default.GetBytes($"DEVICE,{UnixMilliseconds.ToString()},4,{UnixMilliseconds.ToString()},{receivedstring};");
+                        byte[] buf = Encoding.UTF8.GetBytes($"DEVICE,{UnixMilliseconds.ToString()},4,{UnixMilliseconds.ToString()},{receivedstring};");
                       //  Console.WriteLine(buf);
                         client.GetStream().Write(buf, 0, buf.Length);
                         DataRecorder.instance.Queue_ex_01.Enqueue(UnixMilliseconds.ToString() + "," + receivedstring);
@@ -241,7 +241,6 @@ namespace VoucherApplication
         }
         public void DataSending(string data)
         {
-
         }
         private void metroButton2_Click(object sender, EventArgs e)
         {
@@ -266,7 +265,6 @@ namespace VoucherApplication
         }
         private void DataTextBox_TextChanged(object sender, EventArgs e)
         {
-
         }
         protected override void OnClosing(CancelEventArgs e)
         {
@@ -322,9 +320,7 @@ namespace VoucherApplication
                     int BUFFERSIZE = client.ReceiveBufferSize;
                     byte[] buffer = new byte[BUFFERSIZE];
                     int bytes = netStream.Read(buffer, 0, buffer.Length);
-
                     string message = Encoding.UTF8.GetString(buffer, 0, bytes);
-
                     string[] splited = message.Split(';');
                  //   Console.WriteLine(message);
                     for (int i = 0; i < splited.Length; i++)
@@ -347,6 +343,7 @@ namespace VoucherApplication
                                     string sendString = splited[i];
                                     string sendData = $"{sendString},{preUnixMilliseconds};";
                                     byte[] byteData = new byte[sendData.Length];
+                                    //byteData = Encoding.UTF8.GetBytes(sendData);
                                     byteData = Encoding.UTF8.GetBytes(sendData);
                                     client.GetStream().Write(byteData, 0, byteData.Length);
                                 //    Console.WriteLine(sendString);
@@ -409,7 +406,6 @@ namespace VoucherApplication
                 catch (Exception e)
                 {
                     MessageBox.Show("서버와의 연결이 끊어졌습니다.", "Server Error");
-                    //client.Close();
                     ReceiveThread.Abort();
                     //MessageBox.Show(e.Message);
                     //MessageBox.Show(e.StackTrace);
