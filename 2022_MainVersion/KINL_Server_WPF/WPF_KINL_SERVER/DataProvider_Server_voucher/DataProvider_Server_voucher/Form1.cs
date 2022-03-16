@@ -550,15 +550,19 @@ namespace DataProvider_Server_voucher
                             }
                             else
                             {
-                                int count = gm_db.CheckTable(GetClinetName(sender), splitedMsgs[1]);
+                                int counter = gm_db.CheckTable(GetClinetName(sender), splitedMsgs[1]);
                                 string data = null;
-                                data = gm_db.Search_Table(GetClinetName(sender), splitedMsgs[1]);
+                                if (counter == 1)
+                                {
+                                    data = gm_db.Search_Table(GetClinetName(sender), splitedMsgs[1]);
+                                    string[] sendByteDatas = data.Split(',');
+                                }
                                 if (data != null)
                                 {
-                                    string[] sendByteDatas = data.Split(',');
+                                    string[] sendByteDatas = data.Split(';');
                                     for (int i = 0; i < sendByteDatas.Length - 1; i++)
                                     {
-                                        sendStringData = "<#5>," + splitedMsgs[1] + sendByteDatas[i] + ';';
+                                        sendStringData = "<#5>," + splitedMsgs[1] +","+ sendByteDatas[i] + ';';
                                         sendByteData = new byte[sendStringData.Length];
                                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                         ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);

@@ -1,0 +1,5 @@
+c:\ 에 해당 파일을 집어넣고 프로그램을 동작시킨다.
+
+
+c:\KINLAB_DATAMIXER 가 됐다면 해당 경로에 바꿀 파일들을 집어넣고 동작
+그러면 c:\KINLAB_DATAMIXER\MakeNEW 에서 고쳐진 파일들이 출력된다.

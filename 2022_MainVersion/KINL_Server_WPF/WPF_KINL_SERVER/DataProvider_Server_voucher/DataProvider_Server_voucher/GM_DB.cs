@@ -51,7 +51,7 @@ namespace DataProvider_Server_voucher
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format($"SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{0}'AND table_name = '{1}';", _idx,_tableName);
+                string insertQuery = string.Format($"SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{_idx}'AND table_name = '{_tableName}';");
                 //SELECT * FROM INFORMATION_SCHEMA.TABLES. WHERE TABLE_SCHEMA='database_name';
                 Log(insertQuery);
                 try
@@ -194,13 +194,12 @@ namespace DataProvider_Server_voucher
                         {
                             stringBuilder.Append(rdr.GetString(i));
                             stringBuilder.Append(",");
-                            stringBuilder.Append(";");
                         }
-                        stringBuilder.Append(rdr.GetString(rdr.FieldCount));
+                        stringBuilder.Append(rdr.GetString(rdr.FieldCount-1));
                         stringBuilder.Append(";");
                     }
                     Log(stringBuilder.ToString());
-
+                    Console.WriteLine("칼럼 숫자:  "+rdr.FieldCount.ToString());
                     rdr.Close();
 
                     connection.Close();
