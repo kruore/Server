@@ -19,6 +19,7 @@ namespace DataProvider_Server_voucher
         //Connect Checker
 
         private Dictionary<int, int> deviceConnection = new Dictionary<int, int>();
+        private Dictionary<int, string> deviceMachineName = new Dictionary<int, string>();
         int server_threadDelay = 20;
         //실제 저장장소
         private Dictionary<string, ObservableCollection<string>> DeviceData = new Dictionary<string, ObservableCollection<string>>();
@@ -226,11 +227,10 @@ namespace DataProvider_Server_voucher
         {
 
             int disconnectDevice;
-            deviceConnection.TryGetValue(targetClient.clientNumber, out disconnectDevice);
             ClientData result = null;
-            ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
             try
             {
+                deviceConnection.TryGetValue(targetClient.clientNumber, out disconnectDevice);
                 if (ClientManager.clientDic[disconnectDevice].isSend == true)
                 {
                     string sendStringDatas = "#3;";
@@ -238,19 +238,14 @@ namespace DataProvider_Server_voucher
                     sendByteDatas = Encoding.UTF8.GetBytes(sendStringDatas);
                     ClientManager.clientDic[disconnectDevice].isSend = false;
                     ClientManager.clientDic[disconnectDevice].tcpClient.GetStream().Write(sendByteDatas, 0, sendByteDatas.Length);
+                    ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
                 }
             }
             catch (Exception e)
             {
-                if (disconnectDevice == -1 && disconnectDevice == 0)
-                {
-                    Console.WriteLine("디바이스를 찾지 못했음");
-                }
-
                 //Console.WriteLine(e);
                 Console.WriteLine("EEEEEEEEEEEEEEEEEEEEEEE");
             }
-            ClientManager.clientDic[disconnectDevice].isSend = false;
             ClientManager.clientDic.TryRemove(targetClient.clientNumber, out result);
             PTPlist.Remove(targetClient.clientNumber.ToString());
             totalDelay.Remove(targetClient.clientNumber.ToString());
@@ -261,14 +256,6 @@ namespace DataProvider_Server_voucher
             {
                 listBox4.Items.Add("PTP:" + targetClient.clientName + "-Leave");
             }));
-            if (ClientManager.clientDic.Count < 1)
-            {
-                conntectCheckThread.Dispose();
-            }
-            else
-            {
-                conntectCheckThread.Start();
-            }
         }
         /// <summary>
         /// 메세지 파싱
@@ -431,6 +418,9 @@ namespace DataProvider_Server_voucher
 
                         // 두 디바이스 커넥트
                         deviceConnection.Add(connectIosNumber, connectDeviceNumber);
+                        deviceMachineName.Add(connectDeviceNumber, splitedMsgs[3]);
+                        int counters = gm_db.CheckTable(splitedMsgs[1], splitedMsgs[3]);
+                        Console.WriteLine("counter : "+counters);
                         break;
 
                     //Data Send
@@ -473,7 +463,9 @@ namespace DataProvider_Server_voucher
                             sendByteData = new byte[sendStringData.Length];
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             int values = 0;
+                            string names = string.Empty;
                             deviceConnection.TryGetValue(int.Parse(sender), out values);
+                            deviceMachineName.TryGetValue(values, out names);
                             int connectDeviceNumber_local = values;
                             if (ClientManager.clientDic[connectDeviceNumber_local].isSend == true)
                             {
@@ -483,6 +475,8 @@ namespace DataProvider_Server_voucher
                             }
                             //deviceConnection.TryGetValue(int.Parse(sender), out values);
                             SaveFile(int.Parse(sender));
+                            deviceConnection.Remove(int.Parse(sender));
+                            deviceMachineName.Remove(values);
                         }
                         catch (Exception e)
                         {
@@ -562,7 +556,7 @@ namespace DataProvider_Server_voucher
                                     string[] sendByteDatas = data.Split(';');
                                     for (int i = 0; i < sendByteDatas.Length - 1; i++)
                                     {
-                                        sendStringData = "<#5>," + splitedMsgs[1] +","+ sendByteDatas[i] + ';';
+                                        sendStringData = "<#5>," + splitedMsgs[1] + "," + sendByteDatas[i] + ';';
                                         sendByteData = new byte[sendStringData.Length];
                                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                         ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
@@ -771,6 +765,7 @@ namespace DataProvider_Server_voucher
                     listBox3.BeginInvoke((Action)(() =>
                     {
                         listBox3.Items.Add("DEVICE : " + clientNumber + "Disconnect");
+
                     }));
                 }
                 else if (protocool == StaticDefine.DATA_SEND_START)
@@ -916,10 +911,19 @@ namespace DataProvider_Server_voucher
         //FILE SAVED
         private void SaveFile(int sender)
         {
-            int clientPort;
-            deviceConnection.TryGetValue(sender, out clientPort);
+            int clientPort=0;
+            string deivceMachineName = string.Empty ;
+            try
+            {
+                deviceConnection.TryGetValue(sender, out clientPort);
+                deviceMachineName.TryGetValue(clientPort, out deivceMachineName);
+            }
+            catch (Exception ex)
+            {
+            }
             string SaveIOS = GetClinetName(sender.ToString());
             string SaveDevice = GetClinetName(clientPort.ToString());
+
             if (SaveDevice.Contains("DEVICE"))
             {
                 for (int i = 0; i < DeviceData[clientPort.ToString()].Count; i++)
@@ -932,7 +936,7 @@ namespace DataProvider_Server_voucher
                     {
                         if (clientNames.clientNumber == clientPort)
                         {
-                            GM_DataRecorder.instance.WriteSteamingData_Batch_Device(clientPort.ToString(), SaveIOS);
+                            GM_DataRecorder.instance.WriteSteamingData_Batch_Device(clientPort.ToString(), SaveIOS, deivceMachineName);
                         }
                     }
                     DeviceData[clientPort.ToString()].Clear();

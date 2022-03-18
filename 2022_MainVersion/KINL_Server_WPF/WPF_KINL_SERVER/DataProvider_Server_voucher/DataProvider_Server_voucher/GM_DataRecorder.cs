@@ -73,7 +73,7 @@ namespace DataProvider_Server_voucher
         bool isCategoryPrinted_DV = false;
         bool isCategoryPrinted_W = false;
         bool isCategoryPrinted_A = false;
-        public bool WriteSteamingData_Batch_Device(string clientNumber, string clientName)
+        public bool WriteSteamingData_Batch_Device(string clientNumber, string clientName, string deviceName)
         {
             bool tempb = false;
 
@@ -82,10 +82,13 @@ namespace DataProvider_Server_voucher
                 isCategoryPrinted_DV = false;
                 string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_DEVICE.txt";
                 string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
-                gM_DB.UpdateDataPath(clientName,DateTime.Now.ToString("yyyyMMddHHmmss"),tempFileName, file_Location);
+                gM_DB.UpdateDataPath(clientName, DateTime.Now.ToString("yyyyMMddHHmmss"), tempFileName, file_Location);
                 string m_str_DataCategory = string.Empty;
-
+                List<string> weigthlist = new List<string>();
+                Dictionary<int, int> counter = new Dictionary<int, int>();
+                List<int> dataList = new List<int>();
                 int totalCountoftheQueue = Queue_Device.Count;
+                int largest = 0;
 
                 //Debug.Log("Saving Data Starts. Queue Count : " + totalCountoftheQueue);
 
@@ -94,9 +97,49 @@ namespace DataProvider_Server_voucher
                     while (Queue_Device[clientNumber].Count != 0)
                     {
                         string stringData = Queue_Device[clientNumber].Dequeue();
+                        string[] splitData = stringData.Split(',');
+                        weigthlist.Add(splitData[7]);
                         if (Queue_Device[clientNumber].Count == 0)
                         {
-                            string[] splitData=stringData.Split(',');
+                            for (int i = 0; i < weigthlist.Count; i++)
+                            {
+                                if (weigthlist[i] == "0")
+                                {
+                                    weigthlist.RemoveRange(0, 1);
+                                }
+                                else
+                                {
+                                    int data = int.Parse(weigthlist[i]);
+                                    if (!counter.ContainsKey(data))
+                                    {
+                                        counter.Add(data, 0);
+                                        Console.WriteLine("데이터 키 생성: " + counter[data]);
+                                    }
+                                    else
+                                    {
+                                        counter[data]++;
+                                        Console.WriteLine("데이터 추가: " +counter[data]);
+                                    }
+                                }
+                            }
+                            if (counter.Count > 0)
+                            {
+                              
+                                foreach (var largestData in counter)
+                                {
+                                    if (largest != 0)
+                                    {
+                                        if ((counter[largest]) < largestData.Value)
+                                        {
+                                            largest = largestData.Key;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        largest = largestData.Key;
+                                    }
+                                }
+                            }
                             /// <param name="_idx">schema 명</param>
                             /// <param name="_datedata">날짜</param>
                             /// <param name="_weight">무게</param>
@@ -105,8 +148,9 @@ namespace DataProvider_Server_voucher
                             /// <param name="_machineindex">머신의 index</param>
                             /// <param name="_exerciseclass">운동종류</param>
                             /// <param name="_mucleclass">운동에 쓰이는 근육</param>
-                            
                             gM_DB.UpdateDataset(clientName, splitData[1], int.Parse(splitData[7]), int.Parse(splitData[8]), 6);
+                            gM_DB.UpdateMachineSet(clientName, deviceName, DateTime.Now.ToString("yyyyMMddHHmmss"), DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString(), largest, int.Parse(splitData[8]), 30);
+                            Console.WriteLine("무게는 : " + largest);
                         }
 
                         if (stringData.Length > 0)
@@ -134,7 +178,7 @@ namespace DataProvider_Server_voucher
                         }
                     }
 
-                  
+
                 }
                 tempb = true;
                 isCategoryPrinted_DV = false;

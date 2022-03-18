@@ -542,11 +542,11 @@ namespace DataProvider_Server_voucher
         /// <param name="_dateData"></param>
         /// <param name="_filePath"></param>
         /// <param name="_filename"></param>
-        public void InsertMachineData(string _idx, string _dateData, string _filePath, string _filename)
+        public void InsertMachineData(string _idx,string _machineName, string _dateData, string _fileData, int _weight,int _count,int _1RM)
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format($"use {_idx};insert into datapath(Datedata,filePath,fileName) value ('{_dateData}','{_filePath}','{_filename}');");
+                string insertQuery = string.Format($"use {_idx};insert into {_machineName}(Datedata,fileDate,weight,count,1RM) value ('{_dateData}',{_fileData},{_weight},{_count},{_1RM});");
                 Log(insertQuery.ToString());
                 try
                 {
@@ -657,6 +657,102 @@ namespace DataProvider_Server_voucher
                 }
             }
         }
+
+        /// <summary>
+        /// Machine Bool Checker
+        /// </summary>
+        /// <param name="_idx"></param>
+        /// <param name="_machineName"></param>
+        /// <param name="_datedata"></param>
+        /// <param name="_weight"></param>
+        /// <returns></returns>
+        public bool CheckMachineSet(string _idx, string _machineName,string _datedata, int _weight)
+        {
+            using (MySqlConnection connection = ConnectionDB())
+            {
+                string insertQuery = string.Format($"use {_idx}; SELECT Count(*) FROM {_machineName} WHERE Data= \"{_datedata}\" and weight = {2} and machineindex = {3};", _idx, _datedata, _weight);
+                Log(insertQuery);
+                try
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(insertQuery, connection);
+                    MySqlDataReader rdr = command.ExecuteReader();
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while (rdr.Read())
+                    {
+                        stringBuilder.Append(rdr.GetString(0));
+                    }
+                    rdr.Close();
+                    int count;
+
+                    connection.Close();
+                    if (int.TryParse(stringBuilder.ToString(), out count))
+                    {
+                        if (count > 0)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log("실패");
+                    Log(e.ToString());
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// UPDATE MACHINE DATA SET
+        /// </summary>
+        /// <param name="_idx"></param>
+        /// <param name="_machineName"></param>
+        /// <param name="_datedata"></param>
+        /// <param name="_weight"></param>
+        /// <param name="_count"></param>
+        /// <param name="_1RM"></param>
+        public void UpdateMachineSet(string _idx,string _machineName, string _datedata,string _filedata, int _weight, int _count, int _1RM)
+        {
+            if (CheckMachineSet(_idx,_machineName, _datedata, _weight))
+            {
+                using (MySqlConnection connection = ConnectionDB())
+                {
+                    string insertQuery = string.Format($"use {_idx};Update {_machineName} set count = count+{_count} where datedata = \"{_datedata}\"and  fileDate = {DateTime.Now.ToString("yyyyMMddHHmmss")} and count = {10} and weight ={_weight} and 1RM = {30};");
+                    Log(insertQuery.ToString());
+                    try
+                    {
+                        connection.Open();
+                        MySqlCommand command = new MySqlCommand(insertQuery, connection);
+                        if (command.ExecuteNonQuery() == 1)
+                        {
+                            Log("데이터 업데이트 성공");
+                        }
+                        else
+                        {
+                            Log("데이터 업데이트 실패");
+                        }
+                        connection.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        Log("실패");
+                        Log(e.ToString());
+                    }
+                }
+            }
+            else
+            {
+                InsertMachineData(_idx,_machineName ,_datedata,_filedata, _weight, _count,30);
+            }
+        }
+
+
+
         /// <summary>
         /// Dataset테이블에 데이터 업데이트 데이터가 있다면 횟수를 추가하고 없다면 새로 삽입
         /// </summary>
