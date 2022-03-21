@@ -387,8 +387,7 @@ namespace VoucherApplication
                                             {
                                                 Thread.Sleep(1);
                                             }
-                                            rTh.Resume();
-                                            //     SetDataText("RunningAndSuspended");
+                                            rTh.Resume(); 
                                         }
                                     }
                                     if (stream != null)

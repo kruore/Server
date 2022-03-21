@@ -55,14 +55,12 @@ from sklearn.metrics import classification_report
 from keras.utils import to_categorical
 
 
-path = 'E:\\PROJECT\\5_4_Server_code_test\\folder_template\\'
+path = 'D:\\PROJECT\\5_4 Server_code_test\\folder_template\\'
 
 ### READ ID csv
-file_ID = 'E:\\PROJECT\\5_4_Server_code_test\\Voucher ID Number3.csv'
+file_ID = 'D:\\PROJECT\\5_4 Server_code_test\\Voucher ID Number3.csv'
 df_id = pd.read_csv(file_ID)
 print(df_id.shape)
-
-
 
 ### TXT to CSV
 # i1 = 0

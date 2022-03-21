@@ -202,21 +202,25 @@ namespace DataProvider_Server_voucher
         {
             while (true)
             {
-                foreach (var item in ClientManager.clientDic)
+                if (ClientManager.clientDic.Count > 0)
                 {
-                    try
+
+                    foreach (var item in ClientManager.clientDic)
                     {
-                        string sendStringData = "<TEST>;";
-                        byte[] sendByteData = new byte[sendStringData.Length];
-                        sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                        item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        try
+                        {
+                            string sendStringData = "<TEST>;";
+                            byte[] sendByteData = new byte[sendStringData.Length];
+                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                            item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        }
+                        catch (Exception e)
+                        {
+                            RemoveClient(item.Value);
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        RemoveClient(item.Value);
-                    }
+                    Thread.Sleep(1000);
                 }
-                Thread.Sleep(1000);
             }
         }
         /// <summary>
@@ -240,6 +244,7 @@ namespace DataProvider_Server_voucher
                     ClientManager.clientDic[disconnectDevice].tcpClient.GetStream().Write(sendByteDatas, 0, sendByteDatas.Length);
                     ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
                 }
+                deviceConnection.Remove(targetClient.clientNumber);
             }
             catch (Exception e)
             {
@@ -251,7 +256,7 @@ namespace DataProvider_Server_voucher
             totalDelay.Remove(targetClient.clientNumber.ToString());
             clientDelays.Remove(targetClient.clientNumber.ToString());
             serverDelays.Remove(targetClient.clientNumber.ToString());
-            deviceConnection.Remove(targetClient.clientNumber);
+            ChangeListView(targetClient.clientNumber.ToString(), StaticDefine.REMOVE_USER_LIST, null, null);
             listBox4.BeginInvoke((Action)(() =>
             {
                 listBox4.Items.Add("PTP:" + targetClient.clientName + "-Leave");
@@ -420,7 +425,7 @@ namespace DataProvider_Server_voucher
                         deviceConnection.Add(connectIosNumber, connectDeviceNumber);
                         deviceMachineName.Add(connectDeviceNumber, splitedMsgs[3]);
                         int counters = gm_db.CheckTable(splitedMsgs[1], splitedMsgs[3]);
-                        Console.WriteLine("counter : "+counters);
+                        Console.WriteLine("counter : " + counters);
                         break;
 
                     //Data Send
@@ -911,8 +916,8 @@ namespace DataProvider_Server_voucher
         //FILE SAVED
         private void SaveFile(int sender)
         {
-            int clientPort=0;
-            string deivceMachineName = string.Empty ;
+            int clientPort = 0;
+            string deivceMachineName = string.Empty;
             try
             {
                 deviceConnection.TryGetValue(sender, out clientPort);
