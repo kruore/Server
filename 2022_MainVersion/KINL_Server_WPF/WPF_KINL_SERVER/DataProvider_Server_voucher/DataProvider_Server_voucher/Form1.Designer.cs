@@ -135,7 +135,7 @@
             this.listBox5.ItemHeight = 12;
             this.listBox5.Location = new System.Drawing.Point(521, 47);
             this.listBox5.Name = "listBox5";
-            this.listBox5.Size = new System.Drawing.Size(267, 304);
+            this.listBox5.Size = new System.Drawing.Size(407, 304);
             this.listBox5.TabIndex = 12;
             // 
             // label5
@@ -152,7 +152,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(940, 515);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.listBox5);
             this.Controls.Add(this.label4);

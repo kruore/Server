@@ -17,7 +17,7 @@ namespace DataProvider_Server_voucher
         object _ptpLock = new object();
 
         //Connect Checker
-
+        private Dictionary<int,int> deviceAI = new Dictionary<int,int>();
         private Dictionary<int, int> deviceConnection = new Dictionary<int, int>();
         private Dictionary<int, string> deviceMachineName = new Dictionary<int, string>();
         int server_threadDelay = 20;
@@ -98,13 +98,13 @@ namespace DataProvider_Server_voucher
                             timeOffset = DateTimeOffset.Now;
                             preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
                             string sendStringData = $"<PTP>,{a.ToString()},{preUnixMilliseconds};";
-
                             byte[] sendByteData = new byte[sendStringData.Length];
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             if (ClientManager.clientDic.ContainsKey(int.Parse(a)))
                             {
                                 ClientManager.clientDic[int.Parse(a)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                             }
+                            Thread.Sleep(1);
                         }
                         catch (Exception e)
                         {
@@ -372,7 +372,7 @@ namespace DataProvider_Server_voucher
                                     preUnixMilliseconds = UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
                                     sendStringData = $"{splitedMsg[0]},{splitedMsg[1]},{splitedMsg[2]},{splitedMsg[3]},{preUnixMilliseconds};";
                                     sendByteData = new byte[sendStringData.Length];
-                                    Console.WriteLine(sendByteData);
+                                    Console.WriteLine(sendStringData);
                                     sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                     ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                                 }
@@ -471,6 +471,7 @@ namespace DataProvider_Server_voucher
                             string names = string.Empty;
                             deviceConnection.TryGetValue(int.Parse(sender), out values);
                             deviceMachineName.TryGetValue(values, out names);
+                            
                             int connectDeviceNumber_local = values;
                             if (ClientManager.clientDic[connectDeviceNumber_local].isSend == true)
                             {
@@ -480,6 +481,12 @@ namespace DataProvider_Server_voucher
                             }
                             //deviceConnection.TryGetValue(int.Parse(sender), out values);
                             SaveFile(int.Parse(sender));
+
+                            // 저장이 완료되면 클라이언트에게 AI분석 요청 의뢰
+                            sendStringData = "#4;";
+                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                            ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                            Console.WriteLine("#4 Send");
                             deviceConnection.Remove(int.Parse(sender));
                             deviceMachineName.Remove(values);
                         }
@@ -498,6 +505,9 @@ namespace DataProvider_Server_voucher
                     // AI Server Send
                     // #4
                     case "#4":
+                        Console.WriteLine("AI 분석 의뢰");
+
+
                         break;
 
                     case "#5":
