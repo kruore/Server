@@ -9,25 +9,28 @@ namespace DataProvider_Server_voucher
 {
     class GM_DB
     {
-        public GM_DB()
+        /// <summary>
+        /// SingleTon
+        /// </summary>
+        private static readonly Lazy<GM_DB> instance = new Lazy<GM_DB>(() => new GM_DB());
+        public static GM_DB Instance
         {
-            init();
+            get
+            {
+                return instance.Value;
+            }
         }
-        public static GM_DB inst;
+        private GM_DB()
+        {
+        }
+
         public MySqlConnection ConnectionDB()
         {
             MySqlConnection connection = new MySqlConnection("Server=localhost;Port=3306;Database=voucher;UiD=root;Pwd=cogsci2017;");
             Console.WriteLine("Connect DB");
             return connection;
         }
-        public void init()
-        {
-            if (inst != null)
-            {
-                inst = this;
-                Console.WriteLine("This");
-            }
-        }
+
         public bool CheckID(string _idx)
         {
             try
@@ -45,9 +48,35 @@ namespace DataProvider_Server_voucher
             }
             return true;
         }
-        
 
-        public int CheckTable(string _idx,string _tableName)
+        public void Update1RM_DataTable(string _idx, string _tableName, string _updateData, string _tableData)
+        {
+            string tables = string.Empty;
+
+            using (MySqlConnection connection = ConnectionDB())
+            {
+                string insertQuery = string.Format($"use { _idx}; UPDATE {_tableName} SET 1RM = {_updateData} WHERE fileDate = {_tableData}");
+                //SELECT * FROM INFORMATION_SCHEMA.TABLES. WHERE TABLE_SCHEMA='database_name';
+                Log(insertQuery);
+                try
+                {
+                    connection.Open();
+                    MySqlCommand command = new MySqlCommand(insertQuery, connection);
+                    MySqlDataReader rdr = command.ExecuteReader();
+                    rdr.Close();
+                    connection.Close();
+                    Log("1RM 삽입 성공");
+                }
+                catch (Exception e)
+                {
+                    Log("1RM 삽입 실패");
+                    Log(e.ToString());
+                }
+            }
+        }
+
+
+        public int CheckTable(string _idx, string _tableName)
         {
             using (MySqlConnection connection = ConnectionDB())
             {
@@ -152,7 +181,7 @@ namespace DataProvider_Server_voucher
                             stringBuilder.Append(rdr.GetString(i));
                             stringBuilder.Append(",");
                         }
-                        stringBuilder.Append(rdr.GetString(rdr.FieldCount-1));
+                        stringBuilder.Append(rdr.GetString(rdr.FieldCount - 1));
                         stringBuilder.Append(";");
                     }
                     Log(stringBuilder.ToString());
@@ -176,7 +205,7 @@ namespace DataProvider_Server_voucher
         /// Serch Table from DB -> Send to server -> Client
         /// </summary>
         /// <param name="_idx">해당 유저 아이디</param>
-        public string Search_Table(string _idx,string _tableName)
+        public string Search_Table(string _idx, string _tableName)
         {
             using (MySqlConnection connection = ConnectionDB())
             {
@@ -195,11 +224,11 @@ namespace DataProvider_Server_voucher
                             stringBuilder.Append(rdr.GetString(i));
                             stringBuilder.Append(",");
                         }
-                        stringBuilder.Append(rdr.GetString(rdr.FieldCount-1));
+                        stringBuilder.Append(rdr.GetString(rdr.FieldCount - 1));
                         stringBuilder.Append(";");
                     }
                     Log(stringBuilder.ToString());
-                    Console.WriteLine("칼럼 숫자:  "+rdr.FieldCount.ToString());
+                    Console.WriteLine("칼럼 숫자:  " + rdr.FieldCount.ToString());
                     rdr.Close();
 
                     connection.Close();
@@ -542,7 +571,7 @@ namespace DataProvider_Server_voucher
         /// <param name="_dateData"></param>
         /// <param name="_filePath"></param>
         /// <param name="_filename"></param>
-        public void InsertMachineData(string _idx,string _machineName, string _dateData, string _fileData, int _weight,int _count,int _1RM)
+        public void InsertMachineData(string _idx, string _machineName, string _dateData, string _fileData, int _weight, int _count, int _1RM)
         {
             using (MySqlConnection connection = ConnectionDB())
             {
@@ -584,7 +613,7 @@ namespace DataProvider_Server_voucher
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format("use {0}; SELECT Count(*) FROM data WHERE Data= \"{1}\" and weight = {2} and machineindex = {3};", _idx, _datedata, _weight, _machineindex);
+                string insertQuery = string.Format("use {0}; SELECT Count(*) FROM data WHERE fileDate= \"{1}\" and weight = {2} and machineindex = {3};", _idx, _datedata, _weight, _machineindex);
                 Log(insertQuery);
                 try
                 {
@@ -666,11 +695,11 @@ namespace DataProvider_Server_voucher
         /// <param name="_datedata"></param>
         /// <param name="_weight"></param>
         /// <returns></returns>
-        public bool CheckMachineSet(string _idx, string _machineName,string _datedata, int _weight)
+        public bool CheckMachineSet(string _idx, string _machineName, string _datedata, int _weight)
         {
             using (MySqlConnection connection = ConnectionDB())
             {
-                string insertQuery = string.Format($"use {_idx}; SELECT Count(*) FROM {_machineName} WHERE Data= \"{_datedata}\" and weight = {2} and machineindex = {3};", _idx, _datedata, _weight);
+                string insertQuery = string.Format($"use {_idx}; SELECT Count(*) FROM {_machineName} WHERE fileDate= \"{_datedata}\" and weight = {_weight};");
                 Log(insertQuery);
                 try
                 {
@@ -716,9 +745,9 @@ namespace DataProvider_Server_voucher
         /// <param name="_weight"></param>
         /// <param name="_count"></param>
         /// <param name="_1RM"></param>
-        public void UpdateMachineSet(string _idx,string _machineName, string _datedata,string _filedata, int _weight, int _count, int _1RM)
+        public void UpdateMachineSet(string _idx, string _machineName, string _datedata, string _filedata, int _weight, int _count, int _1RM)
         {
-            if (CheckMachineSet(_idx,_machineName, _datedata, _weight))
+            if (CheckMachineSet(_idx, _machineName, _datedata, _weight))
             {
                 using (MySqlConnection connection = ConnectionDB())
                 {
@@ -747,7 +776,7 @@ namespace DataProvider_Server_voucher
             }
             else
             {
-                InsertMachineData(_idx,_machineName ,_datedata,_filedata, _weight, _count,30);
+                InsertMachineData(_idx, _machineName, _datedata, _filedata, _weight, _count, 30);
             }
         }
 

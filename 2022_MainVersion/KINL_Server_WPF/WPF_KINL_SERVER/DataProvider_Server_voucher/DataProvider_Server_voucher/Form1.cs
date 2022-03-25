@@ -17,7 +17,7 @@ namespace DataProvider_Server_voucher
         object _ptpLock = new object();
 
         //Connect Checker
-        private Dictionary<int,int> deviceAI = new Dictionary<int,int>();
+        private Dictionary<int, int> deviceAI = new Dictionary<int, int>();
         private Dictionary<int, int> deviceConnection = new Dictionary<int, int>();
         private Dictionary<int, string> deviceMachineName = new Dictionary<int, string>();
         int server_threadDelay = 20;
@@ -48,13 +48,15 @@ namespace DataProvider_Server_voucher
         //디바이스 네임
         public static string clientNames;
 
+        //분석 AI
+        public static Dictionary<string,string> ai_FeedData = new Dictionary<string, string>();
+
         Task conntectCheckThread = null;
 
         private Dictionary<string, bool> DeviceSend = new Dictionary<string, bool>();
         private Dictionary<string, bool> Watch_DeviceSend = new Dictionary<string, bool>();
         private Dictionary<string, bool> Airpod_DeviceSend = new Dictionary<string, bool>();
 
-        GM_DB gm_db = new GM_DB();
 
         public Form1()
         {
@@ -424,7 +426,7 @@ namespace DataProvider_Server_voucher
                         // 두 디바이스 커넥트
                         deviceConnection.Add(connectIosNumber, connectDeviceNumber);
                         deviceMachineName.Add(connectDeviceNumber, splitedMsgs[3]);
-                        int counters = gm_db.CheckTable(splitedMsgs[1], splitedMsgs[3]);
+                        int counters = GM_DB.Instance.CheckTable(splitedMsgs[1], splitedMsgs[3]);
                         Console.WriteLine("counter : " + counters);
                         break;
 
@@ -471,7 +473,7 @@ namespace DataProvider_Server_voucher
                             string names = string.Empty;
                             deviceConnection.TryGetValue(int.Parse(sender), out values);
                             deviceMachineName.TryGetValue(values, out names);
-                            
+
                             int connectDeviceNumber_local = values;
                             if (ClientManager.clientDic[connectDeviceNumber_local].isSend == true)
                             {
@@ -487,6 +489,7 @@ namespace DataProvider_Server_voucher
                             sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                             ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                             Console.WriteLine("#4 Send");
+                            Console.WriteLine("SENDER : "+sender);
                             deviceConnection.Remove(int.Parse(sender));
                             deviceMachineName.Remove(values);
                         }
@@ -506,7 +509,30 @@ namespace DataProvider_Server_voucher
                     // #4
                     case "#4":
                         Console.WriteLine("AI 분석 의뢰");
-
+                        string AI_name;
+                        int AI_clientNumber;
+                        try
+                        {
+                            foreach (var item in ClientManager.clientDic)
+                            {
+                                if (item.Value.clientName == "AI")
+                                {
+                                    Console.WriteLine("AI 찾았음!");
+                                    AI_name = item.Value.clientName;
+                                    AI_clientNumber = GetClinetNumber("AI");
+                                    Console.WriteLine(sender.ToString());
+                                    Console.WriteLine(GetClinetName(sender));
+                                    sendStringData = "#4," + ai_FeedData[GetClinetName(sender)] + "," + sender.ToString() + ";";
+                                    Console.WriteLine(sendStringData);
+                                    sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                                    ClientManager.clientDic[AI_clientNumber].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("AI 없음");
+                        }
 
                         break;
 
@@ -520,7 +546,7 @@ namespace DataProvider_Server_voucher
                             Thread.Sleep(1000);
                             if (splitedMsgs[1] == "All")
                             {
-                                string data = gm_db.Search_All_Table(GetClinetName(sender));
+                                string data = GM_DB.Instance.Search_All_Table(GetClinetName(sender));
                                 string[] sendByteDatas = data.Split(';');
                                 for (int i = 0; i < sendByteDatas.Length - 1; i++)
                                 {
@@ -532,7 +558,7 @@ namespace DataProvider_Server_voucher
                             }
                             else if (splitedMsgs[1] == "DataPath")
                             {
-                                string data = gm_db.Search_Table(GetClinetName(sender), "DataPath");
+                                string data = GM_DB.Instance.Search_Table(GetClinetName(sender), "DataPath");
                                 string[] sendByteDatas = data.Split(',');
 
                                 for (int i = 0; i < sendByteDatas.Length - 1; i++)
@@ -542,11 +568,10 @@ namespace DataProvider_Server_voucher
                                     sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                     ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                                 }
-
                             }
                             else if (splitedMsgs[1] == "Data")
                             {
-                                string data = gm_db.Search_Table(GetClinetName(sender), "Data");
+                                string data = GM_DB.Instance.Search_Table(GetClinetName(sender), "Data");
                                 string[] sendByteDatas = data.Split(',');
 
                                 for (int i = 0; i < sendByteDatas.Length - 1; i++)
@@ -559,12 +584,20 @@ namespace DataProvider_Server_voucher
                             }
                             else
                             {
-                                int counter = gm_db.CheckTable(GetClinetName(sender), splitedMsgs[1]);
+                                int counter = GM_DB.Instance.CheckTable(GetClinetName(sender), splitedMsgs[1]);
                                 string data = null;
                                 if (counter == 1)
                                 {
-                                    data = gm_db.Search_Table(GetClinetName(sender), splitedMsgs[1]);
-                                    string[] sendByteDatas = data.Split(',');
+                                    data = GM_DB.Instance.Search_Table(GetClinetName(sender), splitedMsgs[1]);
+
+                                    if (data == null)
+                                    {
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        string[] sendByteDatas = data.Split(',');
+                                    }
                                 }
                                 if (data != null)
                                 {
@@ -590,7 +623,15 @@ namespace DataProvider_Server_voucher
                         Console.WriteLine("DB Search");
                         // IOS request DB data
                         break;
+                    case "#8":
+                        Console.WriteLine(msgList);
+                        GM_DB.Instance.Update1RM_DataTable(GetClinetName(splitedMsgs[2]), splitedMsgs[4], splitedMsgs[1], splitedMsgs[3]);
+                        sendStringData = "<#5>," + splitedMsgs[4] + ';' + "<#6>;";
+                        sendByteData = new byte[sendStringData.Length];
+                        sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                        ClientManager.clientDic[int.Parse(splitedMsgs[2])].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
 
+                        break;
                     //Close Socket;
                     case "#9":
                         RemoveClient(ClientManager.clientDic[int.Parse(sender)]);

@@ -283,7 +283,7 @@ namespace VoucherApplication
                 if(!bLogin)
                 {
                     string parsedName = "%^&";
-                    parsedName += "6_DEVICE";
+                    parsedName += "3_DEVICE";
 
                     clientNAME = parsedName;
 

@@ -15,6 +15,8 @@ namespace DataProvider_Server_voucher
         private string rootpath = string.Empty;
         private string mainfolder_Path = string.Empty;
 
+        string DateTimes = DateTime.Now.ToString("yyyyMMddHHmmss");
+        string UnixTimeMillisecondsTime = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
         private string mainFolderName = "KPT_Server_DataFolder";
 
         private string str_DataCategory = string.Empty;
@@ -24,7 +26,6 @@ namespace DataProvider_Server_voucher
         public Dictionary<string, Queue<string>> Queue_Airpod = new Dictionary<string, Queue<string>>();
         public Dictionary<string, Queue<string>> Queue_Watch = new Dictionary<string, Queue<string>>();
 
-        GM_DB gM_DB = new GM_DB();
         public GM_DataRecorder()
         {
             if (instance == null)
@@ -80,9 +81,9 @@ namespace DataProvider_Server_voucher
             try
             {
                 isCategoryPrinted_DV = false;
-                string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_DEVICE.txt";
+                string tempFileName = $"{DateTimes}_{clientName}_DEVICE.txt";
                 string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
-                gM_DB.UpdateDataPath(clientName, DateTime.Now.ToString("yyyyMMddHHmmss"), tempFileName, file_Location);
+                GM_DB.Instance.UpdateDataPath(clientName, DateTimes, tempFileName, file_Location);
                 string m_str_DataCategory = string.Empty;
                 List<string> weigthlist = new List<string>();
                 Dictionary<int, int> counter = new Dictionary<int, int>();
@@ -105,27 +106,25 @@ namespace DataProvider_Server_voucher
                             {
                                 if (weigthlist[i] == "0")
                                 {
-                                    weigthlist.RemoveRange(0, 1);
+                                    weigthlist.RemoveAt(i);
                                 }
                                 else
                                 {
                                     int data = int.Parse(weigthlist[i]);
                                     if (!counter.ContainsKey(data))
                                     {
+                                        Console.WriteLine("key 추가됨:" + data);
                                         counter.Add(data, 0);
-                                        Console.WriteLine("데이터 키 생성: " + counter[data]);
                                     }
                                     else
                                     {
                                         counter[data]++;
-                                        Console.WriteLine("데이터 추가: " +counter[data]);
                                     }
                                 }
                             }
                             if (counter.Count > 0)
                             {
-                              
-                                foreach (var largestData in counter)
+                                foreach (KeyValuePair<int, int> largestData in counter.ToList())
                                 {
                                     if (largest != 0)
                                     {
@@ -148,9 +147,19 @@ namespace DataProvider_Server_voucher
                             /// <param name="_machineindex">머신의 index</param>
                             /// <param name="_exerciseclass">운동종류</param>
                             /// <param name="_mucleclass">운동에 쓰이는 근육</param>
-                            gM_DB.UpdateDataset(clientName, splitData[1], int.Parse(splitData[7]), int.Parse(splitData[8]), 6);
-                            gM_DB.UpdateMachineSet(clientName, deviceName, DateTime.Now.ToString("yyyyMMddHHmmss"), DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString(), largest, int.Parse(splitData[8]), 30);
-                            Console.WriteLine("무게는 : " + largest);
+                            GM_DB.Instance.UpdateDataset(clientName, splitData[1], int.Parse(splitData[7]), int.Parse(splitData[8]), 6);
+                            GM_DB.Instance.UpdateMachineSet(clientName, deviceName, DateTimes, UnixTimeMillisecondsTime, largest, int.Parse(splitData[8]), 0);
+                            Console.WriteLine("클라이언트 IOS 의 넘버는 : "+clientNumber);
+                            if (Form1.ai_FeedData.ContainsKey(clientName))
+                            {
+                                Form1.ai_FeedData[clientName] = stringData + "," + largest + "," + UnixTimeMillisecondsTime + "," + deviceName;
+                                Console.WriteLine("AI 분석 데이터:" + Form1.ai_FeedData);
+                                Console.WriteLine("무게는 : " + largest);
+                            }
+                            else
+                            {
+                                Form1.ai_FeedData.Add(clientName, stringData + "," + largest + "," + UnixTimeMillisecondsTime + "," + deviceName);
+                            }
                         }
 
                         if (stringData.Length > 0)
