@@ -15,7 +15,6 @@ namespace DataProvider_Server_voucher
         private string rootpath = string.Empty;
         private string mainfolder_Path = string.Empty;
 
-        string DateTimes = DateTime.Now.ToString("yyyyMMddHHmmss");
         string UnixTimeMillisecondsTime = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
         private string mainFolderName = "KPT_Server_DataFolder";
 
@@ -71,15 +70,30 @@ namespace DataProvider_Server_voucher
                 Queue_Watch[clientName].Enqueue(_Queue);
             }
         }
-        bool isCategoryPrinted_DV = false;
-        bool isCategoryPrinted_W = false;
-        bool isCategoryPrinted_A = false;
+        //bool IsCategoryPrinted_DV = false;
+        //bool isCategoryPrinted_DV = false;
+        //public bool isCategoryPrinted_DV
+        //{
+        //get
+        //    {
+        //        return IsCategoryPrinted_DV;
+        //    }
+        //    set
+        //    {
+        //        Console.WriteLine("Call");
+        //        IsCategoryPrinted_DV = value;
+        //    }
+        //}
+        //bool isCategoryPrinted_W = false;
+        //bool isCategoryPrinted_A = false;
         public bool WriteSteamingData_Batch_Device(string clientNumber, string clientName, string deviceName)
         {
+            bool isCategoryPrinted_DV = false;
             bool tempb = false;
 
             try
             {
+                string DateTimes = DateTime.Now.ToString("yyyyMMddHHmmss");
                 isCategoryPrinted_DV = false;
                 string tempFileName = $"{DateTimes}_{clientName}_DEVICE.txt";
                 string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
@@ -100,6 +114,7 @@ namespace DataProvider_Server_voucher
                         string stringData = Queue_Device[clientNumber].Dequeue();
                         string[] splitData = stringData.Split(',');
                         weigthlist.Add(splitData[7]);
+
                         if (Queue_Device[clientNumber].Count == 0)
                         {
                             for (int i = 0; i < weigthlist.Count; i++)
@@ -149,7 +164,7 @@ namespace DataProvider_Server_voucher
                             /// <param name="_mucleclass">운동에 쓰이는 근육</param>
                             GM_DB.Instance.UpdateDataset(clientName, splitData[1], int.Parse(splitData[7]), int.Parse(splitData[8]), 6);
                             GM_DB.Instance.UpdateMachineSet(clientName, deviceName, DateTimes, UnixTimeMillisecondsTime, largest, int.Parse(splitData[8]), 0);
-                            Console.WriteLine("클라이언트 IOS 의 넘버는 : "+clientNumber);
+                            Console.WriteLine("클라이언트 IOS 의 넘버는 : " + clientNumber);
                             if (Form1.ai_FeedData.ContainsKey(clientName))
                             {
                                 Form1.ai_FeedData[clientName] = stringData + "," + largest + "," + UnixTimeMillisecondsTime + "," + deviceName;
@@ -161,36 +176,30 @@ namespace DataProvider_Server_voucher
                                 Form1.ai_FeedData.Add(clientName, stringData + "," + largest + "," + UnixTimeMillisecondsTime + "," + deviceName);
                             }
                         }
-
-                        if (stringData.Length > 0)
+                        if (stringData.Length > 0 && !isCategoryPrinted_DV)
                         {
-                            if (!isCategoryPrinted_DV)
-                            {
-                                str_DataCategory =
-                                   "DeviceName,"
-                                   + "PTPTime,"
-                                   + "UnixTime,"
-                                   + "protocool,"
-                                   + "CurrentDeviceTime,"
-                                   + "DistanceMM,"
-                                   + "DistanceCM,"
-                                   + "Weight,"
-                                   + "Count,"
-                                   + "DistanceADC,"
-                                   + "WeightADC,"
-                                   + "DeviceName(Current)";
-                                streamWriter.WriteLine(str_DataCategory);
-                                isCategoryPrinted_DV = true;
-                            }
-                            streamWriter.WriteLine(stringData);
-
+                            str_DataCategory =
+                               "DeviceName,"
+                               + "PTPTime,"
+                               + "UnixTime,"
+                               + "protocool,"
+                               + "CurrentDeviceTime,"
+                               + "DistanceMM,"
+                               + "DistanceCM,"
+                               + "Weight,"
+                               + "Count,"
+                               + "DistanceADC,"
+                               + "WeightADC,"
+                               + "DeviceName(Current)";
+                            streamWriter.WriteLine(str_DataCategory);
+                            isCategoryPrinted_DV = true;
                         }
+                        streamWriter.WriteLine(stringData);
+
                     }
-
-
+                    streamWriter.Close();
                 }
                 tempb = true;
-                isCategoryPrinted_DV = false;
             }
             catch (Exception e)
             {
@@ -200,12 +209,12 @@ namespace DataProvider_Server_voucher
         }
         public bool WriteSteamingData_Batch_Watch(string clientNumber, string clientName)
         {
+            bool isCategoryPrinted_W = false;
             bool tempb = false;
-
+            string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_WATCH.txt";
             try
             {
                 isCategoryPrinted_W = false;
-                string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_WATCH.txt";
                 string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
                 string m_str_DataCategory = string.Empty;
@@ -245,6 +254,7 @@ namespace DataProvider_Server_voucher
                             streamWriter.WriteLine(stringData);
                         }
                     }
+                    streamWriter.Close();
                 }
                 tempb = true;
             }
@@ -252,16 +262,18 @@ namespace DataProvider_Server_voucher
             {
                 Console.WriteLine("1111111111" + e);
             }
+
             return tempb;
         }
         public bool WriteSteamingData_Batch_Airpod(string clientNumber, string clientName)
         {
+            bool isCategoryPrinted_A = false;
             bool tempb = false;
+            string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_AIRPOD.txt";
 
             try
             {
                 isCategoryPrinted_A = false;
-                string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_AIRPOD.txt";
                 string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
 
                 string m_str_DataCategory = string.Empty;
@@ -300,8 +312,10 @@ namespace DataProvider_Server_voucher
                             streamWriter.WriteLine(stringData);
                         }
                     }
+                    streamWriter.Close();
                 }
                 tempb = true;
+
             }
             catch (Exception e)
             {

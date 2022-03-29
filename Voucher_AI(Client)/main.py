@@ -43,9 +43,9 @@ while 1:
                 if isActive:
                     print(splited_datas[i]);
                     print(splited_data[14])
-                    sender = splited_data[16]
-                    timeMill = splited_data[14]
-                    machine = splited_data[15]
+                    sender = splited_data[14]
+                    timeMill = splited_data[12]
+                    machine = splited_data[13]
                     print("데이터 분석 코드 삽입 및 처리 : " + sender)
                     print("데이터 기기 :  " + machine)
                     w = float(splited_data[13])

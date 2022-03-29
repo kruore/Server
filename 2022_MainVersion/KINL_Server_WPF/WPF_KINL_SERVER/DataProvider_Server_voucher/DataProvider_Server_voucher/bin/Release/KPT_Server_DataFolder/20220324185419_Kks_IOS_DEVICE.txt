@@ -1,2 +1,0 @@
-DeviceName,PTPTime,UnixTime,protocool,CurrentDeviceTime,DistanceMM,DistanceCM,Weight,Count,DistanceADC,WeightADC,DeviceName(Current)
-DEVICE,1648115584293,1648115584877,4,1648115584877,688,68,0,0,0,0

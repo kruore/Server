@@ -92,6 +92,7 @@
   <ItemGroup>
     <Compile Include="ClientData.cs" />
     <Compile Include="ClientManager.cs" />
+    <Compile Include="fileWatcher.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

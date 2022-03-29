@@ -49,7 +49,7 @@ namespace DataProvider_Server_voucher
         public static string clientNames;
 
         //분석 AI
-        public static Dictionary<string,string> ai_FeedData = new Dictionary<string, string>();
+        public static Dictionary<string, string> ai_FeedData = new Dictionary<string, string>();
 
         Task conntectCheckThread = null;
 
@@ -65,7 +65,8 @@ namespace DataProvider_Server_voucher
             ClientManager.messageParsingAction += MessageParsing;
             ClientManager.ChangeListViewAction += ChangeListView;
             ClientManager.PTP_Synchronized += CheckPTP;
-
+            fileWatcher.watcher();
+            fileWatcher.watcher_sub();
         }
 
         private void PTPEndChecker(string sender)
@@ -482,16 +483,12 @@ namespace DataProvider_Server_voucher
                                 Console.WriteLine("DATA SAVE");
                             }
                             //deviceConnection.TryGetValue(int.Parse(sender), out values);
+                            Console.WriteLine("1회 호출됨");
+                            fileWatcher.Clear();
                             SaveFile(int.Parse(sender));
-
+                            Send_AI(sender,values);
                             // 저장이 완료되면 클라이언트에게 AI분석 요청 의뢰
-                            sendStringData = "#4;";
-                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                            ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-                            Console.WriteLine("#4 Send");
-                            Console.WriteLine("SENDER : "+sender);
-                            deviceConnection.Remove(int.Parse(sender));
-                            deviceMachineName.Remove(values);
+
                         }
                         catch (Exception e)
                         {
@@ -584,9 +581,9 @@ namespace DataProvider_Server_voucher
                             }
                             else
                             {
-                                int counter = GM_DB.Instance.CheckTable(GetClinetName(sender), splitedMsgs[1]);
+                                int counter_c = GM_DB.Instance.CheckTable(GetClinetName(sender), splitedMsgs[1]);
                                 string data = null;
-                                if (counter == 1)
+                                if (counter_c == 1)
                                 {
                                     data = GM_DB.Instance.Search_Table(GetClinetName(sender), splitedMsgs[1]);
 
@@ -605,6 +602,7 @@ namespace DataProvider_Server_voucher
                                     for (int i = 0; i < sendByteDatas.Length - 1; i++)
                                     {
                                         sendStringData = "<#5>," + splitedMsgs[1] + "," + sendByteDatas[i] + ';';
+                                        Console.WriteLine(sendStringData);
                                         sendByteData = new byte[sendStringData.Length];
                                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                         ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
@@ -625,12 +623,41 @@ namespace DataProvider_Server_voucher
                         break;
                     case "#8":
                         Console.WriteLine(msgList);
-                        GM_DB.Instance.Update1RM_DataTable(GetClinetName(splitedMsgs[2]), splitedMsgs[4], splitedMsgs[1], splitedMsgs[3]);
-                        sendStringData = "<#5>," + splitedMsgs[4] + ';' + "<#6>;";
+                        GM_DB.Instance.Update1RM_DataTable(GetClinetName(splitedMsgs[1]), splitedMsgs[2], splitedMsgs[3], splitedMsgs[4]);
+
+                        //Shoulder Press Return
+                        int counter = GM_DB.Instance.CheckTable(GetClinetName(splitedMsgs[1]), splitedMsgs[2]);
+                        string datas = null;
+                        if (counter == 1)
+                        {
+                            datas = GM_DB.Instance.Search_Table(GetClinetName(splitedMsgs[1]), splitedMsgs[2]);
+
+                            if (datas == null)
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                string[] sendByteDatas = datas.Split(',');
+                            }
+                        }
+                        if (datas != null)
+                        {
+                            string[] sendByteDatas = datas.Split(';');
+                            for (int i = 0; i < sendByteDatas.Length - 1; i++)
+                            {
+                                sendStringData = "<#5>," + splitedMsgs[2] + "," + sendByteDatas[i] + ';';
+                                Console.WriteLine("DDDDDDDDDDDDDDDDDDDDDDDDDDDD:"+sendStringData);
+                                sendByteData = new byte[sendStringData.Length];
+                                sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                                ClientManager.clientDic[int.Parse(splitedMsgs[1])].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                            }
+                        }
+                        sendStringData = "<#6>;";
                         sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                        ClientManager.clientDic[int.Parse(splitedMsgs[2])].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
-
+                        ClientManager.clientDic[int.Parse(splitedMsgs[1])].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        Console.WriteLine("DB Search");
                         break;
                     //Close Socket;
                     case "#9":
@@ -681,27 +708,89 @@ namespace DataProvider_Server_voucher
                         {
                             if (splitedMsg.Length == 10)
                             {
+                                bool isRight = true;
                                 for (int i = 1; i < splitedMsg.Length; i++)
                                 {
-                                    if (splitedMsg[i].Contains("<") && splitedMsg[i].Contains("W"))
+                                    if (i < 3)
                                     {
-                                        return;
+                                        if(splitedMsg[i].Length==13)
+                                        {
+                                            double a;
+                                            isRight = double.TryParse(splitedMsg[i], out a);
+                                            if (!isRight)
+                                            {
+                                                Console.WriteLine(splitedMsg[i]);
+                                                isRight = false;
+                                                break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            isRight = true;
+                                            break;
+                                        }
                                     }
+                                    else if (i == 3)
+                                    {
+                                        if (splitedMsg[i].Length == 1)
+                                        {
+                                            float b;
+                                            isRight = float.TryParse(splitedMsg[i], out b);
+                                            if (!isRight)
+                                            {
+                                                Console.WriteLine(splitedMsg[i]);
+                                                isRight = false;
+                                                break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            isRight = true;
+                                            break;
+                                        }
+                                    }
+                                    if (splitedMsg[i].Length <= 5)
+                                    {
+                                        float b;
+                                        isRight = float.TryParse(splitedMsg[i], out b);
+                                        if (!isRight)
+                                        {
+                                            Console.WriteLine(splitedMsg[i]);
+                                            isRight = false;
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        isRight = true;
+                                        break;
+                                    }
+                                    //if (splitedMsg[i].Contains("<") && splitedMsg[i].Contains("W"))
+                                    //{
+                                    //    return;
+                                    //}
                                 }
-                                long tempTime1 = Convert.ToInt64(splitedMsg[1]);
-                                long PTPTime1 = totalDelay[sender];
-                                tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[sender] / 2);
-                                StringBuilder aaaa1 = new StringBuilder();
-                                aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
-                                aaaa1.Append(tempTime1);
-                                for (int j = 1; j < splitedMsg.Length; j++)
+                                if (isRight)
                                 {
-                                    aaaa1.Append("," + splitedMsg[j]);
+                                    long tempTime1 = Convert.ToInt64(splitedMsg[1]);
+                                    long PTPTime1 = totalDelay[sender];
+                                    tempTime1 = (tempTime1 + PTPTime1) - (serverDelays[sender] / 2);
+                                    StringBuilder aaaa1 = new StringBuilder();
+                                    aaaa1 = aaaa1.Append(splitedMsg[0] + ",");
+                                    aaaa1.Append(tempTime1);
+                                    for (int j = 1; j < splitedMsg.Length; j++)
+                                    {
+                                        aaaa1.Append("," + splitedMsg[j]);
+                                    }
+                                    string groupLogMessage2 = aaaa1.ToString();
+                                   // Console.WriteLine(aaaa1);
+                                    ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage2, "AIRPOT");
+                                    //}
                                 }
-                                string groupLogMessage2 = aaaa1.ToString();
-                                //   Console.WriteLine(aaaa1);
-                                ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage2, "AIRPOT");
-                                //}
+                                else if (!isRight)
+                                {
+                                    Console.WriteLine("???????????");
+                                }
                             }
                         }
                         catch (Exception ex)
@@ -747,7 +836,7 @@ namespace DataProvider_Server_voucher
                                 }
                                 //    Console.WriteLine(aaaa2);
                                 string groupLogMessage3 = aaaa2.ToString();
-                                //  Console.WriteLine(groupLogMessage);
+                                //Console.WriteLine(groupLogMessage3);
                                 ChangeListView(sender, StaticDefine.DATA_SEND_START, groupLogMessage3, "WATCH");
                             }
                         }
@@ -1087,6 +1176,16 @@ namespace DataProvider_Server_voucher
         private void label5_Click(object sender, EventArgs e)
         {
 
+        }
+        public void Send_AI(string sender, int values)
+        {
+            string sendStringData = "#4;";
+            var sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+            ClientManager.clientDic[int.Parse(sender)].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+            Console.WriteLine("#4 Send");
+            Console.WriteLine("SENDER : " + sender);
+            deviceConnection.Remove(int.Parse(sender));
+            deviceMachineName.Remove(values);
         }
     }
 }
