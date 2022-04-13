@@ -21,10 +21,10 @@ namespace DataProvider_Server_voucher
         public ClientType clientType { get; set; }
         public bool isSend { get; set; }
 
-        //IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
-
-        //TcpConnectionInformation[] tcpConnInfoArray = properties.GetActiveTcpConnections();
-
+        /// <summary>
+        /// TCP Client 를 통한 데이터 획득 및 아이디 넘버링 객체 구현
+        /// </summary>
+        /// <param name="tcpClient">해당 class를 통한 clientID 구현 </param>
 
         public ClientData(TcpClient tcpClient)
         {
@@ -42,11 +42,6 @@ namespace DataProvider_Server_voucher
             string[] temp3 = null;
 
             temp2 = tcpClient.Client.RemoteEndPoint.ToString().Split(splitDivision[1]);
-
-            //temp = tcpConnInfo.Client.LocalEndPoint.ToString().Split(splitDivision[0]);
-            //temp3 = ((IPEndPoint)tcpListener.LocalEndpoint).Port.ToString();
-
-            //temp2 = ((IPEndPoint)tcpClient.Client.LocalEndPoint).Port.ToString();          
             this.clientNumber = int.Parse(temp2[1]);
 
         }

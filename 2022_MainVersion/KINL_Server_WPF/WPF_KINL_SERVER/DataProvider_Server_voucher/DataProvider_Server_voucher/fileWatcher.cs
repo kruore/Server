@@ -8,6 +8,9 @@ using System.IO;
 
 namespace DataProvider_Server_voucher
 {
+    /// <summary>
+    /// 파일의 변동을 눈치채고 만약에 상태가 변경된다면 해당 상태를 파악하는 프로그램
+    /// </summary>
     public class fileWatcher
     {
         public static void watcher()

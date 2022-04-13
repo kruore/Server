@@ -10,18 +10,14 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Threading;
 using System.Text.RegularExpressions;
-
-
 using System.Net;
 using System.Net.Sockets;
-
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
 using System.Collections.ObjectModel;
-
 using System.Reflection;
 using System.IO;
+
 namespace VoucherApplication
 {
 
@@ -33,8 +29,12 @@ namespace VoucherApplication
         /// <summary>TimeEndPeriod(). See the Windows API documentation for details.</summary>
         [DllImport("winmm.dll", EntryPoint = "timeEndPeriod", SetLastError = true)]
         public static extern uint TimeEndPeriod(uint uMilliseconds);
+
+        //Send Message Extern int
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 IParam);
+
+        // Server Controll Value
         bool server_send = false;
         private const int WM_SETREDRAW = 11;
         bool recorddata = false;
@@ -42,13 +42,16 @@ namespace VoucherApplication
         Stopwatch stopwatch;
         public string initialis, index, weight;
 
+
+        // Client Cotroll Value
         public string clientNAME;
         TcpClient client = null;
         Thread ReceiveThread = null;
         NetworkStream netStream = null;
-
         bool bLogin;
 
+
+        // Main
         public Form1()
         {
             if (inst == null)
@@ -61,10 +64,11 @@ namespace VoucherApplication
             stopwatch = new Stopwatch();
             Start();
         }
+
+
+        #region Program Life Cycle
         public void Start()
         {
-            //Console.WriteLine("Start");
-            dataqueue = new Queue<string>();
             string[] port = SerialPort.GetPortNames();
             SetDataText(port.Length.ToString());
             for (int i = 0; i < port.Length; i++)
@@ -75,24 +79,6 @@ namespace VoucherApplication
             rTh = new Thread(EnqueueData);
             rTh.IsBackground = false;
         }
-
-        SerialPort stream;
-        Queue<string> dataqueue;
-        public string receivedstring;
-
-        long preUnixMilliseconds;
-        long UnixMilliseconds;
-        DateTimeOffset timeOffset;
-        public Thread rTh;
-        public Thread rTh1;
-        bool easurement_timing_budget_check = false;
-        private static AutoResetEvent are = new AutoResetEvent(false);
-        /// <summary>
-        /// Startbutton
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// 
         private void streamOn()
         {
             string[] port = SerialPort.GetPortNames();
@@ -123,20 +109,8 @@ namespace VoucherApplication
                 SetDataText("Null Port");
             }
         }
-        private void metroButton1_Click(object sender, EventArgs e)
-        {
-            //streamOn();
-            Login();
-        }
-        void EnqueueData()
-        {
-            while (true)
-            {
-                DataRecorder.instance.SetFileName();
-                DataRecorder.instance.WriteSteamingData_Batch();
-                rTh.Suspend();
-            }
-        }
+
+
         public void FIxedUpdate()
         {
             Console.WriteLine("DATASEND!!!!");
@@ -153,14 +127,7 @@ namespace VoucherApplication
                     }
                 }
                 stopwatch.Stop();
-                //if (stopwatch.ElapsedMilliseconds < 40)
-                //{
-                //    Thread.SpinWait(40);
-                //}
-                //else
-                //{
-                //    Thread.SpinWait(1);
-                //}
+
                 TimeEndPeriod(1);
             }
             if (stream != null)
@@ -177,6 +144,10 @@ namespace VoucherApplication
                 }
             }
         }
+
+        /// <summary>
+        ///  UPDATE TIME
+        /// </summary>
         public void DataUpdate()
         {
             try
@@ -187,7 +158,6 @@ namespace VoucherApplication
                 }
                 if (easurement_timing_budget_check)
                 {
-                    //receivedstring = DateTime.Now.ToString("yyyyMMddHHmmss.fff") + ",wow";
                     if (receivedstring != null)
                     {
                         if (receivedstring.IndexOf(",DKU") > -1)
@@ -205,7 +175,7 @@ namespace VoucherApplication
                         timeOffset = DateTimeOffset.Now;
                         UnixMilliseconds = timeOffset.ToUnixTimeMilliseconds();
                         byte[] buf = Encoding.UTF8.GetBytes($"DEVICE,{UnixMilliseconds.ToString()},4,{UnixMilliseconds.ToString()},{receivedstring};");
-                      //  Console.WriteLine(buf);
+                        //  Console.WriteLine(buf);
                         client.GetStream().Write(buf, 0, buf.Length);
                         DataRecorder.instance.Queue_ex_01.Enqueue(UnixMilliseconds.ToString() + "," + receivedstring);
                         string data = preUnixMilliseconds + "delay:" + (UnixMilliseconds - preUnixMilliseconds).ToString() + "count:" + DataRecorder.instance.Queue_ex_01.Count.ToString() + ",time" + DateTime.Now.ToString("HHmmss.fff") + ",data:" + receivedstring;
@@ -239,14 +209,56 @@ namespace VoucherApplication
                 //DataTextBox.BeginInvoke(new Action(() => DataTextBox.Text = e.ToString()));
             }
         }
-        public void DataSending(string data)
+
+
+        #endregion
+
+
+        SerialPort stream;
+        public string receivedstring;
+
+        long preUnixMilliseconds;
+        long UnixMilliseconds;
+        DateTimeOffset timeOffset;
+        public Thread rTh;
+        public Thread rTh1;
+        bool easurement_timing_budget_check = false;
+        private static AutoResetEvent are = new AutoResetEvent(false);
+
+        #region Button Click Event
+        /// <summary>
+        /// Startbutton
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// 
+        private void metroButton1_Click(object sender, EventArgs e)
         {
+            //streamOn();
+            Login();
         }
+
+
+        #endregion
+
+
+        #region Data Controll
+        void EnqueueData()
+        {
+            while (true)
+            {
+                DataRecorder.instance.SetFileName();
+                DataRecorder.instance.WriteSteamingData_Batch();
+                rTh.Suspend();
+            }
+        }
+
+
         private void metroButton2_Click(object sender, EventArgs e)
         {
             bLogin = false;
             client.Close();
-            client=null;
+            client = null;
 
             if (recorddata)
             {
@@ -259,12 +271,19 @@ namespace VoucherApplication
             }
             return;
         }
+
+
+        #endregion
+
+        #region UI CONTROLL
+
         public void SetDataText(string _data)
         {
             DataTextBox.AppendText(_data + "\n");
         }
         private void DataTextBox_TextChanged(object sender, EventArgs e)
         {
+
         }
         protected override void OnClosing(CancelEventArgs e)
         {
@@ -275,12 +294,19 @@ namespace VoucherApplication
         {
             base.OnFormClosing(e);
         }
+        #endregion
 
+        #region Client Controll
+
+
+        /// <summary>
+        /// Player Login
+        /// </summary>
         private void Login()
         {
             try
             {
-                if(!bLogin)
+                if (!bLogin)
                 {
                     string parsedName = "%^&";
                     parsedName += "3_DEVICE";
@@ -291,8 +317,10 @@ namespace VoucherApplication
 
                     //동국대학교 계산관 IP
                     client.Connect("210.94.216.195", 4545);
+
                     // 서버 컴퓨터 IP
                     //  client.Connect("210.94.167.45", 4545);
+
                     byte[] byteData = new byte[parsedName.Length];
                     byteData = Encoding.UTF8.GetBytes(parsedName);
                     client.GetStream().Write(byteData, 0, byteData.Length);
@@ -322,7 +350,6 @@ namespace VoucherApplication
                     int bytes = netStream.Read(buffer, 0, buffer.Length);
                     string message = Encoding.UTF8.GetString(buffer, 0, bytes);
                     string[] splited = message.Split(';');
-                 //   Console.WriteLine(message);
                     for (int i = 0; i < splited.Length; i++)
                     {
                         if (splited[i].Equals(""))
@@ -332,7 +359,6 @@ namespace VoucherApplication
                         else
                         {
                             string[] splited_Data = splited[i].Split(',');
-                            //   Console.WriteLine(splited.Count);
                             if (splited_Data.Length > 0)
                             {
                                 if (splited_Data[0].Equals("<PTP>"))
@@ -343,10 +369,8 @@ namespace VoucherApplication
                                     string sendString = splited[i];
                                     string sendData = $"{sendString},{preUnixMilliseconds};";
                                     byte[] byteData = new byte[sendData.Length];
-                                    //byteData = Encoding.UTF8.GetBytes(sendData);
                                     byteData = Encoding.UTF8.GetBytes(sendData);
                                     client.GetStream().Write(byteData, 0, byteData.Length);
-                                //    Console.WriteLine(sendString);
                                 }
                                 else if (splited_Data[0].Equals("#2"))
                                 {
@@ -356,18 +380,16 @@ namespace VoucherApplication
                                     streamOn();
                                     if (stream != null)
                                     {
-                                        Console.WriteLine("STREAM SEND");
+                                        return;
                                     }
                                     else
                                     {
                                         MessageBox.Show("기기 스트림이 불안정합니다.\n다시 연결해주세요.");
                                         Console.WriteLine("STREAM END");
                                     }
-                                    Console.WriteLine("DADADADADAD");
                                 }
                                 else if (splited_Data[0].Equals("#3"))
                                 {
-                                    Console.WriteLine("DDDDDDDDDDDDDDDDDDDDDDDDDDD");
                                     if (recorddata)
                                     {
                                         recorddata = false;
@@ -387,7 +409,7 @@ namespace VoucherApplication
                                             {
                                                 Thread.Sleep(1);
                                             }
-                                            rTh.Resume(); 
+                                            rTh.Resume();
                                         }
                                     }
                                     if (stream != null)
@@ -406,14 +428,14 @@ namespace VoucherApplication
                 {
                     MessageBox.Show("서버와의 연결이 끊어졌습니다.", "Server Error");
                     ReceiveThread.Abort();
-                    //MessageBox.Show(e.Message);
-                    //MessageBox.Show(e.StackTrace);
-                    //Environment.Exit(1);
                 }
             }
 
         }
 
     }
+
+    #endregion
+
 }
 

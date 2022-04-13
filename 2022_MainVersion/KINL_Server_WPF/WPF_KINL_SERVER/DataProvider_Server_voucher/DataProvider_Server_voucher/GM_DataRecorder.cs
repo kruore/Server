@@ -10,21 +10,32 @@ namespace DataProvider_Server_voucher
 {
     public class GM_DataRecorder
     {
+
+        /// <summary>
+        ///  싱글톤 데이터 프로그램
+        /// </summary>
         public static GM_DataRecorder instance = null;
 
+        // 파일 세이브 관련 처리
         private string rootpath = string.Empty;
         private string mainfolder_Path = string.Empty;
 
         string UnixTimeMillisecondsTime = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
         private string mainFolderName = "KPT_Server_DataFolder";
 
+        // 다중 접속 스레드 관련 처리
         private string str_DataCategory = string.Empty;
         object _lock = new object();
 
+
+        //데이터 관련 처리
         public Dictionary<string, Queue<string>> Queue_Device = new Dictionary<string, Queue<string>>();
         public Dictionary<string, Queue<string>> Queue_Airpod = new Dictionary<string, Queue<string>>();
         public Dictionary<string, Queue<string>> Queue_Watch = new Dictionary<string, Queue<string>>();
 
+        /// <summary>
+        /// 데이터 레코드 인스턴스
+        /// </summary>
         public GM_DataRecorder()
         {
             if (instance == null)
@@ -34,6 +45,8 @@ namespace DataProvider_Server_voucher
             mainfolder_Path = rootpath = Directory.GetCurrentDirectory();
             mainfolder_Path = MakeFolder(mainFolderName);
         }
+
+        #region DataControll
         public void Enqueue_Data(string clientName, string _Queue)
         {
             lock (_lock)
@@ -70,22 +83,11 @@ namespace DataProvider_Server_voucher
                 Queue_Watch[clientName].Enqueue(_Queue);
             }
         }
-        //bool IsCategoryPrinted_DV = false;
-        //bool isCategoryPrinted_DV = false;
-        //public bool isCategoryPrinted_DV
-        //{
-        //get
-        //    {
-        //        return IsCategoryPrinted_DV;
-        //    }
-        //    set
-        //    {
-        //        Console.WriteLine("Call");
-        //        IsCategoryPrinted_DV = value;
-        //    }
-        //}
-        //bool isCategoryPrinted_W = false;
-        //bool isCategoryPrinted_A = false;
+        #endregion
+
+
+
+        #region Data Batch End File Saved
         public bool WriteSteamingData_Batch_Device(string clientNumber, string clientName, string deviceName)
         {
             bool isCategoryPrinted_DV = false;
@@ -323,28 +325,24 @@ namespace DataProvider_Server_voucher
             }
             return tempb;
         }
+        #endregion
+
+
+        #region Program Controll
+
         private void OnDisable()
         {
             DisposeFileReader();
             //Directory.SetCurrentDirectory(rootpath);
         }
-        private StreamReader fileReader = null;
 
-        public void Start_Load_csvData(string _AccountName)
-        {
-            string file_Location = System.IO.Path.Combine(mainfolder_Path, _AccountName);
-            string[] fileNames = Directory.GetFiles(file_Location);
-            fileReader = new StreamReader(fileNames[fileNames.Length - 1]);
-        }
+        #endregion
 
-        private void DisposeFileReader()
-        {
-            if (fileReader != null)
-            {
-                fileReader.Dispose();
-                fileReader = null;
-            }
-        }
+        // 스트림 라이터 프로그램 읽기
+
+
+        #region Folder Utill
+
         //폴더 생성
         public string MakeFolder(string _WantedfolderName)
         {
@@ -360,6 +358,30 @@ namespace DataProvider_Server_voucher
             }
             return finalFolderPath;
 
+        }
+        #endregion
+
+
+
+        private StreamReader fileReader = null;
+        /// <summary>
+        /// CSV READ
+        /// </summary>
+        /// <param name="_AccountName">카운터는 </param>
+        public void Start_Load_csvData(string _AccountName)
+        {
+            string file_Location = System.IO.Path.Combine(mainfolder_Path, _AccountName);
+            string[] fileNames = Directory.GetFiles(file_Location);
+            fileReader = new StreamReader(fileNames[fileNames.Length - 1]);
+        }
+
+        private void DisposeFileReader()
+        {
+            if (fileReader != null)
+            {
+                fileReader.Dispose();
+                fileReader = null;
+            }
         }
     }
 }

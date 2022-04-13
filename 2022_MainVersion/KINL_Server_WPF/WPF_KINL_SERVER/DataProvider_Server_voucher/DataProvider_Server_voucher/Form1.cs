@@ -37,7 +37,7 @@ namespace DataProvider_Server_voucher
         //메세지 간이 저장 공간
         Dictionary<string, string> msgDic = new Dictionary<string, string>();
 
-        //메세지 정리1644221081875
+        //메세지 정리
         List<string> msgList = new List<string>();
 
         //UNIX PTP
@@ -51,8 +51,11 @@ namespace DataProvider_Server_voucher
         //분석 AI
         public static Dictionary<string, string> ai_FeedData = new Dictionary<string, string>();
 
+        // Echo Server Thread
         Task conntectCheckThread = null;
 
+
+        // Device Data
         private Dictionary<string, bool> DeviceSend = new Dictionary<string, bool>();
         private Dictionary<string, bool> Watch_DeviceSend = new Dictionary<string, bool>();
         private Dictionary<string, bool> Airpod_DeviceSend = new Dictionary<string, bool>();
@@ -236,10 +239,11 @@ namespace DataProvider_Server_voucher
             int disconnectDevice;
             ClientData result = null;
             try
-            {
+            {// 클라이언트 데이터 전송
                 deviceConnection.TryGetValue(targetClient.clientNumber, out disconnectDevice);
                 if (ClientManager.clientDic[disconnectDevice].isSend == true)
                 {
+                    //데이터 전송 (종료하기 위해서는 #3)
                     string sendStringDatas = "#3;";
                     byte[] sendByteDatas = new byte[sendStringDatas.Length];
                     sendByteDatas = Encoding.UTF8.GetBytes(sendStringDatas);
@@ -254,6 +258,7 @@ namespace DataProvider_Server_voucher
                 //Console.WriteLine(e);
                 Console.WriteLine("EEEEEEEEEEEEEEEEEEEEEEE");
             }
+            /// 해당 리소스 해제
             ClientManager.clientDic.TryRemove(targetClient.clientNumber, out result);
             PTPlist.Remove(targetClient.clientNumber.ToString());
             totalDelay.Remove(targetClient.clientNumber.ToString());
@@ -274,6 +279,7 @@ namespace DataProvider_Server_voucher
         {
             //// Console.WriteLine(message);
             //testContain += message;
+            // 데이터 전처리
             lock (lockObj)
             {
                 if (!msgDic.ContainsKey(sender))
@@ -397,7 +403,6 @@ namespace DataProvider_Server_voucher
                         break;
                 }
             }
-
             else if (msgList.IndexOf("#") == 0)
             {
                 string[] splitedMsgs = msgList.Split(',');
@@ -459,7 +464,6 @@ namespace DataProvider_Server_voucher
                             return;
                         }
                         break;
-
                     //#3 = Data End
                     case "#3":
                         sendStringData = "#3;";
@@ -861,6 +865,11 @@ namespace DataProvider_Server_voucher
                 }
             }
         }
+        /// <summary>
+        /// Client Number을 return 해주는 함수
+        /// </summary>
+        /// <param name="targetClientName"></param>
+        /// <returns></returns>
         private int GetClinetNumber(string targetClientName)
         {
             foreach (var item in ClientManager.clientDic)

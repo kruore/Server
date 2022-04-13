@@ -12,10 +12,20 @@ namespace DataProvider_Server_voucher
 {
     class ClientManager
     {
+        // Client Data Package
         public static ConcurrentDictionary<int, ClientData> clientDic = new ConcurrentDictionary<int, ClientData>();
         public static event Action<string, string> messageParsingAction = null;
         public static event Action<string, int, string,string> ChangeListViewAction = null;
         public static event Action<string> PTP_Synchronized = null;
+
+
+        #region Client Controll
+
+
+        /// <summary>
+        /// client added
+        /// </summary>
+        /// <param name="newClient">client data class, init</param>
         public void AddClient(TcpClient newClient)
         {
             ClientData currentClient = new ClientData(newClient);
@@ -33,6 +43,22 @@ namespace DataProvider_Server_voucher
             }
         }
 
+        private bool CheckID(string ID)
+        {
+            if (ID.Contains("%^&"))
+                return true;
+
+            File.AppendAllText("IDErrLog.txt", ID);
+            return false;
+        }
+
+        #endregion
+
+
+        /// <summary>
+        /// Data Received = Client Data Send and Received
+        /// </summary>
+        /// <param name="ar">Data Get, Data Received</param>
         private void DataReceived(IAsyncResult ar)
         {
             ClientData client = ar.AsyncState as ClientData;
@@ -93,14 +119,7 @@ namespace DataProvider_Server_voucher
             }
         }
 
-        private bool CheckID(string ID)
-        {
-            if (ID.Contains("%^&"))
-                return true;
-
-            File.AppendAllText("IDErrLog.txt", ID);
-            return false;
-        }
+    
     }
 
 }

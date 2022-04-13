@@ -7,6 +7,9 @@ using MySql.Data.MySqlClient;
 
 namespace DataProvider_Server_voucher
 {
+    /// <summary>
+    ///  데이터 베이스 커넥트 프로그램
+    /// </summary>
     class GM_DB
     {
         /// <summary>

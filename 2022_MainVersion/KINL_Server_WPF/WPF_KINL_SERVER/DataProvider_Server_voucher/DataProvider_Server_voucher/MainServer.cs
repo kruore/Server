@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace DataProvider_Server_voucher
 {
+    /// <summary>
+    ///  서버 클라이언트 연결 관련 정리 및 관리
+    /// </summary>
     internal class MainServer
     {
         ClientManager _clientManager = new ClientManager();
@@ -29,13 +32,12 @@ namespace DataProvider_Server_voucher
 
             while (true)
             {
+                // 연결시 Echo Program 동작
                 Task<TcpClient> acceptTask = listener.AcceptTcpClientAsync();
                 acceptTask.Wait();
 
                 Console.WriteLine("SomeClientConnect");
                 TcpClient newClient = acceptTask.Result;
-                //Console.WriteLine(newClient.Client.LocalEndPoint.ToString());
-                //Console.WriteLine(newClient.Client.RemoteEndPoint.ToString());
 
                 _clientManager.AddClient(newClient);
             }
