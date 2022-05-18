@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server_Hue", "Server_Hue\Server_Hue.csproj", "{629D601E-3F96-4345-AFD5-7FD770BEBE83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client_Hue", "Client_Hue\Client_Hue.csproj", "{F4A088D4-C394-4EFE-ABDA-E3938160CA94}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{629D601E-3F96-4345-AFD5-7FD770BEBE83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{629D601E-3F96-4345-AFD5-7FD770BEBE83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{629D601E-3F96-4345-AFD5-7FD770BEBE83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{629D601E-3F96-4345-AFD5-7FD770BEBE83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4A088D4-C394-4EFE-ABDA-E3938160CA94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4A088D4-C394-4EFE-ABDA-E3938160CA94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4A088D4-C394-4EFE-ABDA-E3938160CA94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4A088D4-C394-4EFE-ABDA-E3938160CA94}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F76DF5DD-9E19-4606-8243-32DEC9670987}
+	EndGlobalSection
+EndGlobal

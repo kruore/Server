@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "629d601e-3f96-4345-afd5-7fd770bebe83": {
+      "ProjectGuid": "629d601e-3f96-4345-afd5-7fd770bebe83",
+      "DisplayName": "Server_Hue",
+      "ColorIndex": 0
+    },
+    "f4a088d4-c394-4efe-abda-e3938160ca94": {
+      "ProjectGuid": "f4a088d4-c394-4efe-abda-e3938160ca94",
+      "DisplayName": "Client_Hue",
+      "ColorIndex": 1
+    }
+  },
+  "NextColorIndex": 2
+}
