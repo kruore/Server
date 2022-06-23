@@ -26,6 +26,9 @@ namespace DataProvider_Server_voucher
         private Dictionary<string, ObservableCollection<string>> AirpodData = new Dictionary<string, ObservableCollection<string>>();
         private Dictionary<string, ObservableCollection<string>> WatchData = new Dictionary<string, ObservableCollection<string>>();
 
+        private string userTemp;
+        private string deviceTemp;
+
         //PTP 할때 사용
         Dictionary<string, List<string>> PTPlist = new Dictionary<string, List<string>>();
 
@@ -68,6 +71,7 @@ namespace DataProvider_Server_voucher
             ClientManager.messageParsingAction += MessageParsing;
             ClientManager.ChangeListViewAction += ChangeListView;
             ClientManager.PTP_Synchronized += CheckPTP;
+            ClientManager.AI_Synchronized += CheckAI;
             fileWatcher.watcher();
             fileWatcher.watcher_sub();
         }
@@ -83,6 +87,14 @@ namespace DataProvider_Server_voucher
                 {
                     item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                 }
+            }
+        }
+
+        private void CheckAI(string a)
+        {
+            if (ClientManager.clientDic.ContainsKey(int.Parse(a)))
+            {
+                Console.WriteLine( ClientManager.clientDic[int.Parse(a)].ToString());
             }
         }
         /// <summary>
@@ -126,7 +138,6 @@ namespace DataProvider_Server_voucher
                 conntectCheckThread.Start();
                 return;
             }
-
         }
         /// <summary>
         /// PTP 10개의 데이터를 받아 가장 짧은 딜레이 기준 최적화
@@ -183,13 +194,13 @@ namespace DataProvider_Server_voucher
             listBox4.BeginInvoke((Action)(() =>
             {
                 ObservableCollection<string> list = new ObservableCollection<string>();
-                if (listBox4.Items.Contains("PTP " + sender))
+                if (listBox4.Items.Contains("PTP ID "+sender+":" + serverDelays[sender].ToString()+".ms"))
                 {
                     return;
                 }
                 else
                 {
-                    listBox4.Items.Add("PTP " + sender);
+                    listBox4.Items.Add("PTP ID " + sender + ":" + serverDelays[sender].ToString() + ".ms");
                 }
             }));
             foreach (var item in ClientManager.clientDic)
@@ -215,10 +226,10 @@ namespace DataProvider_Server_voucher
                     {
                         try
                         {
-                            string sendStringData = "<TEST>;";
-                            byte[] sendByteData = new byte[sendStringData.Length];
-                            sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                            item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                            //string sendStringData = "<TEST>;";
+                            //byte[] sendByteData = new byte[sendStringData.Length];
+                            //sendByteData = Encoding.UTF8.GetBytes(sendStringData);
+                            //item.Value.tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                         }
                         catch (Exception e)
                         {
@@ -512,6 +523,10 @@ namespace DataProvider_Server_voucher
                         Console.WriteLine("AI 분석 의뢰");
                         string AI_name;
                         int AI_clientNumber;
+
+                        var Tempdatas = ai_FeedData[GetClinetName(sender)] + "," + sender.ToString();
+                        userTemp = GetClinetName(sender);
+                        deviceTemp = Tempdatas;
                         try
                         {
                             foreach (var item in ClientManager.clientDic)
@@ -521,10 +536,7 @@ namespace DataProvider_Server_voucher
                                     Console.WriteLine("AI 찾았음!");
                                     AI_name = item.Value.clientName;
                                     AI_clientNumber = GetClinetNumber("AI");
-                                    Console.WriteLine(sender.ToString());
-                                    Console.WriteLine(GetClinetName(sender));
-                                    sendStringData = "#4," + ai_FeedData[GetClinetName(sender)] + "," + sender.ToString() + ";";
-                                    Console.WriteLine(sendStringData);
+                                    sendStringData = "#4";
                                     sendByteData = Encoding.UTF8.GetBytes(sendStringData);
                                     ClientManager.clientDic[AI_clientNumber].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                                 }
@@ -626,15 +638,18 @@ namespace DataProvider_Server_voucher
                         // IOS request DB data
                         break;
                     case "#8":
-                        Console.WriteLine(msgList);
-                        GM_DB.Instance.Update1RM_DataTable(GetClinetName(splitedMsgs[1]), splitedMsgs[2], splitedMsgs[3], splitedMsgs[4]);
-
+                        var ac = msgList.Split(',');
+                        var a = deviceTemp.Split(',');
+                       // GM_DB.Instance.Update1RM_DataTable(GetClinetName(splitedMsgs[1]), splitedMsgs[2], splitedMsgs[3], splitedMsgs[4]);
+                        GM_DB.Instance.Update1RM_DataTable(GetClinetName(a[14]), a[13], float.Parse(splitedMsgs[1]).ToString("N0"), a[12]);
                         //Shoulder Press Return
-                        int counter = GM_DB.Instance.CheckTable(GetClinetName(splitedMsgs[1]), splitedMsgs[2]);
+                        //int counter = GM_DB.Instance.CheckTable(GetClinetName(splitedMsgs[1]), splitedMsgs[2]);
+                        int counter = GM_DB.Instance.CheckTable(GetClinetName(a[14]), a[13]);
                         string datas = null;
                         if (counter == 1)
                         {
-                            datas = GM_DB.Instance.Search_Table(GetClinetName(splitedMsgs[1]), splitedMsgs[2]);
+                          //  datas = GM_DB.Instance.Search_Table(GetClinetName(splitedMsgs[1]), splitedMsgs[2]);
+                            datas = GM_DB.Instance.Search_Table(GetClinetName(a[14]), a[13]);
 
                             if (datas == null)
                             {
@@ -650,17 +665,19 @@ namespace DataProvider_Server_voucher
                             string[] sendByteDatas = datas.Split(';');
                             for (int i = 0; i < sendByteDatas.Length - 1; i++)
                             {
-                                sendStringData = "<#5>," + splitedMsgs[2] + "," + sendByteDatas[i] + ';';
+                               // sendStringData = "<#5>," + splitedMsgs[2] + "," + sendByteDatas[i] + ';';
+                                sendStringData = "<#5>," + a[13] + "," + sendByteDatas[i] + ';';
                                 Console.WriteLine("DDDDDDDDDDDDDDDDDDDDDDDDDDDD:"+sendStringData);
                                 sendByteData = new byte[sendStringData.Length];
                                 sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                                ClientManager.clientDic[int.Parse(splitedMsgs[1])].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                                ClientManager.clientDic[int.Parse(a[14])].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                             }
                         }
                         sendStringData = "<#6>;";
                         sendByteData = new byte[sendStringData.Length];
                         sendByteData = Encoding.UTF8.GetBytes(sendStringData);
-                        ClientManager.clientDic[int.Parse(splitedMsgs[1])].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                      //  ClientManager.clientDic[int.Parse(splitedMsgs[1])].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
+                        ClientManager.clientDic[int.Parse(a[14])].tcpClient.GetStream().Write(sendByteData, 0, sendByteData.Length);
                         Console.WriteLine("DB Search");
                         break;
                     //Close Socket;
@@ -872,13 +889,16 @@ namespace DataProvider_Server_voucher
         /// <returns></returns>
         private int GetClinetNumber(string targetClientName)
         {
+            Console.WriteLine(targetClientName);
             foreach (var item in ClientManager.clientDic)
             {
                 if (item.Value.clientName == targetClientName)
                 {
+                    Console.WriteLine("찾는중:"+item.Value.clientNumber);
                     return item.Value.clientNumber;
                 }
             }
+            Console.WriteLine("못찾음중:" +targetClientName);
             return -1;
         }
 

@@ -13,6 +13,7 @@ namespace DataProvider_Server_voucher
     /// </summary>
     public class fileWatcher
     {
+        public static int checker = 0;
         public static void watcher()
         {
             Console.WriteLine("Watcher ACTIVE");
@@ -83,6 +84,12 @@ namespace DataProvider_Server_voucher
         private static void OnCreated(object sender, FileSystemEventArgs e)
         {
             string value = $"Created: {e.FullPath}";
+            checker++;
+            if(checker==3)
+            {
+                Console.WriteLine("3개의 파일이 생성되었음");
+                checker = 0;
+            }
             Console.WriteLine(value);
         }
 
@@ -171,3 +178,5 @@ namespace DataProvider_Server_voucher
         }
     }
 }
+
+

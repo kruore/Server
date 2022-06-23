@@ -97,7 +97,8 @@ namespace DataProvider_Server_voucher
             {
                 string DateTimes = DateTime.Now.ToString("yyyyMMddHHmmss");
                 isCategoryPrinted_DV = false;
-                string tempFileName = $"{DateTimes}_{clientName}_DEVICE.txt";
+                //    string tempFileName = $"{DateTimes}_{clientName}_DEVICE.txt";
+                string tempFileName = $"{DateTimes}_07_6_05DEVICE_DEVICE.txt";
                 string file_Location = System.IO.Path.Combine(mainfolder_Path, tempFileName);
                 GM_DB.Instance.UpdateDataPath(clientName, DateTimes, tempFileName, file_Location);
                 string m_str_DataCategory = string.Empty;
@@ -164,6 +165,7 @@ namespace DataProvider_Server_voucher
                             /// <param name="_machineindex">머신의 index</param>
                             /// <param name="_exerciseclass">운동종류</param>
                             /// <param name="_mucleclass">운동에 쓰이는 근육</param>
+                            Console.WriteLine("현재 무게는 "+largest);
                             GM_DB.Instance.UpdateDataset(clientName, splitData[1], int.Parse(splitData[7]), int.Parse(splitData[8]), 6);
                             GM_DB.Instance.UpdateMachineSet(clientName, deviceName, DateTimes, UnixTimeMillisecondsTime, largest, int.Parse(splitData[8]), 0);
                             Console.WriteLine("클라이언트 IOS 의 넘버는 : " + clientNumber);
@@ -191,7 +193,7 @@ namespace DataProvider_Server_voucher
                                + "Weight,"
                                + "Count,"
                                + "DistanceADC,"
-                               + "WeightADC,"
+                               + "WeightADC"
                                + "DeviceName(Current)";
                             streamWriter.WriteLine(str_DataCategory);
                             isCategoryPrinted_DV = true;
@@ -213,7 +215,8 @@ namespace DataProvider_Server_voucher
         {
             bool isCategoryPrinted_W = false;
             bool tempb = false;
-            string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_WATCH.txt";
+           // string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_WATCH.txt";
+            string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_07_6_05DEVICE_WATCH.txt";
             try
             {
                 isCategoryPrinted_W = false;
@@ -271,8 +274,8 @@ namespace DataProvider_Server_voucher
         {
             bool isCategoryPrinted_A = false;
             bool tempb = false;
-            string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_AIRPOD.txt";
-
+            //string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_{clientName}_AIRPOD.txt";
+            string tempFileName = $"{DateTime.Now.ToString("yyyyMMddHHmmss")}_07_6_05DEVICE_AIRPOD.txt";
             try
             {
                 isCategoryPrinted_A = false;

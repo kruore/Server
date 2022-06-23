@@ -9,38 +9,45 @@ using System.Net.Sockets;
 namespace Server_Hue
 {
 
-class program
+    class program
     {
         static Listener listener = new Listener();
+        static void OnAcceptHandler(Socket clientSocket)
+        {
+            try
+            {
+                Session session = new Session();
+                session.Start(clientSocket);
+                byte[] sendBuff = Encoding.UTF8.GetBytes("#4");
+                session.Send(sendBuff);
 
+                Thread.Sleep(1000);
+                session.Disconnect();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
         static void Main(string[] args)
         {
+
             Socket socket;
             string host = Dns.GetHostName();
             IPHostEntry ipHost = Dns.GetHostEntry(host);
-            IPAddress ipAddr = ipHost.AddressList[0];
-            IPEndPoint ipEnd = new IPEndPoint(ipAddr, 4545);
-            listener.Init(ipEnd);
+            // IPAddress ipAddr = ipHost.AddressList[0];
+            IPAddress iPAddr = IPAddress.Any;
+            IPEndPoint ipEnd = new IPEndPoint(iPAddr, 4545);
+            Console.WriteLine(ipEnd);
+            listener.Init(ipEnd, OnAcceptHandler, 10);
+
             try
             {
-                Console.WriteLine("Listen");
+                Console.WriteLine("Listening...");
                 while (true)
                 {
-                  
-
-                    Socket client = listener.Accept();
-
-
-                    byte[] recvBuff = new byte[1024];
-                    int recvBytes = client.Receive(recvBuff);
-                    string recvData = Encoding.UTF8.GetString(recvBuff, 0, recvBytes);
-                    Console.WriteLine($"[From Client]{recvData}");
-
-                    byte[] sendBuff = Encoding.UTF8.GetBytes("Hello");
-                    client.Send(sendBuff);
-
-                    //socket.Shutdown(SocketShutdown.Both);
-                    //socket.Close();
+                    ;
                 }
             }
             catch (Exception e)
@@ -50,10 +57,6 @@ class program
 
         }
 
-        public void Init(IPEndPoint endPoint)
-        {
-
-        }
 
     }
 }

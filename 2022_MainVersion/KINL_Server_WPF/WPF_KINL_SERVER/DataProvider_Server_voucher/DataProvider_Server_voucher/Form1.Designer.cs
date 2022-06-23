@@ -46,9 +46,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(136, 12);
+            this.label1.Size = new System.Drawing.Size(153, 12);
             this.label1.TabIndex = 2;
-            this.label1.Text = "IOS Connecttion Check";
+            this.label1.Text = "AirPod Connecttion Check";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label2
@@ -133,7 +133,7 @@
             // 
             this.listBox5.FormattingEnabled = true;
             this.listBox5.ItemHeight = 12;
-            this.listBox5.Location = new System.Drawing.Point(521, 47);
+            this.listBox5.Location = new System.Drawing.Point(521, 51);
             this.listBox5.Name = "listBox5";
             this.listBox5.Size = new System.Drawing.Size(407, 304);
             this.listBox5.TabIndex = 12;

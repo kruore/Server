@@ -11,29 +11,36 @@ namespace Server_Hue
     class Listener
     {
         Socket listenerSocket;
-        public void Init(IPEndPoint ipEndPoint)
+        Action<Socket> _onAcceptHandler;
+
+        public void Init(IPEndPoint ipEndPoint, Action<Socket> onAcceptHandler, int backLog)
         {
             listenerSocket = new Socket(ipEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
+            _onAcceptHandler += onAcceptHandler;
             listenerSocket.Bind(ipEndPoint);
 
-            listenerSocket.Listen(10);
+            listenerSocket.Listen(backLog);
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
             args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted);
             RegisterAccept(args);
         }
         void RegisterAccept(SocketAsyncEventArgs args)
         {
+            args.AcceptSocket = null;
+
             bool pending = listenerSocket.AcceptAsync(args);
             if(!pending)
             {
                 OnAcceptCompleted(null,args);
+              
             }
         }
         void OnAcceptCompleted(object sender ,SocketAsyncEventArgs args)
         {
             if(args.SocketError == SocketError.Success)
             {
+                _onAcceptHandler.Invoke(args.AcceptSocket);
+            
                 // 접속
             }
             else
