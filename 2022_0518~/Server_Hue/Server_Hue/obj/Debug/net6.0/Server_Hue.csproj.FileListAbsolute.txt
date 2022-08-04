@@ -1,6 +1,4 @@
-D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\bin\Debug\net6.0\Server_Hue.exe
 D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\bin\Debug\net6.0\Server_Hue.deps.json
-D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\bin\Debug\net6.0\Server_Hue.runtimeconfig.json
 D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\bin\Debug\net6.0\Server_Hue.dll
 D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\bin\Debug\net6.0\ref\Server_Hue.dll
 D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\bin\Debug\net6.0\Server_Hue.pdb
@@ -12,4 +10,6 @@ D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\obj\Debug\net6.0\Server_Hue.cs
 D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\obj\Debug\net6.0\Server_Hue.dll
 D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\obj\Debug\net6.0\ref\Server_Hue.dll
 D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\obj\Debug\net6.0\Server_Hue.pdb
+D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\bin\Debug\net6.0\Server_Hue.exe
+D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\bin\Debug\net6.0\Server_Hue.runtimeconfig.json
 D:\GitHub\Server\2022_0518~\Server_Hue\Server_Hue\obj\Debug\net6.0\Server_Hue.genruntimeconfig.cache

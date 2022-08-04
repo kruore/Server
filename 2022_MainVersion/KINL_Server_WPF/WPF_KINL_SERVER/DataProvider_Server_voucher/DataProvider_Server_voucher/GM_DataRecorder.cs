@@ -85,8 +85,6 @@ namespace DataProvider_Server_voucher
         }
         #endregion
 
-
-
         #region Data Batch End File Saved
         public bool WriteSteamingData_Batch_Device(string clientNumber, string clientName, string deviceName)
         {

@@ -8,17 +8,16 @@ using System.Net.Sockets;
 
 namespace Server_Hue
 {
-    class Listener
+    public class Listener
     {
         Socket listenerSocket;
-        Action<Socket> _onAcceptHandler;
+        Func<Session> _sessionFactory;
 
-        public void Init(IPEndPoint ipEndPoint, Action<Socket> onAcceptHandler, int backLog)
+        public void Init(IPEndPoint ipEndPoint, Func<Session> sessionFactory, int backLog)
         {
             listenerSocket = new Socket(ipEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            _onAcceptHandler += onAcceptHandler;
+            _sessionFactory += sessionFactory;
             listenerSocket.Bind(ipEndPoint);
-
             listenerSocket.Listen(backLog);
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
             args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted);
@@ -27,7 +26,6 @@ namespace Server_Hue
         void RegisterAccept(SocketAsyncEventArgs args)
         {
             args.AcceptSocket = null;
-
             bool pending = listenerSocket.AcceptAsync(args);
             if(!pending)
             {
@@ -39,8 +37,10 @@ namespace Server_Hue
         {
             if(args.SocketError == SocketError.Success)
             {
-                _onAcceptHandler.Invoke(args.AcceptSocket);
-            
+                Session session = _sessionFactory.Invoke();
+                args.UserToken = sender;
+                session.Start(args.AcceptSocket);
+                session.OnConnected(args.AcceptSocket.RemoteEndPoint);
                 // 접속
             }
             else
