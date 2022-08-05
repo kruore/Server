@@ -11,11 +11,23 @@ namespace Server_Hue
 
     internal class DataRecorder
     {
-
-        public void PrintData(ConcurrentQueue<string> datas,int count)
+        public void PrintData(ConcurrentQueue<string> datas,int count,ushort id, ushort device)
         {
+            string file_index = string.Empty;
+            switch (device)
+            {
+                case 1:
+                    file_index = "Watch";
+                    break;
+                case 2:
+                    file_index = "Airpod";
+                    break;
+                case 3:
+                    file_index = "Device";
+                    break;
+            }
             DirectoryInfo di = new DirectoryInfo(@"c:\MyDir\");
-            var fileName = di+"CheckFile" +count.ToString()+ ".txt";
+            var fileName = di+"CheckFile"+id.ToString()+"_"+file_index + count.ToString()+ ".txt";
             Console.WriteLine(fileName);
 
             // Write each directory name to a file.

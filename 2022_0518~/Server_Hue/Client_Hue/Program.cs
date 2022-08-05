@@ -49,7 +49,6 @@ namespace Client_Hue
                         //manu.Add(manudata[1], data);
                     }
 
-
                     for(int i = 0; i <data.Count; i++)
                     {
                         Packet packet = new Packet() { size = 20, packetId = 4, packetData = data[i] };
@@ -61,7 +60,6 @@ namespace Client_Hue
                         packet.size = (ushort)dataSize;
                         byte[] buffer = BitConverter.GetBytes(packet.size);
 
-
                         ushort size = 0;
 
                         size += (ushort)buffer.Length;
@@ -72,7 +70,6 @@ namespace Client_Hue
                         success &= BitConverter.TryWriteBytes(new Span<byte>(s.Array, s.Offset, s.Count), size);
 
                         ArraySegment<byte> sendBuff = SendBufferHelper.Close(size);
-
 
                         //size += 2;
                         //success &= BitConverter.TryWriteBytes(new Span<byte>(s.Array, s.Offset + size, s.Count - size), packet.packetId);
