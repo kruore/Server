@@ -12,7 +12,27 @@ namespace Server_Hue
     {
         Socket listenerSocket;
         Func<Session> _sessionFactory;
+        PTPSession _session;
+        public EndPoint ipPoint;
+        public void Init(IPEndPoint endPoint, Func<Session> sessionFactory, int register = 10, int backlog = 100)
+        {
+            listenerSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            _sessionFactory += sessionFactory;
 
+            // 문지기 교육
+            listenerSocket.Bind(endPoint);
+
+            // 영업 시작
+            // backlog : 최대 대기수
+            listenerSocket.Listen(backlog);
+
+            for (int i = 0; i < register; i++)
+            {
+                SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+                args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted);
+                RegisterAccept(args);
+            }
+        }
         public void Init(IPEndPoint ipEndPoint, Func<Session> sessionFactory, int backLog)
         {
             listenerSocket = new Socket(ipEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -30,7 +50,6 @@ namespace Server_Hue
             if(!pending)
             {
                 OnAcceptCompleted(null,args);
-              
             }
         }
         void OnAcceptCompleted(object sender ,SocketAsyncEventArgs args)
@@ -39,8 +58,10 @@ namespace Server_Hue
             {
                 Session session = _sessionFactory.Invoke();
                 args.UserToken = sender;
+                ipPoint = args.AcceptSocket.RemoteEndPoint;
                 session.Start(args.AcceptSocket);
                 session.OnConnected(args.AcceptSocket.RemoteEndPoint);
+                //PTP Start()     
                 // 접속
             }
             else

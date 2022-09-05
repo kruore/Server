@@ -11,18 +11,18 @@ namespace Server_Hue
     {
         public static ThreadLocal<SendBuffer> CurrentBuffer = new ThreadLocal<SendBuffer>(() => { return null; });
         public static int ChunkSize { get; set; } = 4096 * 100;
+
         public static ArraySegment<byte> Open(int reserveSize)
         {
-            if(CurrentBuffer.Value ==null)
-            {
+            if (CurrentBuffer.Value == null)
                 CurrentBuffer.Value = new SendBuffer(ChunkSize);
-            }
-            if(CurrentBuffer.Value.FreeSize <  reserveSize)
-            {
+
+            if (CurrentBuffer.Value.FreeSize < reserveSize)
                 CurrentBuffer.Value = new SendBuffer(ChunkSize);
-            }
-            return CurrentBuffer.Value.Open(ChunkSize);
+
+            return CurrentBuffer.Value.Open(reserveSize);
         }
+
         public static ArraySegment<byte> Close(int usedSize)
         {
             return CurrentBuffer.Value.Close(usedSize);

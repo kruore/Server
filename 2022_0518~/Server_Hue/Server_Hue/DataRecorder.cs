@@ -11,7 +11,7 @@ namespace Server_Hue
 
     internal class DataRecorder
     {
-        public void PrintData(ConcurrentQueue<string> datas,int count,ushort id, ushort device)
+        public void PrintData(ConcurrentQueue<string> datas,ushort id, ushort device)
         {
             string file_index = string.Empty;
             switch (device)
@@ -27,7 +27,7 @@ namespace Server_Hue
                     break;
             }
             DirectoryInfo di = new DirectoryInfo(@"c:\MyDir\");
-            var fileName = di+"CheckFile"+id.ToString()+"_"+file_index + count.ToString()+ ".txt";
+            var fileName = di+"CheckFile"+id.ToString()+"_"+file_index + ".txt";
             Console.WriteLine(fileName);
 
             // Write each directory name to a file.

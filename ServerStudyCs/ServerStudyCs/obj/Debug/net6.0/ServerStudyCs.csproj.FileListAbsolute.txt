@@ -1,0 +1,15 @@
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\bin\Debug\net6.0\ServerStudyCs.exe
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\bin\Debug\net6.0\ServerStudyCs.deps.json
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\bin\Debug\net6.0\ServerStudyCs.runtimeconfig.json
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\bin\Debug\net6.0\ServerStudyCs.dll
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\bin\Debug\net6.0\ref\ServerStudyCs.dll
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\bin\Debug\net6.0\ServerStudyCs.pdb
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\obj\Debug\net6.0\ServerStudyCs.csproj.AssemblyReference.cache
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\obj\Debug\net6.0\ServerStudyCs.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\obj\Debug\net6.0\ServerStudyCs.AssemblyInfoInputs.cache
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\obj\Debug\net6.0\ServerStudyCs.AssemblyInfo.cs
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\obj\Debug\net6.0\ServerStudyCs.csproj.CoreCompileInputs.cache
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\obj\Debug\net6.0\ServerStudyCs.dll
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\obj\Debug\net6.0\ref\ServerStudyCs.dll
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\obj\Debug\net6.0\ServerStudyCs.pdb
+C:\Users\epsel\source\repos\ServerStudyCs\ServerStudyCs\obj\Debug\net6.0\ServerStudyCs.genruntimeconfig.cache
