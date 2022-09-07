@@ -1,0 +1,31 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "cf07baa1-7c3b-4792-8d6a-191a0d2e67d0": {
+      "ProjectGuid": "cf07baa1-7c3b-4792-8d6a-191a0d2e67d0",
+      "DisplayName": "ServerCore",
+      "ColorIndex": 0
+    },
+    "efdfc031-199c-4d09-b799-b1879ffedd58": {
+      "ProjectGuid": "efdfc031-199c-4d09-b799-b1879ffedd58",
+      "DisplayName": "Server",
+      "ColorIndex": 1
+    },
+    "02e33185-9680-40ca-81b1-5f1671727d43": {
+      "ProjectGuid": "02e33185-9680-40ca-81b1-5f1671727d43",
+      "DisplayName": "DummyClient",
+      "ColorIndex": 2
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "기타 파일",
+      "ColorIndex": -1
+    },
+    "ea63d7a5-8e49-40e0-b16d-07fc06c3e717": {
+      "ProjectGuid": "ea63d7a5-8e49-40e0-b16d-07fc06c3e717",
+      "DisplayName": "PacketGenerator",
+      "ColorIndex": 3
+    }
+  },
+  "NextColorIndex": 4
+}

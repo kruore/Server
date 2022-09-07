@@ -7,7 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerCore", "ServerStudyCs
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DummyClient", "DummyClient\DummyClient.csproj", "{02E33185-9680-40CA-81B1-5F1671727D43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "ServerCore\Server.csproj", "{EFDFC031-199C-4D09-B799-B1879FFEDD58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "ServerCore\Server.csproj", "{EFDFC031-199C-4D09-B799-B1879FFEDD58}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PacketGenerator", "PacketGenerator\PacketGenerator.csproj", "{EA63D7A5-8E49-40E0-B16D-07FC06C3E717}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{E78AA662-E3C3-4BBD-A3F8-C61BAA5BC9B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,9 +31,16 @@ Global
 		{EFDFC031-199C-4D09-B799-B1879FFEDD58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFDFC031-199C-4D09-B799-B1879FFEDD58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFDFC031-199C-4D09-B799-B1879FFEDD58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA63D7A5-8E49-40E0-B16D-07FC06C3E717}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA63D7A5-8E49-40E0-B16D-07FC06C3E717}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA63D7A5-8E49-40E0-B16D-07FC06C3E717}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA63D7A5-8E49-40E0-B16D-07FC06C3E717}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EA63D7A5-8E49-40E0-B16D-07FC06C3E717} = {E78AA662-E3C3-4BBD-A3F8-C61BAA5BC9B1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {78184D0C-D44F-480E-8EDE-FBD4EACF7E54}
