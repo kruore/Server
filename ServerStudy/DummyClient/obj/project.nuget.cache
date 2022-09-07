@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "5o49KDB+wOBebESIW0d16GWjpoiigFhrgPnrCClNgZbxMwVj/nQ3xQRAhoO7GrvjRQInb/19+gF/FdApNhHC3A==",
+  "dgSpecHash": "HFf6+lEepF7GLj3GIaAAXVcazP+ajCnpxbYNsd1W/wcmnHY2kR960vyD1eCWcqZlEMtnCT0sc4H9yIkOH+5CtQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\epsel\\source\\repos\\ServerStudyCs\\DummyClient\\DummyClient.csproj",
+  "projectFilePath": "D:\\GitHub\\Server\\ServerStudy\\DummyClient\\DummyClient.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
