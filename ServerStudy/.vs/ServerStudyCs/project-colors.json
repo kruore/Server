@@ -25,7 +25,22 @@
       "ProjectGuid": "ea63d7a5-8e49-40e0-b16d-07fc06c3e717",
       "DisplayName": "PacketGenerator",
       "ColorIndex": 3
+    },
+    "8478bdf5-ffd6-4f99-bcf5-32b9130cb616": {
+      "ProjectGuid": "8478bdf5-ffd6-4f99-bcf5-32b9130cb616",
+      "DisplayName": "PacketGenerator",
+      "ColorIndex": 4
+    },
+    "b1839980-6bc6-4aad-bd26-371a0962b5bf": {
+      "ProjectGuid": "b1839980-6bc6-4aad-bd26-371a0962b5bf",
+      "DisplayName": "Server",
+      "ColorIndex": 5
+    },
+    "51fec4c1-221d-4515-8d5f-4a8f938e07e1": {
+      "ProjectGuid": "51fec4c1-221d-4515-8d5f-4a8f938e07e1",
+      "DisplayName": "PacketGenerator",
+      "ColorIndex": 6
     }
   },
-  "NextColorIndex": 4
+  "NextColorIndex": 7
 }

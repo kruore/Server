@@ -34,3 +34,8 @@ D:\GitHub\Server\ServerStudy\DummyClient\obj\Debug\net6.0\DummyClient.dll
 D:\GitHub\Server\ServerStudy\DummyClient\obj\Debug\net6.0\ref\DummyClient.dll
 D:\GitHub\Server\ServerStudy\DummyClient\obj\Debug\net6.0\DummyClient.pdb
 D:\GitHub\Server\ServerStudy\DummyClient\obj\Debug\net6.0\DummyClient.genruntimeconfig.cache
+D:\GitHub\Server\ServerStudy\DummyClient\bin\Debug\net6.0\PacketGenerator.deps.json
+D:\GitHub\Server\ServerStudy\DummyClient\bin\Debug\net6.0\PacketGenerator.runtimeconfig.json
+D:\GitHub\Server\ServerStudy\DummyClient\bin\Debug\net6.0\PacketGenerator.exe
+D:\GitHub\Server\ServerStudy\DummyClient\bin\Debug\net6.0\PacketGenerator.dll
+D:\GitHub\Server\ServerStudy\DummyClient\bin\Debug\net6.0\PacketGenerator.pdb

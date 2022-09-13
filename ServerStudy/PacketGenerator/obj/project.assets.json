@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net6.0": {}
+    "net6.0": {
+      "ServerCore/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/ServerCore.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ServerCore.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "ServerCore/1.0.0": {
+      "type": "project",
+      "path": "../ServerStudyCs/ServerCore.csproj",
+      "msbuildProject": "../ServerStudyCs/ServerCore.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net6.0": []
+    "net6.0": [
+      "ServerCore >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\epsel\\.nuget\\packages\\": {},
@@ -38,7 +57,11 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\GitHub\\Server\\ServerStudy\\ServerStudyCs\\ServerCore.csproj": {
+              "projectPath": "D:\\GitHub\\Server\\ServerStudy\\ServerStudyCs\\ServerCore.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

@@ -3,8 +3,23 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	  <EnableDefaultComlileitems>false</EnableDefaultComlileitems>
+
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <BaseOutputPath>D:\GitHub\Server\ServerStudy\PacketGenerator</BaseOutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="GenPacket.cs" />
+    <Compile Include="PacketFormat.cs" />
+    <Compile Include="PacketHandler.cs" />
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ServerStudyCs\ServerCore.csproj" />
+  </ItemGroup>
 
 </Project>
