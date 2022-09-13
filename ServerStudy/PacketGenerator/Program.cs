@@ -5,6 +5,7 @@ namespace PacketGenerator
 {
     class Program
     {
+        static string genPacket;
         static void Main(string[] args)
         {
             XmlReaderSettings settings = new XmlReaderSettings()
@@ -28,6 +29,8 @@ namespace PacketGenerator
                     }
                     Console.WriteLine($"{r.Name}{r["name"]},{r.Depth}");
                 }
+
+                File.WriteAllText("GenPacket.cs",genPacket);
             }
         }
         public static void ParsePacket(XmlReader r)
@@ -43,11 +46,19 @@ namespace PacketGenerator
                 Console.WriteLine("Packet without name");
                 return;
             }
-            ParseMembers(r);
+            Tuple<string,string,string> t = ParseMembers(r);
+            genPacket = string.Format(PacketFormat.parketFormat,t.Item1, t.Item2, t.Item3);
         }
-        public static void ParseMembers(XmlReader r)
+        /// {1} : 맴버 변수들
+        /// {2} : 맴버 변수의 Read
+        /// {3} : 맴버 변수들의 Write
+        public static Tuple<string,string,string> ParseMembers(XmlReader r)
         {
             string packetName = r["name"];
+
+            string memberCode = "";
+            string readCode = "";
+            string writeCode = "";
 
             int depth = r.Depth + 1;
             while (r.Read())
@@ -60,27 +71,79 @@ namespace PacketGenerator
                 if (string.IsNullOrEmpty(memberName))
                 {
                     Console.WriteLine("Member without name");
-                    return;
+                    return null;
+                }
+                
+                if(string.IsNullOrEmpty(memberCode)==false)
+                {
+                    //NewLine을 통해 작성될 코드에 줄 바꿈 처리
+                    memberCode += Environment.NewLine;
+                }       
+                if(string.IsNullOrEmpty(readCode) ==false)
+                {
+                    //NewLine을 통해 작성될 코드에 줄 바꿈 처리
+                    readCode += Environment.NewLine;
+                }       
+                if(string.IsNullOrEmpty(writeCode) ==false)
+                {
+                    //NewLine을 통해 작성될 코드에 줄 바꿈 처리
+                    writeCode += Environment.NewLine;
                 }
 
                 string memberType = r.Name.ToLower();
                 switch (memberType)
                 {
-                    case "bool":
-                    case "string":
+                    case "bool": 
+                    case "byte":
                     case "int":
-                        break;
                     case "long":
                     case "float":
                     case "double":
-                    case "list":
                     case "ushort":
                     case "short":
+                        memberCode += string.Format(PacketFormat.memberFormat,memberType,memberName);
+                        readCode += string.Format(PacketFormat.readFormat, memberName, ToMemberType(memberType), memberType);
+                        writeCode += string.Format(PacketFormat.writeFormat, memberName, memberType);
+                        break;
+                    case "list":
+                        break;
+                    case "string":
+                        memberCode += string.Format(PacketFormat.memberFormat, memberType, memberName);
+                        readCode += string.Format(PacketFormat.readStringFormat, memberName);
+                        writeCode += string.Format(PacketFormat.writeStringFormat, memberName);
                         break;
                     default:
                         break;
                 }
             }
+            memberCode = memberCode.Replace("\n", "\n\t");
+            memberCode = memberCode.Replace("\n", "\n\t\t");
+            memberCode = memberCode.Replace("\n", "\n\t\t");
+            return new Tuple<string, string, string>(memberCode, readCode, writeCode);
         }
+
+        public static string ToMemberType(string memberType)
+        {
+            switch(memberType)
+            {
+                case "bool":
+                    return "ToBoolean";
+                case "int":
+                    return "ToInt32";
+                case "long":
+                    return "ToInt64";
+                case "float":
+                    return "ToSingle";
+                case "double":
+                    return "ToDouble";
+                case "ushort":
+                    return "ToUInt16";
+                case "short":
+                    return "ToInt16";
+            }
+            return null;
+
+        }
+
     }
 }

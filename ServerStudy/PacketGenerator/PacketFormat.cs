@@ -11,7 +11,8 @@ namespace PacketGenerator
         /// <summary>
         /// {0} : 패킷 이름
         /// {1} : 맴버 변수들
-        /// 
+        /// {2} : 맴버 변수의 Read
+        /// {3} : 맴버 변수들의 Write
         /// </summary>
         public static string parketFormat =
 @"
@@ -19,41 +20,6 @@ namespace PacketGenerator
     {{
         {1}
 
-        public struct SkillInfo
-        {{
-            public int id;
-            public short level;
-            public short duration;
-
-            public bool Write(Span<byte> s, ref ushort count)
-            {{
-                bool success = true;
-                success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.id);
-                count += sizeof(int);
-                success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.level);
-                count += sizeof(ushort);
-                success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.duration);
-                count += sizeof(ushort);
-                return success;
-            }}
-
-            public void Read(ReadOnlySpan<byte> s, ref ushort count)
-            {{
-
-                id = BitConverter.ToInt32(s.Slice(count, s.Length - count));
-                count += sizeof(int);
-                level = BitConverter.ToInt16(s.Slice(count, s.Length - count));
-                count += sizeof(ushort);
-                duration = BitConverter.ToInt16(s.Slice(count, s.Length - count));
-                count += sizeof(ushort);
-            }}
-        }}
-
-        public List<SkillInfo> skills = new List<SkillInfo>();
-        public PlayerInfoReq()
-        {{
-            this.name = ""Welcome"";
-        }}
     public void Read(ArraySegment<byte> segment)
     {{
         ushort pos = 0;
@@ -62,27 +28,8 @@ namespace PacketGenerator
 
         pos += sizeof(ushort);
         pos += sizeof(ushort);
-        this.playerId = BitConverter.ToInt16(s.Slice(pos, s.Length - pos));
-        pos += sizeof(long);
-
-
-
-        ushort nameLen = BitConverter.ToUInt16(s.Slice(pos, s.Length - pos));
-        pos += sizeof(ushort);
-        this.name = Encoding.Unicode.GetString(s.Slice(pos, nameLen));
-        pos += nameLen;
-        // Skill List
-
-        ushort skillLen = BitConverter.ToUInt16(s.Slice(pos, s.Length - pos));
-        pos += sizeof(ushort);
-        for (int i = 0; i < skillLen; i++)
-        {{
-            SkillInfo skill = new SkillInfo();
-            skill.Read(s, ref pos);
-            skills.Add(skill);
-        }}
-
-
+        
+        {2}
     }}
 
     public ArraySegment<byte> Write()
@@ -96,37 +43,12 @@ namespace PacketGenerator
 
         //Slice  = 
         size += sizeof(ushort);
-        success &= BitConverter.TryWriteBytes(s.Slice(size, s.Length - size), (ushort)PacketID.PlayerInfoReq);
+        success &= BitConverter.TryWriteBytes(s.Slice(size, s.Length - size), (ushort)PacketID.{0});
         size += sizeof(ushort);
-        success &= BitConverter.TryWriteBytes(s.Slice(size, s.Length - size), this.playerId);
-        size += sizeof(long);
-        //success &= BitConverter.TryWriteBytes(new Span<byte>(s.Array, s.Offset + size, s.Count - size), this.playerId);
-        //success &= BitConverter.TryWriteBytes(new Span<byte>(s.Array, s.Offset, s.Count), size);
-
-        // String Data를 샌드하기 위해서는 우선 길이를 구한다.
-        // 길이를 집어넣는다.
-        //// 값을 집어넣는다.
-
-        //ushort nameLen = (ushort)Encoding.Unicode.GetByteCount(this.name);
-        //success &= BitConverter.TryWriteBytes(s.Slice(size, s.Length - size), nameLen);
-        //size += sizeof(ushort);
-        //Array.Copy(Encoding.Unicode.GetBytes(this.name), 0, segment.Array, size, nameLen);
-        //size += nameLen;
-        // => 한방 처리
-        ushort nameLen = (ushort)Encoding.Unicode.GetBytes(this.name, 0, this.name.Length, segment.Array, segment.Offset + size + sizeof(ushort));
-        success &= BitConverter.TryWriteBytes(s.Slice(size, s.Length - size), nameLen);
-        size += sizeof(ushort);
-        size += nameLen;
 
 
-        // Skill 을 집어 넣는다.
-        success &= BitConverter.TryWriteBytes(s.Slice(size, s.Length - size), (ushort)skills.Count);
-        size += sizeof(ushort);
-        foreach (SkillInfo skill in skills)
-        {{
-            success &= skill.Write(s, ref size);
-            //TODO
-        }}
+        {3}
+
 
         // Size(패킷 사이즈를 맨 앞에 넣는다.)
         success &= BitConverter.TryWriteBytes(s, size);
@@ -140,6 +62,53 @@ namespace PacketGenerator
         return sendBuff;
     }}
 }}
+";
+        /// <summary>
+        /// {0} : 변수 형식
+        /// {1} : 변수 이름
+        /// </summary>
+        public static string memberFormat =
+@"public {0} {1}";
+
+        /// <summary>
+        /// {0} : 변수 이름
+        /// {1} : To~ 변수 형식
+        /// {2} : 변수 형식
+        /// </summary>
+        public static string readFormat =
+@"
+this.{0} = BitConverter.{1}(s.Slice(count, s.Length - count));
+count += sizeof{2});
+";
+        /// <summary>
+        /// {0} : 변수 이름
+        /// </summary>
+        public static string readStringFormat =
+@"
+ushort {0}Len = BitConverter.ToUInt16(s.Slice(pos, s.Length - pos));
+pos += sizeof(ushort);
+this.name = Encoding.Unicode.GetString(s.Slice(pos, {0}Len));
+pos += {0}Len;
+";
+        /// <summary>
+        /// {0} : 변수 이름
+        /// {1} : 변수 형식
+        /// </summary>
+        public static string writeFormat =
+@"
+success &= BitConverter.TryWriteBytes(s.Slice(count, s.Length - count), this.{0});
+count += sizeof({1});
+";
+        /// <summary>
+        /// {0} : 변수 이름
+        /// </summary>
+        public static string writeStringFormat =
+@"
+ushort {0}Len = (ushort)Encoding.Unicode.GetBytes(this.{0}, 0, this.{0}.Length, segment.Array, segment.Offset + size + sizeof(ushort));
+success &= BitConverter.TryWriteBytes(s.Slice(size, s.Length - size), {0}Len);
+size += sizeof(ushort);
+size += {0}Len;
+
 ";
     }
 }
