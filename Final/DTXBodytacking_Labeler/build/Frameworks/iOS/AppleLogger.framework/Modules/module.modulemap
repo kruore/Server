@@ -1,0 +1,11 @@
+framework module AppleLogger {
+  umbrella header "AppleLogger.h"
+
+  export *
+  module * { export * }
+}
+
+module AppleLogger.Swift {
+  header "AppleLogger-Swift.h"
+  requires objc
+}

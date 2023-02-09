@@ -1,0 +1,17 @@
+﻿<Properties StartupConfiguration="{7E4E1A4C-B8BF-03D4-5AA9-AD95CB37698F}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/iOSNative.cs">
+    <Files>
+      <File FileName="Assets/iOSNative.cs" Line="151" Column="6" />
+      <File FileName="Assets/ProviderMapping.cs" />
+      <File FileName="Assets/ButtonMapping.cs" />
+      <File FileName="Assets/client.cs" Line="40" Column="78" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="cf280e4f-aa65-49ff-aeb3-eafc466acc50" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
